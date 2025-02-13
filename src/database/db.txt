@@ -1,0 +1,187 @@
+# Documentación LocalDB - AlquiTones
+
+## Descripción General
+Base de datos local para la aplicación AlquiTones que gestiona instrumentos musicales, categorías y usuarios. Utiliza localStorage para persistencia y está completamente probada con test unitarios.
+
+---
+
+## 🛠️ Estructura de Datos
+
+### Categorías (4)
+```javascript
+{
+    id: number,
+    name: string,
+    icon: string,
+    description: string
+}
+IDs Predefinidos:
+
+Cuerdas (ID: 1)
+
+Viento (ID: 2)
+
+Percusión (ID: 3)
+
+Teclados (ID: 4)
+
+Productos (12)
+javascript
+Copy
+{
+    id: number,
+    name: string,
+    description: string,
+    categoryId: number,
+    pricePerDay: number,
+    status: string,
+    specifications: Array<{label: string, value: string}>,
+    images: Array<string>,  // 5 URLs obligatorias
+    mainImage: string,       // Primera imagen del array
+    createdAt: string
+}
+Usuarios
+javascript
+Copy
+{
+    id: number,
+    username: string,
+    email: string,
+    password: string,
+    role: 'admin' | 'client',
+    createdAt: string,
+    isActive: boolean
+}
+🔑 Métodos de Autenticación
+javascript
+Copy
+// Iniciar sesión (devuelve usuario o lanza error)
+const user = localDB.login('admin@alquitones.com', 'admin123');
+
+// Cerrar sesión
+localDB.logout();
+
+// Obtener usuario activo
+const currentUser = localDB.getCurrentUser();
+
+// Verificar rol admin
+const isAdmin = localDB.isAdmin();
+📦 Métodos CRUD
+Para Productos:
+javascript
+Copy
+// Crear (requiere 5 imágenes)
+const newProduct = localDB.createProduct({...});
+
+// Leer
+const allProducts = localDB.getAllProducts();
+const product = localDB.getProductById(1);
+
+// Actualizar
+localDB.updateProduct(1, { name: 'Nuevo nombre' });
+
+// Eliminar
+localDB.deleteProduct(1);
+Para Usuarios:
+javascript
+Copy
+// Crear (valida email único)
+const newUser = localDB.createUser({...});
+
+// Leer
+const allUsers = localDB.getAllUsers();
+const user = localDB.getUserById(1);
+
+// Actualizar (no permite emails duplicados)
+localDB.updateUser(1, { username: 'nuevo_usuario' });
+
+// Eliminar
+localDB.deleteUser(1);
+🧪 Pruebas Unitarias Implementadas
+javascript
+Copy
+// Ejecutar todas las pruebas
+import { dbTests } from './tests/LocalDB.test.js';
+dbTests.runAllTests();
+Cobertura de Pruebas:
+Productos:
+
+Creación con validación de 5 imágenes.
+
+Lectura, actualización y eliminación.
+
+Búsqueda por texto y categoría.
+
+Usuarios:
+
+Registro con email único.
+
+Gestión de roles (admin/client).
+
+Validación de cuentas activas/inactivas.
+
+Autenticación:
+
+Login exitoso y persistencia de sesión.
+
+Bloqueo de credenciales inválidas.
+
+Logout y verificación de roles.
+
+Manejo de cuentas desactivadas.
+
+🖼️ Ejemplos Frontend
+1. Mostrar productos por categoría:
+javascript
+Copy
+function ProductList({ categoryId }) {
+    const products = localDB.getProductsByCategory(categoryId);
+    return products.map(product => (
+        <div key={product.id}>
+            <img src={product.mainImage} />
+            <h3>{product.name}</h3>
+            <p>${product.pricePerDay}/día</p>
+        </div>
+    ));
+}
+2. Gestión de sesión de usuario:
+javascript
+Copy
+// Componente de Login
+const handleSubmit = (email, password) => {
+    try {
+        const user = localDB.login(email, password);
+        // Redirigir a dashboard
+    } catch (error) {
+        alert(error.message);
+    }
+};
+
+// Componente Navbar
+const currentUser = localDB.getCurrentUser();
+return (
+    {currentUser && <button onClick={localDB.logout}>Cerrar sesión</button>}
+);
+⚠️ Notas Clave
+Imágenes:
+
+Cada producto debe tener exactamente 5 URLs en images.
+
+Formatos soportados: .PNG, .jpg, .webp.
+
+Seguridad:
+
+Las contraseñas se almacenan en texto plano (no recomendado para producción).
+
+Usar isAdmin() para restringir funcionalidades críticas.
+
+IDs:
+
+Generados secuencialmente. Para producción, reemplazar por UUIDs.
+
+🔍 Referencia de Productos
+Categoría	Productos (IDs)
+Cuerdas (1)	Guitarra Fender (1), Violín (2), Bajo (3)
+Viento (2)	Saxofón (4), Clarinete (5), Trompeta (6)
+Percusión (3)	Batería (7), Congas (8), Platillos (9)
+Teclados (4)	Piano (10), Sintetizador (11), Nord (12)
