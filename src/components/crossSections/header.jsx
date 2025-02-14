@@ -10,7 +10,7 @@ const Header = () => {
 
     return (
 
-        <header className='sticky top-0 bg-white p-4 items-center shadow-md'>
+        <header className='sticky top-0 fixed bg-white p-4 items-center shadow-md'>
             {/* Desktop */}
             <div className='justify-between items-center hidden md:flex'>
                 <a href="/" >
