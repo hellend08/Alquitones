@@ -21,7 +21,7 @@ const Header = () => {
     return (
         <header className="bg-gray-200 p-4 flex justify-between items-center">
             <a href="/" className="flex items-center">
-                <img src="/src/assets/alquitonesLogo.png" alt="logo" className="h-12" />
+                <img src="/src/assets/logo-light.png" alt="logo" className="h-12" />
             </a>
             <div>
                 {user ? (

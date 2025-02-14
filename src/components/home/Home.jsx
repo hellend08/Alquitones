@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { localDB } from '../../database/LocalDB';
 import Header from '../crossSections/header';
+import Footer from '../crossSections/Footer'
 
 const Home = () => {
     const [user, setUser] = useState(null);
@@ -29,6 +30,7 @@ const Home = () => {
                     </p>
                 </div>
             </main>
+            <Footer />
         </div>
     );
 };
