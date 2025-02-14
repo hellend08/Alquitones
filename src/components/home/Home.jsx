@@ -1,4 +1,5 @@
 import Header from '../crossSections/header';
+import Footer from '../crossSections/Footer'
 
 const Home = () => {
     return (
@@ -14,6 +15,7 @@ const Home = () => {
                     </p>
                 </div>
             </main>
+            <Footer />
         </div>
     );
 };
