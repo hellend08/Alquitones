@@ -5,7 +5,7 @@ import Home from './components/home/Home';
 import Admin from './components/admin/Admin';
 import { localDB } from './database/LocalDB';
 
-// Protected Route Component
+// Protected Route Component solo para rutas que requieren autenticación
 // eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const user = localDB.getCurrentUser();
@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
   
   if (adminOnly && user.role !== 'admin') {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
   
   return children;
@@ -25,9 +25,12 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Rutas públicas */}
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
         
+        {/* Rutas protegidas */}
         <Route 
           path="/admin/*" 
           element={
@@ -37,20 +40,18 @@ function App() {
           } 
         />
         
+        {/* Rutas de usuario autenticado */}
         <Route 
-          path="/home" 
+          path="/profile" 
           element={
             <ProtectedRoute>
-              <Home />
+              <div>Profile Page</div>
             </ProtectedRoute>
           } 
         />
         
-        {/* Default route */}
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        
         {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
