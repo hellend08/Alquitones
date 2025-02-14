@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { localDB } from '../../database/LocalDB';
 import styles from './Auth.module.css';
+import { useNavigate } from 'react-router-dom'; 
 
 const Auth = () => {
+    const navigate = useNavigate();
     const isLoginPage = window.location.pathname.includes('login');
     
     const [formData, setFormData] = useState({
@@ -44,9 +46,8 @@ const Auth = () => {
                 // Lógica de login
                 const user = await localDB.login(formData.email, formData.password);
                 if (user) {
-                    // Redirigir según el rol
-                    window.location.href = user.role === 'admin' ? '/admin' : '/home';
-                }
+                    navigate(user.role === 'admin' ? '/admin' : '/home');
+                  }
             }
         } catch (error) {
             setError(error.message);
