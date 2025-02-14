@@ -1,21 +1,6 @@
-// import { useEffect, useState } from 'react';
-// import { localDB } from '../../database/LocalDB';
 import Header from '../crossSections/header';
 
 const Home = () => {
-    // const [user, setUser] = useState(null);
-
-    // useEffect(() => {
-    //     const currentUser = localDB.getCurrentUser();
-    //     if (!currentUser) {
-    //         window.location.href = '/login';
-    //         return;
-    //     }
-    //     setUser(currentUser);
-    // }, []);
-
-    // if (!user) return null;
-
     return (
         <div className="min-h-screen bg-background">
             <Header />
