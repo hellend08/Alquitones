@@ -1,0 +1,133 @@
+/* Variables con la paleta de colores AlquiTones */
+:root {
+    --color-dark-brown: #413620;
+    --color-golden: #9C6615;
+    --color-golden-light: #9F7833;
+    --color-sunset: #FFD791;
+    --color-gray: #CDD1DE;
+    --color-white: #FFFFFF;
+    --color-black: #000000;
+    --color-background: #F8F9FA;
+}
+
+.authContainer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: var(--color-sunset);
+}
+
+.authCard {
+    background-color: var(--color-white);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(65, 54, 32, 0.1);
+}
+
+.authHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.authLogo {
+    height: 4rem;
+    margin-bottom: 1rem;
+}
+
+.authTitle {
+    color: var(--color-dark-brown);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formLabel {
+    color: var(--color-dark-brown);
+    font-weight: 500;
+}
+
+.formInput {
+    padding: 0.75rem;
+    border: 2px solid var(--color-gray);
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.formInput:focus {
+    outline: none;
+    border-color: var(--color-golden);
+    box-shadow: 0 0 0 2px rgba(156, 102, 21, 0.1);
+}
+
+.submitButton {
+    padding: 0.75rem;
+    background-color: var(--color-golden);
+    color: var(--color-white);
+    border: none;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+    background-color: var(--color-golden-light);
+}
+
+.authFooter {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.authLink {
+    color: var(--color-golden);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.authLink:hover {
+    color: var(--color-golden-light);
+}
+
+.errorMessage {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+}
+
+.divider {
+    margin: 0.75rem 0;
+    color: var(--color-gray);
+}
+
+.backLink {
+    display: block;
+    margin-top: 1rem;
+    color: var(--color-dark-brown);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.backLink:hover {
+    color: var(--color-golden);
+}

@@ -1,0 +1,382 @@
+/* Variables con la paleta de colores AlquiTones */
+:root {
+    --color-dark-brown: #413620;
+    --color-golden: #9C6615;
+    --color-golden-light: #9F7833;
+    --color-sunset: #FFD791;
+    --color-gray: #CDD1DE;
+    --color-white: #FFFFFF;
+    --color-black: #000000;
+    --color-background: #F8F9FA;
+}
+
+.adminContainer {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: var(--color-dark-brown);
+    color: var(--color-white);
+    padding: 1.5rem;
+}
+
+.sidebarHeader {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.adminLogo {
+    max-width: 120px;
+    margin-bottom: 1rem;
+}
+
+.sidebarNav ul {
+    list-style: none;
+    padding: 1.5rem 0;
+}
+
+.sidebarNav li {
+    margin-bottom: 0.5rem;
+}
+
+.sidebarNav a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    color: var(--color-white);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebarNav a i {
+    margin-right: 0.75rem;
+}
+
+.sidebarNav a:hover,
+.sidebarNav li.active a {
+    background-color: var(--color-golden);
+}
+
+/* Contenido principal */
+.mainContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.adminHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--color-white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.searchBar input {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-gray);
+    border-radius: 4px;
+    width: 300px;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.userName {
+    color: var(--color-dark-brown);
+    font-weight: 500;
+}
+
+.logoutBtn {
+    padding: 0.5rem 1rem;
+    background-color: var(--color-golden);
+    color: var(--color-white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logoutBtn:hover {
+    background-color: var(--color-golden-light);
+}
+
+/* Área de contenido */
+.contentArea {
+    padding: 1.5rem;
+    background-color: var(--color-background);
+    flex: 1;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sectionHeader h2 {
+    color: var(--color-dark-brown);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.addButton {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-golden);
+    color: var(--color-white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.addButton:hover {
+    background-color: var(--color-golden-light);
+}
+
+/* Tabla */
+.tableContainer {
+    background-color: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.instrumentsTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.instrumentsTable th,
+.instrumentsTable td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-gray);
+    text-align: left;
+}
+
+.instrumentsTable th {
+    background-color: var(--color-sunset);
+    font-weight: bold;
+    color: var(--color-dark-brown);
+}
+
+.instrumentsTable tr:hover {
+    background-color: var(--color-background);
+}
+
+.productImage {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.statusBadge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    display: inline-block;
+}
+
+.disponible {
+    background-color: #10B981;
+    color: white;
+}
+
+.reservado {
+    background-color: #F59E0B;
+    color: white;
+}
+
+.mantenimiento {
+    background-color: #EF4444;
+    color: white;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.editButton,
+.deleteButton {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editButton {
+    background-color: #3B82F6;
+    color: white;
+}
+
+.editButton:hover {
+    background-color: #2563EB;
+}
+
+.deleteButton {
+    background-color: #EF4444;
+    color: white;
+}
+
+.deleteButton:hover {
+    background-color: #DC2626;
+}
+
+/* Paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.pageButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-gray);
+    background-color: var(--color-white);
+    color: var(--color-dark-brown);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pageButton:hover:not(:disabled) {
+    background-color: var(--color-sunset);
+    border-color: var(--color-golden);
+}
+
+.pageButton.active {
+    background-color: var(--color-golden);
+    color: var(--color-white);
+    border-color: var(--color-golden);
+}
+
+.pageButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: var(--color-white);
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modalHeader h3 {
+    color: var(--color-dark-brown);
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.modalClose {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-dark-brown);
+}
+
+.formGroup {
+    margin-bottom: 1rem;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-dark-brown);
+    font-weight: 500;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--color-gray);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.formGroup textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modalBtn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.modalBtnPrimary {
+    background-color: var(--color-golden);
+    color: var(--color-white);
+    border: none;
+}
+
+.modalBtnPrimary:hover {
+    background-color: var(--color-golden-light);
+}
+
+.modalBtnSecondary {
+    background-color: var(--color-gray);
+    color: var(--color-dark-brown);
+    border: none;
+}
+
+.modalBtnSecondary:hover {
+    background-color: #BCC1D0;
+}
