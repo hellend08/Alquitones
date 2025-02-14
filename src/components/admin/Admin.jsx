@@ -3,6 +3,7 @@ import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import Header from '../crossSections/header';
 import { useNavigate, Routes, Route, Link, Navigate } from 'react-router-dom';
+import Footer from '../crossSections/footer';
 
 // Dashboard component (placeholder)
 const Dashboard = () => (
@@ -295,6 +296,7 @@ const Instruments = () => {
                 </div>
             )}
         </div>
+        <Footer />
         </div>
     );
 };
@@ -407,6 +409,7 @@ const Admin = () => {
                 </div>
             </main>
         </div>
+        <Footer />
         </div>
     );
 };
