@@ -1,15 +1,18 @@
-//import { useState } from 'react'
-import './App.css'
-import Header from './components/crossSections/header'
+import './App.css';
+import Auth from './components/auth/Auth';
+import Home from './components/home/Home';
 
 function App() {
-  //const [count, setCount] = useState(0)
+  // Determinar qué componente mostrar basado en la URL
+  const path = window.location.pathname;
 
-  return (
-    <>
-      <Header />
-    </>
-  )
+  // Renderizar Auth para rutas de login y registro
+  if (path === '/login' || path === '/register') {
+    return <Auth />;
+  }
+
+  // Por defecto, mostrar Home (que ya incluye el Header)
+  return <Home />;
 }
 
-export default App
+export default App;
