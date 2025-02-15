@@ -52,7 +52,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/05.webp'
                     ],
-                    mainImage: 'assets/images/instrumentos/fender-strat.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -83,7 +83,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/5.PNG'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/violin-strad.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/3.PNG',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -114,7 +114,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/14.PNG'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/bajo-musicman.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/11.PNG',
                     createdAt: new Date().toISOString()
                 },
 
@@ -147,7 +147,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/saxo-selmer.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -178,7 +178,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/34.PNG'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/clarinete-buffet.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/32.PNG',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -209,7 +209,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/44.PNG'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/trompeta-bach.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/41.webp',
                     createdAt: new Date().toISOString()
                 },
 
@@ -242,7 +242,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/54.jpg'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/bateria-dw.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/50.PNG',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -273,7 +273,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/64.jpg'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/congas-lp.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/61.jpg',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -304,7 +304,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/74.jpg'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/platillos-zildjian.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
                     createdAt: new Date().toISOString()
                 },
 
@@ -337,7 +337,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/84.webp'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/steinway-d274.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/81.jpg',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -368,7 +368,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/94.jpg'
                     
                     ],
-                    mainImage: 'assets/images/instrumentos/moog-one.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/94.jpg',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -393,7 +393,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/113.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg'
                     ],
-                    mainImage: 'assets/images/instrumentos/nord-stage3.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/112.webp',
                     createdAt: new Date().toISOString()
                 }
             ]

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import Header from '../crossSections/header';
-import { useNavigate, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Footer from '../crossSections/footer';
 
 // Dashboard component (placeholder)
@@ -105,9 +105,7 @@ const Instruments = () => {
     };
 
     return (
-        <div>
         <div className={styles.instrumentsSection}>
-            <Header />
             <div className={styles.sectionHeader}>
                 <h2>Gestión de Instrumentos</h2>
                 <button 
@@ -296,8 +294,6 @@ const Instruments = () => {
                 </div>
             )}
         </div>
-        <Footer />
-        </div>
     );
 };
 
@@ -326,90 +322,77 @@ const Users = () => (
 );
 
 const Admin = () => {
-    const navigate = useNavigate();
-    const [user, setUser] = useState(null);
+    // const navigate = useNavigate();
+    // // const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        checkAdmin();
-    }, []);
+    // useEffect(() => {
+    //     checkAdmin();
+    // }, []);
 
-    const checkAdmin = () => {
-        const currentUser = localDB.getCurrentUser();
-        if (!currentUser || currentUser.role !== 'admin') {
-            navigate('/login');
-            return;
-        }
-        setUser(currentUser);
-    };
+    // const checkAdmin = () => {
+    //     const currentUser = localDB.getCurrentUser();
+    //     if (!currentUser || currentUser.role !== 'admin') {
+    //         navigate('/login');
+    //         return;
+    //     }
+    //     setUser(currentUser);
+    // };
 
-    const handleLogout = () => {
-        localDB.logout();
-        navigate('/login');
-    };
+    // // const handleLogout = () => {
+    // //     localDB.logout();
+    // //     navigate('/login');
+    // // };
 
     return (
         <div>
             <Header />
-        <div className={styles.adminContainer}>
-            <aside className={styles.sidebar}>
-                <div className={styles.sidebarHeader}>
-                    <img src="/src/assets/alquitonesLogo.png" alt="AlquiTones Logo" className={styles.adminLogo} />
-                    <h1>AlquiTones</h1>
-                </div>
-                <nav className={styles.sidebarNav}>
-                    <ul>
-                        <li>
-                            <Link to="/admin/dashboard">
-                                <i className="fas fa-home"></i> Dashboard
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/instruments">
-                                <i className="fas fa-guitar"></i> Instrumentos
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/rentals">
-                                <i className="fas fa-calendar-alt"></i> Alquileres
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/categories">
-                                <i className="fas fa-tags"></i> Categorías
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/users">
-                                <i className="fas fa-users"></i> Usuarios
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
+            <div className={styles.adminContainer}>
+                <aside className={styles.sidebar}>
+                    <nav className={styles.sidebarNav}>
+                        <ul>
+                            <li>
+                                <Link to="/admin/dashboard">
+                                    <i className="fas fa-home"></i> Dashboard
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/instruments">
+                                    <i className="fas fa-guitar"></i> Instrumentos
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/rentals">
+                                    <i className="fas fa-calendar-alt"></i> Alquileres
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/categories">
+                                    <i className="fas fa-tags"></i> Categorías
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/admin/users">
+                                    <i className="fas fa-users"></i> Usuarios
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
+                </aside>
 
-            <main className={styles.mainContent}>
-                <header className={styles.adminHeader}>
-                    <div className={styles.userInfo}>
-                        <span className={styles.userName}>{user?.username}</span>
-                        <button onClick={handleLogout} className={styles.logoutBtn}>
-                            Cerrar sesión
-                        </button>
+                <main className={styles.mainContent}>
+                    <div className={styles.contentArea}>
+                        <Routes>
+                            <Route path="dashboard" element={<Dashboard />} />
+                            <Route path="instruments" element={<Instruments />} />
+                            <Route path="rentals" element={<Rentals />} />
+                            <Route path="categories" element={<Categories />} />
+                            <Route path="users" element={<Users />} />
+                            <Route path="" element={<Navigate to="dashboard" replace />} />
+                        </Routes>
                     </div>
-                </header>
-
-                <div className={styles.contentArea}>
-                    <Routes>
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="instruments" element={<Instruments />} />
-                        <Route path="rentals" element={<Rentals />} />
-                        <Route path="categories" element={<Categories />} />
-                        <Route path="users" element={<Users />} />
-                        <Route path="" element={<Navigate to="dashboard" replace />} />
-                    </Routes>
-                </div>
-            </main>
-        </div>
-        <Footer />
+                </main>
+            </div>
+            <Footer />
         </div>
     );
 };

@@ -1,7 +1,7 @@
 
 function Footer() {
     return (
-        <footer className="absolute inset-x-0 bottom-0 bg-gray-200 p-4 lg:py-8 lg:px-10 text-left text-[#001F3F]">
+        <footer className="inset-x-0 bottom-0 bg-gray-200 p-4 lg:py-8 lg:px-10 text-left text-[#001F3F]">
             <div className="w-full md:flex lg:gap-32">
                 <a href="/" className="lg:flex items-center md:w-1/4">
                     <img src="/src/assets/logo-light.png" alt="logo" className="h-auto md:w-full" />
