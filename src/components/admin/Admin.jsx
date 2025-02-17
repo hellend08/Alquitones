@@ -32,16 +32,16 @@ const Instruments = () => {
         try {
             const allProducts = localDB.getAllProducts();
             let filteredProducts = allProducts;
-            
+
             if (searchTerm) {
-                filteredProducts = allProducts.filter(product => 
+                filteredProducts = allProducts.filter(product =>
                     product.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-            
+
             const start = (currentPage - 1) * ITEMS_PER_PAGE;
             const end = start + ITEMS_PER_PAGE;
-            
+
             setInstruments(filteredProducts.slice(start, end));
             setTotalPages(Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
         } catch (error) {
@@ -50,7 +50,7 @@ const Instruments = () => {
         }
     };
 
-    
+
     const getProductCategory = (categoryId) => {
         const categories = localDB.data.categories;
         const category = categories.find(cat => cat.id === categoryId);
@@ -76,7 +76,7 @@ const Instruments = () => {
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
-        
+
         const form = e.target;
         const instrumentData = {
             name: form['instrument-name'].value,
@@ -94,7 +94,7 @@ const Instruments = () => {
             } else {
                 await localDB.updateProduct(currentInstrument.id, instrumentData);
             }
-            
+
             loadInstruments();
             setModalOpen(false);
             alert(modalMode === 'create' ? 'Instrumento creado con éxito' : 'Instrumento actualizado con éxito');
@@ -104,11 +104,36 @@ const Instruments = () => {
         }
     };
 
+    // Agregar esta nueva función dentro del componente Instruments
+    const handleDeleteInstrument = async (instrument) => {
+        // Mostrar mensaje de confirmación
+        const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar el instrumento "${instrument.name}"?`);
+
+        // Si el usuario no confirma, salimos de la función
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+            // Intentar eliminar el producto
+            await localDB.deleteProduct(instrument.id);
+
+            // Recargar la lista de instrumentos
+            loadInstruments();
+
+            // Mostrar mensaje de éxito
+            alert('Instrumento eliminado exitosamente');
+        } catch (error) {
+            console.error('Error al eliminar instrumento:', error);
+            alert('Error al eliminar el instrumento');
+        }
+    };
+
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
                 <h2>Gestión de Instrumentos</h2>
-                <button 
+                <button
                     onClick={handleAddInstrument}
                     className={styles.addButton}
                 >
@@ -117,9 +142,9 @@ const Instruments = () => {
             </div>
 
             <div className={styles.searchBar}>
-                <input 
-                    type="text" 
-                    placeholder="Buscar..." 
+                <input
+                    type="text"
+                    placeholder="Buscar..."
                     value={searchTerm}
                     onChange={handleSearch}
                 />
@@ -143,8 +168,8 @@ const Instruments = () => {
                             <tr key={instrument.id}>
                                 <td>{instrument.id}</td>
                                 <td>
-                                    <img 
-                                        src={instrument.mainImage} 
+                                    <img
+                                        src={instrument.mainImage}
                                         alt={instrument.name}
                                         className={styles.productImage}
                                     />
@@ -160,13 +185,14 @@ const Instruments = () => {
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
                                 <td className={styles.actions}>
-                                    <button 
+                                    <button
                                         onClick={() => handleEditInstrument(instrument)}
                                         className={styles.editButton}
                                     >
                                         <i className="fas fa-edit"></i>
                                     </button>
-                                    <button 
+                                    <button
+                                        onClick={() => handleDeleteInstrument(instrument)}
                                         className={styles.deleteButton}
                                     >
                                         <i className="fas fa-trash"></i>
@@ -179,7 +205,7 @@ const Instruments = () => {
             </div>
 
             <div className={styles.pagination}>
-                <button 
+                <button
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
                     className={styles.pageButton}
@@ -195,7 +221,7 @@ const Instruments = () => {
                         {index + 1}
                     </button>
                 ))}
-                <button 
+                <button
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
                     className={styles.pageButton}
@@ -210,8 +236,8 @@ const Instruments = () => {
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
                             <h3>{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
-                            <button 
-                                onClick={() => setModalOpen(false)} 
+                            <button
+                                onClick={() => setModalOpen(false)}
                                 className={styles.modalClose}
                             >
                                 &times;
@@ -229,7 +255,7 @@ const Instruments = () => {
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="instrument-category">Categoría</label>
-                                <select 
+                                <select
                                     id="instrument-category"
                                     defaultValue={currentInstrument?.categoryId || ''}
                                     required
@@ -264,7 +290,7 @@ const Instruments = () => {
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="instrument-status">Estado</label>
-                                <select 
+                                <select
                                     id="instrument-status"
                                     defaultValue={currentInstrument?.status || 'Disponible'}
                                     required
@@ -275,14 +301,14 @@ const Instruments = () => {
                                 </select>
                             </div>
                             <div className={styles.formActions}>
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     onClick={() => setModalOpen(false)}
                                     className={styles.modalBtnSecondary}
                                 >
                                     Cancelar
                                 </button>
-                                <button 
+                                <button
                                     type="submit"
                                     className={styles.modalBtnPrimary}
                                 >
@@ -346,35 +372,40 @@ const Admin = () => {
     return (
         <div>
             <Header />
+            {/* Agregar el div del mensaje responsive */}
+            <div className={styles.responsiveMessage}>
+                No disponible por el momento en responsive
+            </div>
+
             <div className={styles.adminContainer}>
                 <aside className={styles.sidebar}>
                     <nav className={styles.sidebarNav}>
                         <ul>
-                            <li>
+                            {/* <li>
                                 <Link to="/admin/dashboard">
                                     <i className="fas fa-home"></i> Dashboard
                                 </Link>
-                            </li>
+                            </li> */}
                             <li>
                                 <Link to="/admin/instruments">
-                                    <i className="fas fa-guitar"></i> Instrumentos
+                                    <i className="fas fa-guitar"></i> Lista Productos
                                 </Link>
                             </li>
-                            <li>
+                            {/* <li>
                                 <Link to="/admin/rentals">
                                     <i className="fas fa-calendar-alt"></i> Alquileres
                                 </Link>
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                                 <Link to="/admin/categories">
                                     <i className="fas fa-tags"></i> Categorías
                                 </Link>
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                                 <Link to="/admin/users">
                                     <i className="fas fa-users"></i> Usuarios
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </nav>
                 </aside>
