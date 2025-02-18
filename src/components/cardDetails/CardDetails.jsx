@@ -14,15 +14,15 @@ function CardDetails() {
     
 
     const loadInstruments = () => {
-            try {
-                const products = localDB.getAllProducts(parseInt());
-                if (products.length > 0) {
-                    setInstrument(products[2]);
-                    setSuggestions(products.slice(1, 3));
-                }
-            } catch (error) {
-                console.error('Error al obtener el instrumento:', error);
+        try {
+            const products = localDB.getAllProducts(parseInt());
+            if (products.length > 0) {
+                setInstrument(products[2]);
+                setSuggestions(products.slice(1, 3));
             }
+        } catch (error) {
+            console.error('Error al obtener el instrumento:', error);
+        }
     };
 
     if (!instrument) {
@@ -44,9 +44,9 @@ function CardDetails() {
                 </div>
             </div>
             <div className="mt-6 p-6 bg-white rounded-lg shadow">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
                     <h2 className="text-xl font-bold">Descripción</h2>
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
                         <p className="text-gray-600 text-lg">{instrument.description}</p>
                         <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
                         <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer">Reserva Ahora</button>
