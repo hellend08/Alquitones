@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
+import Header from '../crossSections/header';
 import { useNavigate, Routes, Route, Link, Navigate } from 'react-router-dom';
+import Footer from '../crossSections/footer';
 
 // Dashboard component (placeholder)
 const Dashboard = () => (
@@ -103,7 +105,9 @@ const Instruments = () => {
     };
 
     return (
+        <div>
         <div className={styles.instrumentsSection}>
+            <Header />
             <div className={styles.sectionHeader}>
                 <h2>Gestión de Instrumentos</h2>
                 <button 
@@ -292,6 +296,8 @@ const Instruments = () => {
                 </div>
             )}
         </div>
+        <Footer />
+        </div>
     );
 };
 
@@ -342,6 +348,8 @@ const Admin = () => {
     };
 
     return (
+        <div>
+            <Header />
         <div className={styles.adminContainer}>
             <aside className={styles.sidebar}>
                 <div className={styles.sidebarHeader}>
@@ -400,6 +408,8 @@ const Admin = () => {
                     </Routes>
                 </div>
             </main>
+        </div>
+        <Footer />
         </div>
     );
 };

@@ -4,8 +4,10 @@ import Auth from './components/auth/Auth';
 import Home from './components/home/Home';
 import Admin from './components/admin/Admin';
 import { localDB } from './database/LocalDB';
+import MainLayout from './Layaouts/MainLayout';
+import CardDetails from './components/cardDetails/CardDetails';
 
-// Protected Route Component
+// Protected Route Component solo para rutas que requieren autenticación
 // eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const user = localDB.getCurrentUser();
@@ -15,7 +17,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
   
   if (adminOnly && user.role !== 'admin') {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
   
   return children;
@@ -25,32 +27,36 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Auth />} />
-        <Route path="/register" element={<Auth />} />
-        
-        <Route 
-          path="/admin/*" 
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <Admin />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/home" 
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Default route */}
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        
-        {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="/" element={<MainLayout />} >
+          {/* Rutas públicas */}
+          <Route path="/" element={<Home />} />
+          <Route path="/detail" element={<CardDetails />} />
+          <Route path="/login" element={<Auth />} />
+          <Route path="/register" element={<Auth />} />
+          
+          {/* Rutas protegidas */}
+          <Route 
+            path="/admin/*" 
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Admin />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Rutas de usuario autenticado */}
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <div>Profile Page</div>
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
     </Router>
   );

@@ -1,33 +1,27 @@
-import React from 'react'
+import { Link } from "react-router-dom"
 
 function Footer() {
     return (
-        <footer className="bg-gray-200 p-4 lg:py-8 lg:px-10 text-left text-[#001F3F]">
+        <footer className="inset-x-0 bottom-0 bg-gray-200 p-4 lg:py-8 lg:px-10 text-left text-[#001F3F] mt-12">
             <div className="w-full md:flex lg:gap-32">
                 <a href="/" className="lg:flex items-center md:w-1/4">
                     <img src="/src/assets/logo-light.png" alt="logo" className="h-auto md:w-full" />
                 </a>
                 <nav className="md:w-3/4 text-sm lg:text-base text-left flex justify-between md:justify-around lg:gap-40 py-5 md:py-0">
-                    <ul>
-                        <li>
-                            <a>Inicio</a>
-                        </li>
-                        <li>
-                            <a>Nosotros</a>
-                        </li>
-                        <li>
-                            <a>Catalogo</a>
-                        </li>
+                    <ul className="flex flex-col">
+                        <Link to="/home">Inicio</Link>
+                        <Link to="/">Nosotros</Link>
+                        <Link to="/">Catalogo</Link>
+                    </ul>
+                    <ul className="flex flex-col">
+                        <li className="font-medium">Administradores</li>
+                        <Link to="/login">Iniciar Sesión</Link>
+                        <Link to="/register">Crear Cuenta</Link>
                     </ul>
                     <ul>
-                        <li>Administradores</li>
-                        <li>Lorem</li>
-                        <li>Lorem</li>
-                    </ul>
-                    <ul>
-                        <li>Contacto</li>
+                        <li className="font-medium">Contacto</li>
                         <li>Av. Alfonso Ugarte 127</li>
-                        <li>Lorem</li>
+                        <li>contacto@alquitones.com</li>
                     </ul>
                 </nav>
             </div>

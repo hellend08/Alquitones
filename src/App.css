@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+body {
+  margin-top: 6rem;
+}
+
 
 
 
