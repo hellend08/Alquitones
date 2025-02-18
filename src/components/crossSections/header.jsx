@@ -10,9 +10,9 @@ const Header = () => {
 
     return (
 
-        <header className='sticky top-0 fixed bg-white p-4 items-center shadow-md'>
+        <header className='w-full sticky top-0 bg-white p-4 items-center shadow-md'>
             {/* Desktop */}
-            <div className='justify-between items-center hidden md:flex'>
+            <div className='mx-8 justify-between items-center hidden md:flex'>
                 <a href="/" >
                     <img src="/src/assets/logo-light.png" alt="logo" className="h-12" />
                 </a>
