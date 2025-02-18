@@ -1,133 +1,87 @@
-/* Variables con la paleta de colores AlquiTones */
-:root {
-    --color-dark-brown: #413620;
-    --color-golden: #9C6615;
-    --color-golden-light: #9F7833;
-    --color-sunset: #FFD791;
-    --color-gray: #CDD1DE;
-    --color-white: #FFFFFF;
-    --color-black: #000000;
-    --color-background: #F8F9FA;
-}
-
+/* Auth.module.css */
 .authContainer {
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background-color: var(--color-sunset);
+    background-color: rgb(254 243 199);
+    padding: 2rem 1rem;
 }
 
-.authCard {
-    background-color: var(--color-white);
-    border-radius: 0.5rem;
-    padding: 2rem;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(65, 54, 32, 0.1);
-}
-
-.authHeader {
+.logoContainer {
+    max-width: 72rem;
+    margin: 0 auto;
     text-align: center;
     margin-bottom: 2rem;
 }
 
-.authLogo {
+.logo {
     height: 4rem;
-    margin-bottom: 1rem;
+    margin: 0 auto;
 }
 
-.authTitle {
-    color: var(--color-dark-brown);
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0.5rem 0;
-}
-
-.authForm {
+.formsContainer {
+    max-width: 72rem;
+    margin: 0 auto;
     display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
-.formGroup {
+/* Vista desktop por defecto */
+.formsSide {
+    flex: 2;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row; /* Cambiado a row para horizontal */
+    gap: 2rem;
 }
 
-.formLabel {
-    color: var(--color-dark-brown);
-    font-weight: 500;
+.formBox {
+    flex: 1; /* Para que ambos formularios tengan el mismo ancho */
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
 }
 
-.formInput {
-    padding: 0.75rem;
-    border: 2px solid var(--color-gray);
-    border-radius: 0.25rem;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+.imageSide {
+    flex: 1;
+    background-color: rgb(71 85 105);
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
 
-.formInput:focus {
-    outline: none;
-    border-color: var(--color-golden);
-    box-shadow: 0 0 0 2px rgba(156, 102, 21, 0.1);
+.imageContainer {
+    width: 100%;
+    height: 100%;
+    position: relative;
 }
 
-.submitButton {
-    padding: 0.75rem;
-    background-color: var(--color-golden);
-    color: var(--color-white);
-    border: none;
-    border-radius: 0.25rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.sideImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.submitButton:hover {
-    background-color: var(--color-golden-light);
+/* Mobile y Tablet */
+@media (max-width: 1024px) {
+    .formsContainer {
+        flex-direction: column;
+    }
+
+    .formsSide {
+        width: 100%;
+        flex-direction: column; /* Cambia a vertical en mobile */
+    }
+
+    .formBox {
+        width: 100%;
+    }
+
+    .imageSide {
+        display: none;
+    }
 }
 
-.authFooter {
-    margin-top: 1.5rem;
-    text-align: center;
-}
-
-.authLink {
-    color: var(--color-golden);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.authLink:hover {
-    color: var(--color-golden-light);
-}
-
-.errorMessage {
-    background-color: #fee2e2;
-    border-left: 4px solid #ef4444;
-    color: #991b1b;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 0.25rem;
-}
-
-.divider {
-    margin: 0.75rem 0;
-    color: var(--color-gray);
-}
-
-.backLink {
-    display: block;
-    margin-top: 1rem;
-    color: var(--color-dark-brown);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.backLink:hover {
-    color: var(--color-golden);
+/* Ajustes específicos para mobile */
+@media (max-width: 640px) {
+    .formBox {
+        padding: 1rem;
+    }
 }

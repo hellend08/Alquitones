@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import Header from '../crossSections/header';
-import { useNavigate, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Footer from '../crossSections/footer';
 
 // Dashboard component (placeholder)
@@ -32,16 +32,16 @@ const Instruments = () => {
         try {
             const allProducts = localDB.getAllProducts();
             let filteredProducts = allProducts;
-            
+
             if (searchTerm) {
-                filteredProducts = allProducts.filter(product => 
+                filteredProducts = allProducts.filter(product =>
                     product.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-            
+
             const start = (currentPage - 1) * ITEMS_PER_PAGE;
             const end = start + ITEMS_PER_PAGE;
-            
+
             setInstruments(filteredProducts.slice(start, end));
             setTotalPages(Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
         } catch (error) {
@@ -50,7 +50,7 @@ const Instruments = () => {
         }
     };
 
-    
+
     const getProductCategory = (categoryId) => {
         const categories = localDB.data.categories;
         const category = categories.find(cat => cat.id === categoryId);
@@ -76,7 +76,7 @@ const Instruments = () => {
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
-        
+
         const form = e.target;
         const instrumentData = {
             name: form['instrument-name'].value,
@@ -94,7 +94,7 @@ const Instruments = () => {
             } else {
                 await localDB.updateProduct(currentInstrument.id, instrumentData);
             }
-            
+
             loadInstruments();
             setModalOpen(false);
             alert(modalMode === 'create' ? 'Instrumento creado con éxito' : 'Instrumento actualizado con éxito');
@@ -104,13 +104,36 @@ const Instruments = () => {
         }
     };
 
+    // Agregar esta nueva función dentro del componente Instruments
+    const handleDeleteInstrument = async (instrument) => {
+        // Mostrar mensaje de confirmación
+        const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar el instrumento "${instrument.name}"?`);
+
+        // Si el usuario no confirma, salimos de la función
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+            // Intentar eliminar el producto
+            await localDB.deleteProduct(instrument.id);
+
+            // Recargar la lista de instrumentos
+            loadInstruments();
+
+            // Mostrar mensaje de éxito
+            alert('Instrumento eliminado exitosamente');
+        } catch (error) {
+            console.error('Error al eliminar instrumento:', error);
+            alert('Error al eliminar el instrumento');
+        }
+    };
+
     return (
-        <div>
         <div className={styles.instrumentsSection}>
-            <Header />
             <div className={styles.sectionHeader}>
                 <h2>Gestión de Instrumentos</h2>
-                <button 
+                <button
                     onClick={handleAddInstrument}
                     className={styles.addButton}
                 >
@@ -119,9 +142,9 @@ const Instruments = () => {
             </div>
 
             <div className={styles.searchBar}>
-                <input 
-                    type="text" 
-                    placeholder="Buscar..." 
+                <input
+                    type="text"
+                    placeholder="Buscar..."
                     value={searchTerm}
                     onChange={handleSearch}
                 />
@@ -145,8 +168,8 @@ const Instruments = () => {
                             <tr key={instrument.id}>
                                 <td>{instrument.id}</td>
                                 <td>
-                                    <img 
-                                        src={instrument.mainImage} 
+                                    <img
+                                        src={instrument.mainImage}
                                         alt={instrument.name}
                                         className={styles.productImage}
                                     />
@@ -162,13 +185,14 @@ const Instruments = () => {
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
                                 <td className={styles.actions}>
-                                    <button 
+                                    <button
                                         onClick={() => handleEditInstrument(instrument)}
                                         className={styles.editButton}
                                     >
                                         <i className="fas fa-edit"></i>
                                     </button>
-                                    <button 
+                                    <button
+                                        onClick={() => handleDeleteInstrument(instrument)}
                                         className={styles.deleteButton}
                                     >
                                         <i className="fas fa-trash"></i>
@@ -181,7 +205,7 @@ const Instruments = () => {
             </div>
 
             <div className={styles.pagination}>
-                <button 
+                <button
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
                     className={styles.pageButton}
@@ -197,7 +221,7 @@ const Instruments = () => {
                         {index + 1}
                     </button>
                 ))}
-                <button 
+                <button
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
                     className={styles.pageButton}
@@ -212,8 +236,8 @@ const Instruments = () => {
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
                             <h3>{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
-                            <button 
-                                onClick={() => setModalOpen(false)} 
+                            <button
+                                onClick={() => setModalOpen(false)}
                                 className={styles.modalClose}
                             >
                                 &times;
@@ -231,7 +255,7 @@ const Instruments = () => {
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="instrument-category">Categoría</label>
-                                <select 
+                                <select
                                     id="instrument-category"
                                     defaultValue={currentInstrument?.categoryId || ''}
                                     required
@@ -266,7 +290,7 @@ const Instruments = () => {
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="instrument-status">Estado</label>
-                                <select 
+                                <select
                                     id="instrument-status"
                                     defaultValue={currentInstrument?.status || 'Disponible'}
                                     required
@@ -277,14 +301,14 @@ const Instruments = () => {
                                 </select>
                             </div>
                             <div className={styles.formActions}>
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     onClick={() => setModalOpen(false)}
                                     className={styles.modalBtnSecondary}
                                 >
                                     Cancelar
                                 </button>
-                                <button 
+                                <button
                                     type="submit"
                                     className={styles.modalBtnPrimary}
                                 >
@@ -295,8 +319,6 @@ const Instruments = () => {
                     </div>
                 </div>
             )}
-        </div>
-        <Footer />
         </div>
     );
 };
@@ -326,90 +348,82 @@ const Users = () => (
 );
 
 const Admin = () => {
-    const navigate = useNavigate();
-    const [user, setUser] = useState(null);
+    // const navigate = useNavigate();
+    // // const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        checkAdmin();
-    }, []);
+    // useEffect(() => {
+    //     checkAdmin();
+    // }, []);
 
-    const checkAdmin = () => {
-        const currentUser = localDB.getCurrentUser();
-        if (!currentUser || currentUser.role !== 'admin') {
-            navigate('/login');
-            return;
-        }
-        setUser(currentUser);
-    };
+    // const checkAdmin = () => {
+    //     const currentUser = localDB.getCurrentUser();
+    //     if (!currentUser || currentUser.role !== 'admin') {
+    //         navigate('/login');
+    //         return;
+    //     }
+    //     setUser(currentUser);
+    // };
 
-    const handleLogout = () => {
-        localDB.logout();
-        navigate('/login');
-    };
+    // // const handleLogout = () => {
+    // //     localDB.logout();
+    // //     navigate('/login');
+    // // };
 
     return (
         <div>
             <Header />
-        <div className={styles.adminContainer}>
-            <aside className={styles.sidebar}>
-                <div className={styles.sidebarHeader}>
-                    <img src="/src/assets/alquitonesLogo.png" alt="AlquiTones Logo" className={styles.adminLogo} />
-                    <h1>AlquiTones</h1>
-                </div>
-                <nav className={styles.sidebarNav}>
-                    <ul>
-                        <li>
-                            <Link to="/admin/dashboard">
-                                <i className="fas fa-home"></i> Dashboard
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/instruments">
-                                <i className="fas fa-guitar"></i> Instrumentos
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/rentals">
-                                <i className="fas fa-calendar-alt"></i> Alquileres
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/categories">
-                                <i className="fas fa-tags"></i> Categorías
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/users">
-                                <i className="fas fa-users"></i> Usuarios
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
+            {/* Agregar el div del mensaje responsive */}
+            <div className={styles.responsiveMessage}>
+                No disponible por el momento en responsive
+            </div>
 
-            <main className={styles.mainContent}>
-                <header className={styles.adminHeader}>
-                    <div className={styles.userInfo}>
-                        <span className={styles.userName}>{user?.username}</span>
-                        <button onClick={handleLogout} className={styles.logoutBtn}>
-                            Cerrar sesión
-                        </button>
+            <div className={styles.adminContainer}>
+                <aside className={styles.sidebar}>
+                    <nav className={styles.sidebarNav}>
+                        <ul>
+                            {/* <li>
+                                <Link to="/admin/dashboard">
+                                    <i className="fas fa-home"></i> Dashboard
+                                </Link>
+                            </li> */}
+                            <li>
+                                <Link to="/admin/instruments">
+                                    <i className="fas fa-guitar"></i> Lista Productos
+                                </Link>
+                            </li>
+                            {/* <li>
+                                <Link to="/admin/rentals">
+                                    <i className="fas fa-calendar-alt"></i> Alquileres
+                                </Link>
+                            </li> */}
+                            {/* <li>
+                                <Link to="/admin/categories">
+                                    <i className="fas fa-tags"></i> Categorías
+                                </Link>
+                            </li> */}
+                            {/* <li>
+                                <Link to="/admin/users">
+                                    <i className="fas fa-users"></i> Usuarios
+                                </Link>
+                            </li> */}
+                        </ul>
+                    </nav>
+                </aside>
+
+                <main className={styles.mainContent}>
+                    <div className={styles.contentArea}>
+                        <Routes>
+                            <Route path="dashboard" element={<Dashboard />} />
+                            <Route path="instruments" element={<Instruments />} />
+                            <Route path="rentals" element={<Rentals />} />
+                            <Route path="categories" element={<Categories />} />
+                            <Route path="users" element={<Users />} />
+                            <Route path="" element={<Navigate to="dashboard" replace />} />
+                        </Routes>
                     </div>
-                </header>
-
-                <div className={styles.contentArea}>
-                    <Routes>
-                        <Route path="dashboard" element={<Dashboard />} />
-                        <Route path="instruments" element={<Instruments />} />
-                        <Route path="rentals" element={<Rentals />} />
-                        <Route path="categories" element={<Categories />} />
-                        <Route path="users" element={<Users />} />
-                        <Route path="" element={<Navigate to="dashboard" replace />} />
-                    </Routes>
-                </div>
-            </main>
-        </div>
-        <Footer />
+                </main>
+            </div>
+            <Footer />
         </div>
     );
 };
