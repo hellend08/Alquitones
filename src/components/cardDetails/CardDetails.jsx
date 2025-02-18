@@ -47,13 +47,12 @@ function CardDetails() {
                 <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
                     <h2 className="text-xl font-bold">Descripción</h2>
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <p className="text-gray-600 text-lg">{instrument.description}</p>
+                        {/* <p className="text-gray-600 text-lg">{instrument.description}</p> */}
                         <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
                         <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer">Reserva Ahora</button>
                     </div>
                 </div>
-                <p>Lorem ipsum dolor sit amet consectetur. Lectus sagittis lacinia purus orci. Mi est quis sem
-                        Mauris scelerisque nunc urna cras orci euisaliquam viverra nec h Vehicula.</p>
+                <p className="text-gray-600 text-lg">{instrument.description}</p>
             </div>
             <h2 className="mt-10 text-xl font-bold">Sugerencias</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
