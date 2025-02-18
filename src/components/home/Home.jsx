@@ -1,20 +1,28 @@
 import Header from '../crossSections/header';
 import Footer from '../crossSections/Footer'
 import SearchBar from './search';
-import SlideShow from './slideshow';
+//import SlideShow from './slideshow';
+import Category from './categorias';
+import ProductCards from './productCards';
 
 const Home = () => {
     return (
         <>
             <Header />
-            <section className="w-5/6 justify-center mx-auto">
-                <div className="bg-(--color-primary) py-4 ">
+            <main className="w-5/6 justify-center mx-auto">
+                <div className="bg-(--color-primary) py-4 mb-4">
                     <SearchBar />
                 </div>
-                <SlideShow />
-            </section>
-
-
+                <div className="py-4 mb-4">
+                    <Category />
+                </div>
+                
+                <div className="py-4 mb-4">
+                    <ProductCards />
+                </div>
+              
+                
+            </main>
             <Footer />
         </>
     );
