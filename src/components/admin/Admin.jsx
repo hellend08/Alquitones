@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
-import Header from '../crossSections/header';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
-import Footer from '../crossSections/footer';
 
 // Dashboard component (placeholder)
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
-        <h2>Panel de Control</h2>
+        <h2>Panel de Administración</h2>
         {/* Add dashboard statistics and overview */}
     </div>
 );
@@ -185,12 +183,12 @@ const Instruments = () => {
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
                                 <td className={styles.actions}>
-                                    <button
+                                    {/* <button
                                         onClick={() => handleEditInstrument(instrument)}
                                         className={styles.editButton}
                                     >
                                         <i className="fas fa-edit"></i>
-                                    </button>
+                                    </button> */}
                                     <button
                                         onClick={() => handleDeleteInstrument(instrument)}
                                         className={styles.deleteButton}
@@ -231,7 +229,7 @@ const Instruments = () => {
             </div>
 
             {/* Modal for adding/editing instruments (similar to previous implementation) */}
-            {modalOpen && (
+            {/* {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
@@ -318,7 +316,7 @@ const Instruments = () => {
                         </form>
                     </div>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };
@@ -371,7 +369,7 @@ const Admin = () => {
 
     return (
         <div>
-            <Header />
+            
             {/* Agregar el div del mensaje responsive */}
             <div className={styles.responsiveMessage}>
                 No disponible por el momento en responsive
@@ -381,31 +379,31 @@ const Admin = () => {
                 <aside className={styles.sidebar}>
                     <nav className={styles.sidebarNav}>
                         <ul>
-                            {/* <li>
+                            <li>
                                 <Link to="/admin/dashboard">
                                     <i className="fas fa-home"></i> Dashboard
                                 </Link>
-                            </li> */}
+                            </li>
                             <li>
                                 <Link to="/admin/instruments">
                                     <i className="fas fa-guitar"></i> Lista Productos
                                 </Link>
                             </li>
-                            {/* <li>
+                            <li>
                                 <Link to="/admin/rentals">
                                     <i className="fas fa-calendar-alt"></i> Alquileres
                                 </Link>
-                            </li> */}
-                            {/* <li>
+                            </li>
+                            <li>
                                 <Link to="/admin/categories">
                                     <i className="fas fa-tags"></i> Categorías
                                 </Link>
-                            </li> */}
-                            {/* <li>
+                            </li>
+                            <li>
                                 <Link to="/admin/users">
                                     <i className="fas fa-users"></i> Usuarios
                                 </Link>
-                            </li> */}
+                            </li>
                         </ul>
                     </nav>
                 </aside>
@@ -423,7 +421,6 @@ const Admin = () => {
                     </div>
                 </main>
             </div>
-            <Footer />
         </div>
     );
 };
