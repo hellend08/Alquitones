@@ -471,3 +471,16 @@
     padding-left: 35px;
     width: 100%;
 }
+
+.imagePreviewContainer {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.imagePreview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+}

@@ -20,6 +20,7 @@ const Instruments = () => {
     const [modalMode, setModalMode] = useState('create');
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [previews, setPreviews] = useState([]);
     const ITEMS_PER_PAGE = 10;
 
     useEffect(() => {
@@ -74,28 +75,55 @@ const Instruments = () => {
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
-
+    
         const form = e.target;
-        const instrumentData = {
-            name: form['instrument-name'].value,
-            categoryId: parseInt(form['instrument-category'].value),
-            pricePerDay: parseFloat(form['instrument-price'].value),
-            description: form['instrument-description'].value,
-            status: form['instrument-status'].value,
-            mainImage: currentInstrument?.mainImage || '/src/assets/alquitonesLogo.png',
-            images: currentInstrument?.images || ['/src/assets/alquitonesLogo.png']
-        };
-
+        const fileInput = document.getElementById('instrument-images');
+        const images = fileInput.files;
+    
+        // Validar que se hayan seleccionado imágenes
+        if (images.length === 0) {
+            alert('Debe seleccionar al menos una imagen');
+            return;
+        }
+    
+        if (images.length > 5) {
+            alert('Solo puede seleccionar un máximo de 5 imágenes');
+            return;
+        }
+    
+        // Convertir imágenes a base64
+        const imagePromises = Array.from(images).map(file => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        });
+    
         try {
+            const base64Images = await Promise.all(imagePromises);
+    
+            const instrumentData = {
+                name: form['instrument-name'].value,
+                categoryId: parseInt(form['instrument-category'].value),
+                pricePerDay: parseFloat(form['instrument-price'].value),
+                description: form['instrument-description'].value,
+                status: form['instrument-status'].value,
+                images: base64Images,
+                mainImage: base64Images[0]  // Primera imagen como imagen principal
+            };
+    
             if (modalMode === 'create') {
                 await localDB.createProduct(instrumentData);
+                alert('Instrumento creado con éxito');
             } else {
                 await localDB.updateProduct(currentInstrument.id, instrumentData);
+                alert('Instrumento actualizado con éxito');
             }
-
+    
             loadInstruments();
             setModalOpen(false);
-            alert(modalMode === 'create' ? 'Instrumento creado con éxito' : 'Instrumento actualizado con éxito');
         } catch (error) {
             console.error('Error:', error);
             alert('Error al ' + (modalMode === 'create' ? 'crear' : 'actualizar') + ' el instrumento');
@@ -290,6 +318,32 @@ const Instruments = () => {
                                     required
                                 />
                             </div>
+                            <div className={styles.formGroup}>
+    <label htmlFor="instrument-images">Imágenes del Instrumento</label>
+    <input
+        type="file"
+        id="instrument-images"
+        accept="image/*"
+        multiple
+        onChange={(e) => {
+            const files = e.target.files;
+            const previews = Array.from(files).map(file => URL.createObjectURL(file));
+            setPreviews(previews);
+        }}
+    />
+    {previews.length > 0 && (
+        <div className={styles.imagePreviewContainer}>
+            {previews.map((preview, index) => (
+                <img 
+                    key={index} 
+                    src={preview} 
+                    alt={`Preview ${index + 1}`} 
+                    className={styles.imagePreview}
+                />
+            ))}
+        </div>
+    )}
+</div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="instrument-description">Descripción</label>
                                 <textarea
