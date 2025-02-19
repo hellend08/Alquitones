@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { localDB } from '../../database/LocalDB';
 
 function CardDetails() {
@@ -41,7 +41,17 @@ function CardDetails() {
                     {instrument.images.slice(1).map((img, index) => (
                         <img key={index} src={img} alt={`Miniatura ${index}`} className="w-full h-47 object-cover rounded-lg" />
                     ))}
+                    <div className="relative">
+                    {/* <Link>Ver Más</Link> onClick={() => setShowGallery(true)} */}
+                    <button 
+                    
+                    className="absolute -right-80 bottom-8 bg-white text-black px-5 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition"
+                >
+                    Ver más
+                </button>
                 </div>
+                </div>
+                
             </div>
             <div className="mt-6 p-6 bg-white rounded-lg shadow">
                 <div className="flex flex-col lg:flex-row justify-between items-center mb-6">

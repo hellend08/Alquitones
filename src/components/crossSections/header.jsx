@@ -10,7 +10,7 @@ const Header = () => {
 
     return (
 
-        <header className='w-full fixed top-0 bg-white p-4 items-center shadow-md'>
+        <header className='w-full fixed top-0 bg-white p-4 items-center shadow-md z-10'>
             {/* Desktop */}
             <div className='mx-8 justify-between items-center hidden md:flex'>
                 <a href="/" >
