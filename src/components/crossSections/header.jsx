@@ -10,17 +10,17 @@ const Header = () => {
 
     return (
 
-        <header className='w-full fixed top-0 bg-white p-4 items-center shadow-md'>
+        <header className='w-full fixed top-0 bg-white p-4 items-center shadow-md z-50'>
             {/* Desktop */}
             <div className='mx-8 justify-between items-center hidden md:flex'>
                 <a href="/" >
                     <img src="/src/assets/logo-light.png" alt="logo" className="h-12" />
-                    <p>Haz que suene sin complicaciones</p>
+                    <p className='text-xs font-stretch-70% text-(--color-secondary)'>Haz que suene sin complicaciones</p>
                 </a>
-                <nav className="md:flex md:w-auto p-1 text-sm font-normal text-gray-600 items-center space-x-4 mr-2">
-                    <a className='relative block rounded-lg p-2 transition hover:scale-125' href="/">Inicio</a>
-                    <a className='relative block rounded-lg p-2 transition hover:scale-125' href="/">Quienes somos</a>
-                    <a className='relative block rounded-lg p-2 transition hover:scale-125' href="/">Catalogo</a>
+                <nav className="md:flex md:w-auto p-1 text-sm font-semibold text-(--color-secondary) items-center space-x-4 mr-2">
+                    <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Inicio</a>
+                    <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Nosotros</a>
+                    <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Catálogo</a>
                     <AuthButtons />
                 </nav>
             </div>

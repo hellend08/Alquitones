@@ -6,14 +6,13 @@ const Category = () => {
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
-        loadCategories();
+        getCategories();
     }, []);
 
-    const loadCategories = () => {
+    const getCategories = () => {
         try {
             const categoriesDB = localDB.data.categories;
             setCategories(categoriesDB);
-            console.log(categories)
         }
         catch (error) {
             console.error(error);
@@ -25,13 +24,13 @@ const Category = () => {
             <div className="flex justify-between ">
                 {categories.map((src, index) => (
                     <div key={index} className="flex flex-col items-center">
-                        <div className="bg-gray-200 w-20 h-20 flex justify-center items-center rounded-full">
+                        <div className="bg-(--color-grey) sm:w-20 w-15 sm:h-20 h-15 flex justify-center items-center rounded-full">
                             <img src={src.icon}
                                 className="w-10 h-10"
                                 alt={src.icon}
                             />
                         </div>
-                        <p className="text-xs text-center mt-2">{src.name}</p>
+                        <p className="text-sm text-center font-semibold text-(--color-secondary) mt-2">{src.name}</p>
                     </div>
                 ))}
             </div>
