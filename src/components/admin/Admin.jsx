@@ -130,7 +130,28 @@ const Instruments = () => {
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Instrumentos</h2>
+            <h2>Gestión de Instrumentos</h2>
+            <div className={styles.headerActions}>
+            <div className={styles.searchContainer}>
+                    <span className="material-symbols-outlined" style={{
+                        position: 'absolute', 
+                        left: '10px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        color: '#9C9C9C', 
+                        fontSize: '20px'
+                    }}>
+                        search
+                    </span>
+                    <input
+                        type="text"
+                        placeholder="Buscar..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className={styles.searchInput}
+                        style={{ paddingLeft: '35px' }}
+                    />
+                </div>
                 <button
                     onClick={handleAddInstrument}
                     className={styles.addButton}
@@ -138,15 +159,7 @@ const Instruments = () => {
                     <i className="fas fa-plus"></i> Agregar Instrumento
                 </button>
             </div>
-
-            <div className={styles.searchBar}>
-                <input
-                    type="text"
-                    placeholder="Buscar..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                />
-            </div>
+        </div>
 
             <div className={styles.tableContainer}>
                 <table className={styles.instrumentsTable}>

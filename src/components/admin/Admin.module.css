@@ -411,3 +411,63 @@
         display: flex;
     }
 }
+
+/* Add these to your existing Admin.module.css */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+    color: var(--color-dark-brown);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.searchContainer {
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--color-gray);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: border-color 0.3s ease;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: var(--color-golden);
+    box-shadow: 0 0 0 2px rgba(156, 102, 21, 0.1);
+}
+
+.searchContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.searchContainer i {
+    position: absolute;
+    left: 10px;
+    color: var(--color-gray);
+    z-index: 1;
+}
+
+.searchInput {
+    padding-left: 35px;
+    width: 100%;
+}
