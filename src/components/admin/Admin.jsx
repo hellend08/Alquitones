@@ -3,11 +3,16 @@ import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 
-// Dashboard component (placeholder)
+// Dashboard component
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
-        <h2>Panel de Administración</h2>
-        {/* Add dashboard statistics and overview */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
@@ -388,27 +393,42 @@ const Instruments = () => {
     );
 };
 
-// Categories component (placeholder)
+// Categories component
 const Categories = () => (
     <div className={styles.categoriesContent}>
-        <h2>Gestión de Categorías</h2>
-        {/* Add category management functionality */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
-// Rentals component (placeholder)
+// Rentals component
 const Rentals = () => (
     <div className={styles.rentalsContent}>
-        <h2>Gestión de Alquileres</h2>
-        {/* Add rental management functionality */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
-// Users component (placeholder)
+// Users component
 const Users = () => (
     <div className={styles.usersContent}>
-        <h2>Gestión de Usuarios</h2>
-        {/* Add user management functionality */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
