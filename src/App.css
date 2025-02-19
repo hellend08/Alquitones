@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+body {
+  margin-top: 8rem;
+}
+
 
 :root {
   --color-primary: #a5844d;

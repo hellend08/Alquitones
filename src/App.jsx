@@ -4,6 +4,8 @@ import Auth from './components/auth/Auth';
 import Home from './components/home/Home';
 import Admin from './components/admin/Admin';
 import { localDB } from './database/LocalDB';
+import MainLayout from './Layaouts/MainLayout';
+import CardDetails from './components/cardDetails/CardDetails';
 
 // Protected Route Component solo para rutas que requieren autenticación
 // eslint-disable-next-line react/prop-types
@@ -25,33 +27,36 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Rutas públicas */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Auth />} />
-        <Route path="/register" element={<Auth />} />
-        
-        {/* Rutas protegidas */}
-        <Route 
-          path="/admin/*" 
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <Admin />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Rutas de usuario autenticado */}
-        <Route 
-          path="/profile" 
-          element={
-            <ProtectedRoute>
-              <div>Profile Page</div>
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" element={<MainLayout />} >
+          {/* Rutas públicas */}
+          <Route path="/" element={<Home />} />
+          <Route path="/detail" element={<CardDetails />} />
+          <Route path="/login" element={<Auth />} />
+          <Route path="/register" element={<Auth />} />
+          
+          {/* Rutas protegidas */}
+          <Route 
+            path="/admin/*" 
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <Admin />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Rutas de usuario autenticado */}
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <div>Profile Page</div>
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
     </Router>
   );
