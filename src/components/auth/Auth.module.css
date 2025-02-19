@@ -1,87 +1,120 @@
 /* Auth.module.css */
 .authContainer {
     min-height: 100vh;
-    background-color: rgb(254 243 199);
+    background-color: #FFD791;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 2rem 1rem;
 }
 
-.logoContainer {
-    max-width: 72rem;
-    margin: 0 auto;
-    text-align: center;
+.logo {
+    width: 200px;
     margin-bottom: 2rem;
 }
 
-.logo {
-    height: 4rem;
-    margin: 0 auto;
-}
-
-.formsContainer {
-    max-width: 72rem;
-    margin: 0 auto;
-    display: flex;
-    gap: 2rem;
-}
-
-/* Vista desktop por defecto */
-.formsSide {
-    flex: 2;
-    display: flex;
-    flex-direction: row; /* Cambiado a row para horizontal */
-    gap: 2rem;
-}
-
-.formBox {
-    flex: 1; /* Para que ambos formularios tengan el mismo ancho */
+.formContainer {
     background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
     padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.imageSide {
+.formToggle {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.toggleButton {
     flex: 1;
-    background-color: rgb(71 85 105);
-    border-radius: 0.5rem;
-    overflow: hidden;
+    padding: 0.75rem;
+    background: none;
+    border: 2px solid #9C6615;
+    color: #9C6615;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.imageContainer {
-    width: 100%;
-    height: 100%;
-    position: relative;
+.toggleButton.active {
+    background-color: #9C6615;
+    color: white;
 }
 
-.sideImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
 }
 
-/* Mobile y Tablet */
-@media (max-width: 1024px) {
-    .formsContainer {
-        flex-direction: column;
-    }
-
-    .formsSide {
-        width: 100%;
-        flex-direction: column; /* Cambia a vertical en mobile */
-    }
-
-    .formBox {
-        width: 100%;
-    }
-
-    .imageSide {
-        display: none;
-    }
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-/* Ajustes específicos para mobile */
-@media (max-width: 640px) {
-    .formBox {
-        padding: 1rem;
+.inputGroup label {
+    color: #413620;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.inputGroup input {
+    padding: 0.75rem;
+    border: 2px solid #CDD1DE;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: #9C6615;
+    box-shadow: 0 0 0 3px rgba(156, 102, 21, 0.1);
+}
+
+.submitButton {
+    padding: 0.75rem;
+    background-color: #9C6615;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.submitButton:hover {
+    background-color: #9F7833;
+}
+
+.errorMessage {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.errorMessage.success {
+    background-color: #dcfce7;
+    border-left-color: #22c55e;
+    color: #166534;
+}
+
+@media (max-width: 480px) {
+    .formContainer {
+        padding: 1.5rem;
+    }
+    
+    .inputGroup input,
+    .submitButton {
+        padding: 0.625rem;
     }
 }
