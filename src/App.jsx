@@ -30,7 +30,7 @@ function App() {
         <Route path="/" element={<MainLayout />} >
           {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
-          <Route path="/detail" element={<CardDetails />} />
+          <Route path="/detail/:id" element={<CardDetails />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
           

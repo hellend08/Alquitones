@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { localDB } from "../../database/LocalDB";
+import { Link } from "react-router-dom";
 
 const ProductCards = () => {
 
@@ -55,14 +56,14 @@ const ProductCards = () => {
                         <div className="flex justify-between items-center mt-auto">
 
                             <div>
-                            <p className="text-xs">Precio por dia</p>
-                            <span className="text-lg font-semibold text-gray-900">${product.pricePerDay}</span>
+                                <p className="text-xs">Precio por dia</p>
+                                <span className="text-lg font-semibold text-gray-900">${product.pricePerDay}</span>
                             </div>
 
 
-                            <a href={product.link} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-primary-dark)">
+                            <Link to={`/detail/${product.id}`} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-secondary)">
                                 Ver detalles
-                            </a>
+                            </Link>
                         </div>
 
                     </div>
