@@ -1,23 +1,31 @@
-import { Link } from 'react-router-dom';
+// import Header from '../crossSections/header';
+// import Footer from '../crossSections/Footer'
+import SearchBar from './search';
+//import SlideShow from './slideshow';
+import Category from './categorias';
+import ProductCards from './productCards';
 
 const Home = () => {
     return (
-        <div className="min-h-screen bg-background">
-            <main className="container mx-auto px-4 py-4">
-                <div className="bg-white rounded-lg shadow p-6">
-                    <h1 className="text-2xl text-dark-brown font-bold mb-4">
-                        Bienvenido a AlquiTones
-                    </h1>
-                    <p className="text-gray-600">
-                        Explora nuestra colección de instrumentos musicales disponibles para alquiler.
-                    </p>
-                    <div className="w-36 h-auto bg-amber-200 text-center my-10 ">
-                        <Link to="/detail">CardDetails</Link>
-                    </div>
+        <>
+            {/* <Header /> */}
+            <main className="w-5/6 justify-center mx-auto">
+                <div className="bg-(--color-primary) py-4 mb-4">
+                    <SearchBar />
+                </div>
+                <div className="py-4 mb-4">
+                    <Category />
+                </div>
+                
+                <div className="py-4 mb-4">
+                    <ProductCards />
                 </div>
             </main>
-        </div>
+            {/* <Footer /> */}
+        </>
     );
 };
 
 export default Home;
+
+//a5844d

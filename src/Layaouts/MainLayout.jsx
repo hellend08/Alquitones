@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from '../components/crossSections/header'
 import { Outlet } from 'react-router-dom'
-import Footer from '../components/crossSections/footer'
+import Footer from '../components/crossSections/Footer'
 
 function MainLayout() {
     return (
