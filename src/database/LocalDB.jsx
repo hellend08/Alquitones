@@ -2,12 +2,13 @@
 class LocalDB {
     constructor() {
         this.data = {
-            categories: [
-                { id: 1, name: 'Cuerdas', icon: 'guitar', description: 'Instrumentos de cuerda' },
-                { id: 2, name: 'Viento', icon: 'trumpet', description: 'Instrumentos de viento' },
-                { id: 3, name: 'Percusión', icon: 'drum', description: 'Instrumentos de percusión' },
-                { id: 4, name: 'Teclados', icon: 'piano', description: 'Instrumentos de teclado' }
-            ],
+            // En LocalDB.jsx, actualiza categories:
+categories: [
+    { id: 1, name: 'Cuerdas', icon: '/src/assets/icons/guitar.png', description: 'Instrumentos de cuerda' },
+    { id: 2, name: 'Viento', icon: '/src/assets/icons/flute.png', description: 'Instrumentos de viento' },
+    { id: 3, name: 'Percusión', icon: '/src/assets/icons/drums.png', description: 'Instrumentos de percusión' },
+    { id: 4, name: 'Teclados', icon: '/src/assets/icons/piano.png', description: 'Instrumentos de teclado' }
+],
             users: [
                 {
                     id: 1,
@@ -52,7 +53,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/05.webp'
                     ],
-                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -368,7 +369,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/94.jpg'
                     
                     ],
-                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/94.jpg',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -387,19 +388,20 @@ class LocalDB {
                         { label: 'Efectos', value: 'Múltiples por sección' }
                     ],
                     images: [
-                        'https://alquitones.s3.us-east-2.amazonaws.com/110.PNG',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/111.jpg',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/112.webp',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/113.PNG',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/110.jpg',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/111.webp',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/112.jpg',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/113.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg'
                     ],
-                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/112.webp',
+                    mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg',
                     createdAt: new Date().toISOString()
                 }
             ]
         };
         
-        // Inicializar localStorage si es necesario
+        // Forzar actualización de datos
+        localStorage.removeItem('alquitonesDB');
         this.initializeStorage();
     }
 
