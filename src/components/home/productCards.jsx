@@ -4,12 +4,7 @@ import { localDB } from "../../database/LocalDB";
 const ProductCards = () => {
 
     const [products, setProducts] = useState([]);
-
-    useEffect(() => {
-        recomendedProducts();
-    }
-        , []);
-
+    const [categories, setCategories] = useState("");
     const recomendedProducts = () => {
         try {
             const productsDB = localDB.getAllProducts();
@@ -22,21 +17,54 @@ const ProductCards = () => {
         }
     };
 
+    const getCategories = () => {
+        try {
+            const categoriesDB = localDB.data.categories;
+            setCategories(categoriesDB);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        getCategories();
+        recomendedProducts();
+    }
+        , []);
+
+    const getCategoryName = (categoryId) => {
+        const category = categories.find((category) => category.id === categoryId);
+        return category.name;
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto">
             {products.map((product) => (
-                <div key={product.id} className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm ">
-                    <a href={product.link}>
-                    <img className="h-48 w-96 object-contain rounded-t-lg" src={product.mainImage} alt={product.name} />
-                    </a>
-                    <div className="p-5">
-                        <a href={product.link}>
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">{product.name}</h5>
-                        </a>
-                        <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{product.description}</p>
-                        <a href={product.link} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-primary-dark)">
-                            Read more
-                        </a>
+                <div key={product.id} className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
+                    <img className="h-48 w-96 object-contain rounded-t-lg" src={product.images[0]} alt={product.name} />
+                    <div className="p-5 border-t border-gray-300">
+                        <div className="h-35 ">
+                            <h5 className="text-xl font-bold tracking-tight text-gray-900 ">{product.name}</h5>
+                            <h6 className="font-light text-xs my-1 text-gray-400">{getCategoryName(product.categoryId)}</h6>
+
+                            <p className="mb-3 font-normal text-sm text-gray-500">{product.description}</p>
+                        </div>
+
+
+                        <div className="flex justify-between items-center mt-auto">
+
+                            <div>
+                            <p className="text-xs">Precio por dia</p>
+                            <span className="text-lg font-semibold text-gray-900">${product.pricePerDay}</span>
+                            </div>
+
+
+                            <a href={product.link} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-primary-dark)">
+                                Ver detalles
+                            </a>
+                        </div>
+
                     </div>
                 </div>
             ))}

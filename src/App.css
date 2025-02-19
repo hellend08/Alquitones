@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  margin-top: 6.5rem;
+  margin-top: 6rem;
   background-color: var(--color-light);
 }
 
@@ -12,7 +12,7 @@ body {
   --color-tertiary: #523E1A;
   --color-quaternary: #FDD85D;
   --color-quinary: #FFE8C0;
-  --color-grey: #7f7f7f;
+  --color-grey: #e1e1e1;
   --color-light: #f4f4f4;
   --color-dark: #222;
 }
