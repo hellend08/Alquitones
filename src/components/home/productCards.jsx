@@ -27,7 +27,7 @@ const ProductCards = () => {
             {products.map((product) => (
                 <div key={product.id} className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm ">
                     <a href={product.link}>
-                        <img className="h-48 w-96 object-contain rounded-t-lg" src={product.images[0]} alt={product.name} />
+                    <img className="h-48 w-96 object-contain rounded-t-lg" src={product.mainImage} alt={product.name} />
                     </a>
                     <div className="p-5">
                         <a href={product.link}>
