@@ -17,7 +17,8 @@ const Home = () => {
                     <Category />
                 </div>
                 
-                <div className="py-4 mb-4">
+                <div className="py-4 mb-4 flex flex-col">
+                    <h1 className="text-2xl font-bold text-(--color-secondary) mb-8">Recomendaciones</h1>
                     <ProductCards />
                 </div>
             </main>
