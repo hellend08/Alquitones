@@ -78,33 +78,16 @@ const Auth = () => {
         <div className={styles.authContainer}>
             <img src="/src/assets/alquitonesLogo.png" alt="AlquiTones" className={styles.logo}/>
             <div className={styles.formContainer}>
-                <div className={styles.formToggle}>
-                    <button 
-                        onClick={() => {
-                            setActiveForm('login');
-                            navigate('/login');
-                        }}
-                        className={`${styles.toggleButton} ${activeForm === 'login' ? styles.active : ''}`}
-                    >
-                        Iniciar Sesión
-                    </button>
-                    <button 
-                        onClick={() => {
-                            setActiveForm('register');
-                            navigate('/register');
-                        }}
-                        className={`${styles.toggleButton} ${activeForm === 'register' ? styles.active : ''}`}
-                    >
-                        Registrarse
-                    </button>
+                <div className={styles.authTitle}>
+                    <h2>{activeForm === 'login' ? 'Iniciar Sesión' : 'Registrarse'}</h2>
                 </div>
-
+    
                 {error && (
                     <div className={`${styles.errorMessage} ${error.includes('exitoso') ? styles.success : ''}`}>
                         {error}
                     </div>
                 )}
-
+    
                 {activeForm === 'register' ? (
                     <form onSubmit={handleRegister} className={styles.form}>
                         <div className={styles.inputGroup}>
@@ -182,6 +165,20 @@ const Auth = () => {
                         </button>
                     </form>
                 )}
+    
+                <div className={styles.formSwitch}>
+                    {activeForm === 'login' ? (
+                        <p>¿No tienes una cuenta? <span onClick={() => {
+                            setActiveForm('register');
+                            navigate('/register');
+                        }} className={styles.switchLink}>Regístrate</span></p>
+                    ) : (
+                        <p>¿Ya tienes una cuenta? <span onClick={() => {
+                            setActiveForm('login');
+                            navigate('/login');
+                        }} className={styles.switchLink}>Inicia sesión</span></p>
+                    )}
+                </div>
             </div>
         </div>
     );
