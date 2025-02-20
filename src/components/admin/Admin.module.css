@@ -10,6 +10,120 @@
     --color-background: #F8F9FA;
 }
 
+
+
+/* En tu Admin.module.css */
+/* Mensaje responsive completo */
+.responsiveMessage {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--color-white);
+    flex-direction: column;
+    z-index: 9999;
+    overflow: hidden;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.responsiveContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.responsiveIllustration {
+    max-width: 280px;
+    width: 90%;
+    margin: 0 auto 2rem;
+}
+
+.responsiveImage {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    opacity: 0.9;
+    filter: grayscale(30%);
+}
+
+.responsiveTitle {
+    color: var(--color-dark-brown);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.responsiveText {
+    color: var(--color-golden-light);
+    font-size: 1rem;
+    max-width: 500px;
+    line-height: 1.6;
+    margin: 0 auto;
+}
+
+/* Media query para móviles */
+@media (max-width: 760px) {
+    .adminContainer {
+        display: none;
+    }
+    
+    .responsiveMessage {
+        display: flex;
+    }
+    
+    .responsiveTitle {
+        font-size: 1.3rem;
+    }
+    
+    .responsiveText {
+        font-size: 0.9rem;
+        padding: 0 1rem;
+    }
+    
+    .responsiveIllustration {
+        max-width: 220px;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .responsiveContent {
+        padding: 1rem;
+    }
+    
+    .responsiveTitle {
+        font-size: 1.2rem;
+    }
+    
+    .responsiveText {
+        font-size: 0.85rem;
+    }
+    
+    .responsiveIllustration {
+        max-width: 180px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 .adminContainer {
     display: flex;
     min-height: 100vh;
@@ -410,4 +524,113 @@
     .responsiveMessage {
         display: flex;
     }
+}
+
+/* Add these to your existing Admin.module.css */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+    color: var(--color-dark-brown);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.searchContainer {
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--color-gray);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: border-color 0.3s ease;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: var(--color-golden);
+    box-shadow: 0 0 0 2px rgba(156, 102, 21, 0.1);
+}
+
+.searchContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+.searchContainer i {
+    position: absolute;
+    left: 10px;
+    color: var(--color-gray);
+    z-index: 1;
+}
+
+.searchInput {
+    padding-left: 35px;
+    width: 100%;
+}
+
+.imagePreviewContainer {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.imagePreview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.placeholderContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 2rem;
+    padding: 2rem;
+    background-color: var(--color-background);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.placeholderImage {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.placeholderImage:hover {
+    opacity: 1;
+}
+
+.placeholderText {
+    font-size: 1.25rem;
+    color: var(--color-dark-brown);
+    font-weight: 500;
+    max-width: 500px;
+    line-height: 1.6;
 }

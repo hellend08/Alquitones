@@ -1,11 +1,12 @@
 // Auth.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Auth.module.css';
 
 const Auth = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [activeForm, setActiveForm] = useState('login'); 
     const [formData, setFormData] = useState({
         username: '',
@@ -14,6 +15,16 @@ const Auth = () => {
         confirmPassword: ''
     });
     const [error, setError] = useState('');
+
+    // Check URL and set active form accordingly
+    useEffect(() => {
+        const path = location.pathname;
+        if (path === '/register') {
+            setActiveForm('register');
+        } else if (path === '/login') {
+            setActiveForm('login');
+        }
+    }, [location]);
 
     const handleChange = (e) => {
         setFormData({
@@ -69,13 +80,19 @@ const Auth = () => {
             <div className={styles.formContainer}>
                 <div className={styles.formToggle}>
                     <button 
-                        onClick={() => setActiveForm('login')}
+                        onClick={() => {
+                            setActiveForm('login');
+                            navigate('/login');
+                        }}
                         className={`${styles.toggleButton} ${activeForm === 'login' ? styles.active : ''}`}
                     >
                         Iniciar Sesión
                     </button>
                     <button 
-                        onClick={() => setActiveForm('register')}
+                        onClick={() => {
+                            setActiveForm('register');
+                            navigate('/register');
+                        }}
                         className={`${styles.toggleButton} ${activeForm === 'register' ? styles.active : ''}`}
                     >
                         Registrarse

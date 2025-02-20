@@ -489,18 +489,18 @@ categories: [
     }
 
     createProduct(productData) {
-        // Validar que tenga 5 imágenes
-        if (!productData.images || productData.images.length !== 5) {
-            throw new Error('El producto debe tener exactamente 5 imágenes');
+        // Modificar validación para permitir 1-5 imágenes
+        if (!productData.images || productData.images.length < 1 || productData.images.length > 5) {
+            throw new Error('El producto debe por lo menos 1 imagen');
         }
-
+    
         const newProduct = {
             id: this.data.products.length + 1,
             ...productData,
-            mainImage: productData.images[0], // Primera imagen como principal
+            mainImage: productData.mainImage, // Primera imagen como principal
             createdAt: new Date().toISOString()
         };
-
+    
         this.data.products.push(newProduct);
         this.saveToStorage();
         return newProduct;

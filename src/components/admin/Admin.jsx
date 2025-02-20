@@ -2,12 +2,21 @@ import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import Header from '../crossSections/header';
+import Footer from '../crossSections/Footer';
 
-// Dashboard component (placeholder)
+
+
+// Dashboard component
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
-        <h2>Panel de Administración</h2>
-        {/* Add dashboard statistics and overview */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
@@ -20,6 +29,7 @@ const Instruments = () => {
     const [modalMode, setModalMode] = useState('create');
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [previews, setPreviews] = useState([]);
     const ITEMS_PER_PAGE = 10;
 
     useEffect(() => {
@@ -74,28 +84,55 @@ const Instruments = () => {
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
-
+    
         const form = e.target;
-        const instrumentData = {
-            name: form['instrument-name'].value,
-            categoryId: parseInt(form['instrument-category'].value),
-            pricePerDay: parseFloat(form['instrument-price'].value),
-            description: form['instrument-description'].value,
-            status: form['instrument-status'].value,
-            mainImage: currentInstrument?.mainImage || '/src/assets/alquitonesLogo.png',
-            images: currentInstrument?.images || ['/src/assets/alquitonesLogo.png']
-        };
-
+        const fileInput = document.getElementById('instrument-images');
+        const images = fileInput.files;
+    
+        // Validar que se hayan seleccionado imágenes
+        if (images.length === 0) {
+            alert('Debe seleccionar al menos una imagen');
+            return;
+        }
+    
+        if (images.length > 5) {
+            alert('Solo puede seleccionar un máximo de 5 imágenes');
+            return;
+        }
+    
+        // Convertir imágenes a base64
+        const imagePromises = Array.from(images).map(file => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        });
+    
         try {
+            const base64Images = await Promise.all(imagePromises);
+    
+            const instrumentData = {
+                name: form['instrument-name'].value,
+                categoryId: parseInt(form['instrument-category'].value),
+                pricePerDay: parseFloat(form['instrument-price'].value),
+                description: form['instrument-description'].value,
+                status: form['instrument-status'].value,
+                images: base64Images,
+                mainImage: base64Images[0]  // Primera imagen como imagen principal
+            };
+    
             if (modalMode === 'create') {
                 await localDB.createProduct(instrumentData);
+                alert('Instrumento creado con éxito');
             } else {
                 await localDB.updateProduct(currentInstrument.id, instrumentData);
+                alert('Instrumento actualizado con éxito');
             }
-
+    
             loadInstruments();
             setModalOpen(false);
-            alert(modalMode === 'create' ? 'Instrumento creado con éxito' : 'Instrumento actualizado con éxito');
         } catch (error) {
             console.error('Error:', error);
             alert('Error al ' + (modalMode === 'create' ? 'crear' : 'actualizar') + ' el instrumento');
@@ -130,7 +167,28 @@ const Instruments = () => {
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Instrumentos</h2>
+            <h2>Gestión de Instrumentos</h2>
+            <div className={styles.headerActions}>
+            <div className={styles.searchContainer}>
+                    <span className="material-symbols-outlined" style={{
+                        position: 'absolute', 
+                        left: '10px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        color: '#9C9C9C', 
+                        fontSize: '20px'
+                    }}>
+                        search
+                    </span>
+                    <input
+                        type="text"
+                        placeholder="Buscar..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className={styles.searchInput}
+                        style={{ paddingLeft: '35px' }}
+                    />
+                </div>
                 <button
                     onClick={handleAddInstrument}
                     className={styles.addButton}
@@ -138,15 +196,7 @@ const Instruments = () => {
                     <i className="fas fa-plus"></i> Agregar Instrumento
                 </button>
             </div>
-
-            <div className={styles.searchBar}>
-                <input
-                    type="text"
-                    placeholder="Buscar..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                />
-            </div>
+        </div>
 
             <div className={styles.tableContainer}>
                 <table className={styles.instrumentsTable}>
@@ -189,12 +239,14 @@ const Instruments = () => {
                                     >
                                         <i className="fas fa-edit"></i>
                                     </button> */}
-                                    <button
-                                        onClick={() => handleDeleteInstrument(instrument)}
-                                        className={styles.deleteButton}
-                                    >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
+<button
+    onClick={() => handleDeleteInstrument(instrument)}
+    className={styles.deleteButton}
+>
+    <i className="fas fa-trash"></i>
+</button>
+
+
                                 </td>
                             </tr>
                         ))}
@@ -278,6 +330,32 @@ const Instruments = () => {
                                 />
                             </div>
                             <div className={styles.formGroup}>
+    <label htmlFor="instrument-images">Imágenes del Instrumento</label>
+    <input
+        type="file"
+        id="instrument-images"
+        accept="image/*"
+        multiple
+        onChange={(e) => {
+            const files = e.target.files;
+            const previews = Array.from(files).map(file => URL.createObjectURL(file));
+            setPreviews(previews);
+        }}
+    />
+    {previews.length > 0 && (
+        <div className={styles.imagePreviewContainer}>
+            {previews.map((preview, index) => (
+                <img 
+                    key={index} 
+                    src={preview} 
+                    alt={`Preview ${index + 1}`} 
+                    className={styles.imagePreview}
+                />
+            ))}
+        </div>
+    )}
+</div>
+                            <div className={styles.formGroup}>
                                 <label htmlFor="instrument-description">Descripción</label>
                                 <textarea
                                     id="instrument-description"
@@ -321,31 +399,57 @@ const Instruments = () => {
     );
 };
 
-// Categories component (placeholder)
+// Categories component
 const Categories = () => (
     <div className={styles.categoriesContent}>
-        <h2>Gestión de Categorías</h2>
-        {/* Add category management functionality */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
-// Rentals component (placeholder)
+// Rentals component
 const Rentals = () => (
     <div className={styles.rentalsContent}>
-        <h2>Gestión de Alquileres</h2>
-        {/* Add rental management functionality */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
-// Users component (placeholder)
+// Users component
 const Users = () => (
     <div className={styles.usersContent}>
-        <h2>Gestión de Usuarios</h2>
-        {/* Add user management functionality */}
+        <div className={styles.placeholderContainer}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="No disponible" 
+                className={styles.placeholderImage}
+            />
+        </div>
     </div>
 );
 
 const Admin = () => {
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+    
+        return () => {
+            document.head.removeChild(link); // Limpia al desmontar el componente
+        };
+    }, []);
+    
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);
 
@@ -371,9 +475,19 @@ const Admin = () => {
         <div>
             
             {/* Agregar el div del mensaje responsive */}
-            <div className={styles.responsiveMessage}>
-                No disponible por el momento en responsive
-            </div>
+<div className={styles.responsiveMessage}>
+    <Header />
+    <div className={styles.responsiveContent}>
+        <div className={styles.responsiveIllustration}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="Vista no disponible en móviles" 
+                className={styles.responsiveImage}
+            />
+        </div>
+    </div>
+    <Footer />
+</div>
 
             <div className={styles.adminContainer}>
                 <aside className={styles.sidebar}>

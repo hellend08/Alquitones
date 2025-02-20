@@ -7,6 +7,7 @@ import { localDB } from './database/LocalDB';
 import MainLayout from './Layaouts/MainLayout';
 import CardDetails from './components/cardDetails/CardDetails';
 
+
 // Protected Route Component solo para rutas que requieren autenticación
 // eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ children, adminOnly = false }) => {
