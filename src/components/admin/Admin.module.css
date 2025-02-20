@@ -10,6 +10,120 @@
     --color-background: #F8F9FA;
 }
 
+
+
+/* En tu Admin.module.css */
+/* Mensaje responsive completo */
+.responsiveMessage {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--color-white);
+    flex-direction: column;
+    z-index: 9999;
+    overflow: hidden;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.responsiveContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.responsiveIllustration {
+    max-width: 280px;
+    width: 90%;
+    margin: 0 auto 2rem;
+}
+
+.responsiveImage {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    opacity: 0.9;
+    filter: grayscale(30%);
+}
+
+.responsiveTitle {
+    color: var(--color-dark-brown);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.responsiveText {
+    color: var(--color-golden-light);
+    font-size: 1rem;
+    max-width: 500px;
+    line-height: 1.6;
+    margin: 0 auto;
+}
+
+/* Media query para móviles */
+@media (max-width: 760px) {
+    .adminContainer {
+        display: none;
+    }
+    
+    .responsiveMessage {
+        display: flex;
+    }
+    
+    .responsiveTitle {
+        font-size: 1.3rem;
+    }
+    
+    .responsiveText {
+        font-size: 0.9rem;
+        padding: 0 1rem;
+    }
+    
+    .responsiveIllustration {
+        max-width: 220px;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .responsiveContent {
+        padding: 1rem;
+    }
+    
+    .responsiveTitle {
+        font-size: 1.2rem;
+    }
+    
+    .responsiveText {
+        font-size: 0.85rem;
+    }
+    
+    .responsiveIllustration {
+        max-width: 180px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 .adminContainer {
     display: flex;
     min-height: 100vh;

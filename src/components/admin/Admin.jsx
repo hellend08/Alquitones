@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
-
+import Header from '../crossSections/header';
+import Footer from '../crossSections/Footer';
 // Dashboard component
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
@@ -458,9 +459,19 @@ const Admin = () => {
         <div>
             
             {/* Agregar el div del mensaje responsive */}
-            <div className={styles.responsiveMessage}>
-                No disponible por el momento en responsive
-            </div>
+<div className={styles.responsiveMessage}>
+    <Header />
+    <div className={styles.responsiveContent}>
+        <div className={styles.responsiveIllustration}>
+            <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="Vista no disponible en móviles" 
+                className={styles.responsiveImage}
+            />
+        </div>
+    </div>
+    <Footer />
+</div>
 
             <div className={styles.adminContainer}>
                 <aside className={styles.sidebar}>
