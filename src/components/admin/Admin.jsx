@@ -229,7 +229,7 @@ const Instruments = () => {
             </div>
 
             {/* Modal for adding/editing instruments (similar to previous implementation) */}
-            {/* {modalOpen && (
+            {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
@@ -316,7 +316,7 @@ const Instruments = () => {
                         </form>
                     </div>
                 </div>
-            )} */}
+            )}
         </div>
     );
 };

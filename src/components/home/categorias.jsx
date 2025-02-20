@@ -1,27 +1,36 @@
-
+import { localDB } from "../../database/LocalDB";
+import { useEffect, useState } from "react";
 
 
 const Category = () => {
-    const icons = [
-        { icon: "src/assets/icons/piano.png", name: "Piano" },
-        { icon: "src/assets/icons/drums.png", name: "Percusión" },
-        { icon: "src/assets/icons/flute.png", name: "Viento" },
-        { icon: "src/assets/icons/guitar.png", name: "Cuerdas" },
-    ];
+    const [categories, setCategories] = useState([]);
 
+    useEffect(() => {
+        getCategories();
+    }, []);
+
+    const getCategories = () => {
+        try {
+            const categoriesDB = localDB.data.categories;
+            setCategories(categoriesDB);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
         <div className="mx-4">
-            <div className="flex justify-between ">
-                {icons.map((src, index) => (
+            <div className="flex justify-around ">
+                {categories.map((src, index) => (
                     <div key={index} className="flex flex-col items-center">
-                        <div className="bg-gray-200 w-20 h-20 flex justify-center items-center rounded-full">
+                        <div className="bg-(--color-grey) sm:w-20 w-15 sm:h-20 h-15 flex justify-center items-center rounded-full">
                             <img src={src.icon}
                                 className="w-10 h-10"
-                                alt="icon"
+                                alt={src.icon}
                             />
                         </div>
-                        <p className="text-xs text-center mt-2">{src.name}</p>
+                        <p className="text-sm text-center font-semibold text-(--color-secondary) mt-2">{src.name}</p>
                     </div>
                 ))}
             </div>

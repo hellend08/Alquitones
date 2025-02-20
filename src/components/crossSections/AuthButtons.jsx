@@ -26,7 +26,7 @@ const AuthButtons = () => {
                 </span>
                 <button
                     onClick={handleLogout}
-                    className="bg-amber-700 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                    className="bg-(--color-secondary) hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
                 >
                     Cerrar Sesión
                 </button>
@@ -38,13 +38,13 @@ const AuthButtons = () => {
         <div className="flex gap-4">
             <button
                 onClick={() => handleAuth('register')}
-                className="bg-amber-700 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                className="border-2 border-(--color-secondary) text-(--color-secondary)   hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm  py-2 px-4 rounded shadow-sm transition-colors duration-200"
             >
                 Crear Cuenta
             </button>
             <button
                 onClick={() => handleAuth('login')}
-                className="border-2 border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white font-semibold py-2 px-4 rounded shadow-sm transition-all duration-200"
+                className="bg-(--color-primary) hover:bg-(--color-secondary) text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
             >
                 Iniciar Sesión
             </button>
