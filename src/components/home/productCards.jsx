@@ -40,14 +40,14 @@ const ProductCards = () => {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {products.map((product) => (
-                <div key={product.id} className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
-                    <img className="h-48 w-96 object-contain rounded-t-lg" src={product.images[0]} alt={product.name} />
+                <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
+                    <img className="h-48 w-96 mx-auto object-contain rounded-t-lg" src={product.images[0]} alt={product.name} />
                     <div className="p-5 border-t border-gray-300">
-                        <div className="h-35 ">
+                        <div className="h-20">
                             <h5 className="text-xl font-bold tracking-tight text-gray-900 ">{product.name}</h5>
-                            <h6 className="font-light text-xs my-1 text-gray-400">{getCategoryName(product.categoryId)}</h6>
+                            <h6 className="font-semibold text-xs my-1 text-gray-400">{getCategoryName(product.categoryId)}</h6>
 
                             <p className="mb-3 font-normal text-sm text-gray-500">{product.description}</p>
                         </div>

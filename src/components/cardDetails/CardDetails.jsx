@@ -1,29 +1,46 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { localDB } from '../../database/LocalDB';
 
 function CardDetails() {
-    // const { id } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
+    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
-        loadInstruments();
-    }, []);
-    
-
-    const loadInstruments = () => {
-        try {
-            const products = localDB.getAllProducts(parseInt());
-            if (products.length > 0) {
-                setInstrument(products[2]);
-                setSuggestions(products.slice(1, 3));
-            }
-        } catch (error) {
-            console.error('Error al obtener el instrumento:', error);
+        const product = localDB.getProductById(parseInt(id));
+        console.log(product)
+        if (product) {
+            setInstrument(product);
+            loadSuggestions(parseInt(id));
+            getCategories();
+            // window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo( 0, 0);
         }
+    }, [id]);
+
+    const loadSuggestions = (currentId) => {
+        let allProducts = localDB.getAllProducts().filter(p => p.id !== currentId);
+        allProducts = allProducts.sort(() => Math.random() - 0.5);
+        setSuggestions(allProducts.slice(0, 2));
     };
+
+    const getCategories = () => {
+        try {
+            const categoriesDB = localDB.data.categories;
+            setCategories(categoriesDB);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getCategoryName = (categoryId) => {
+        const category = categories.find((category) => category.id === categoryId);
+        return category.name;
+    }
 
     if (!instrument) {
         return <div className="text-center py-10">Cargando...</div>;
@@ -32,8 +49,8 @@ function CardDetails() {
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">{instrument.name} <span className="text-gray-500 text-sm">cod {instrument.id}</span></h1>
-                <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900 cursor-pointer">Atrás</button>
+                <h1 className="text-2xl font-bold text-(--color-secondary)">{instrument.name} <span className="text-gray-500 text-sm">cod {instrument.id}</span></h1>
+                <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-(--color-secondary) cursor-pointer">Atrás</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <img src={instrument.images[0]} alt={instrument.name} className="w-full h-96 object-cover rounded-lg" />
@@ -41,28 +58,47 @@ function CardDetails() {
                     {instrument.images.slice(1).map((img, index) => (
                         <img key={index} src={img} alt={`Miniatura ${index}`} className="w-full h-47 object-cover rounded-lg" />
                     ))}
+                    <div className="relative">
+                    {/* <Link>Ver Más</Link> onClick={() => setShowGallery(true)} */}
+                    <button 
+                    
+                    className="absolute -right-80 bottom-8 bg-white text-(--color-secondary) px-5 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) transition"
+                >
+                    Ver más
+                </button>
                 </div>
+                </div>
+                
             </div>
             <div className="mt-6 p-6 bg-white rounded-lg shadow">
-                <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold">Descripción</h2>
+                <div className="flex flex-col lg:flex-row justify-between items-center mb-2.5">
+                    <h2 className="text-xl font-bold text-(--color-secondary)">Descripción</h2>
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        {/* <p className="text-gray-600 text-lg">{instrument.description}</p> */}
                         <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
-                        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer">Reserva Ahora</button>
+                        <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
                     </div>
                 </div>
                 <p className="text-gray-600 text-lg">{instrument.description}</p>
             </div>
-            <h2 className="mt-10 text-xl font-bold">Sugerencias</h2>
+            <h2 className="mt-10 text-xl font-bold text-(--color-secondary)">Sugerencias</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 {suggestions.map((product) => (
-                    <div key={product.id} className="bg-white shadow-md rounded-lg p-4">
-                        <img src={product.mainImage} alt={product.name} className="w-full h-48 object-cover rounded-lg" />
-                        <h3 className="text-xl font-bold mt-2">{product.name}</h3>
-                        <p className="text-gray-600">{product.category}</p>
-                        <p className="font-semibold">Precio: ${product.pricePerDay.toFixed(2)}</p>
-                        <button className="mt-2 text-blue-600 hover:underline cursor-pointer">Ver detalles</button>
+                    <div key={product.id} className="bg-white shadow-md rounded-lg">
+                        <img src={product.mainImage} alt={product.name} className="h-48 w-96 mx-auto object-contain rounded-t-lg" />
+                        <div className="p-5 border-t border-gray-300">
+                            <h3 className="text-xl font-bold tracking-tight text-(--color-secondary)">{product.name}</h3>
+                            <h6 className="font-semibold text-xs my-1 text-gray-400">{getCategoryName(product.categoryId)}</h6>
+                            <p className="mb-3 font-normal text-sm text-gray-500">{product.description}</p>
+                            <div className="flex justify-between items-center mt-auto">
+                                <div>
+                                    <p className="text-xs">Precio por día</p>
+                                    <p className="text-lg font-semibold text-(--color-secondary)">${product.pricePerDay.toFixed(2)}</p>
+                                </div>
+                                <Link to={`/detail/${product.id}`} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-secondary) transition">
+                                    Ver detalles
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>

@@ -9,7 +9,7 @@ const Home = () => {
     return (
         <>
             {/* <Header /> */}
-            <main className="w-5/6 justify-center mx-auto">
+            <main className="max-w-5xl justify-center mx-auto">
                 <div className="bg-(--color-primary) py-4 mb-4">
                     <SearchBar />
                 </div>

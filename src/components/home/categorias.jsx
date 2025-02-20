@@ -21,7 +21,7 @@ const Category = () => {
 
     return (
         <div className="mx-4">
-            <div className="flex justify-between ">
+            <div className="flex justify-around ">
                 {categories.map((src, index) => (
                     <div key={index} className="flex flex-col items-center">
                         <div className="bg-(--color-grey) sm:w-20 w-15 sm:h-20 h-15 flex justify-center items-center rounded-full">
