@@ -74,7 +74,6 @@ function CardDetails() {
                 <div className="flex flex-col lg:flex-row justify-between items-center mb-2.5">
                     <h2 className="text-xl font-bold text-(--color-secondary)">Descripción</h2>
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        {/* <p className="text-gray-600 text-lg">{instrument.description}</p> */}
                         <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
                         <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
                     </div>
