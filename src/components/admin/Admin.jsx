@@ -4,6 +4,9 @@ import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
 import Footer from '../crossSections/Footer';
+
+
+
 // Dashboard component
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
@@ -236,12 +239,14 @@ const Instruments = () => {
                                     >
                                         <i className="fas fa-edit"></i>
                                     </button> */}
-                                    <button
-                                        onClick={() => handleDeleteInstrument(instrument)}
-                                        className={styles.deleteButton}
-                                    >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
+<button
+    onClick={() => handleDeleteInstrument(instrument)}
+    className={styles.deleteButton}
+>
+    <i className="fas fa-trash"></i>
+</button>
+
+
                                 </td>
                             </tr>
                         ))}
@@ -434,6 +439,17 @@ const Users = () => (
 );
 
 const Admin = () => {
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+    
+        return () => {
+            document.head.removeChild(link); // Limpia al desmontar el componente
+        };
+    }, []);
+    
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);
 
