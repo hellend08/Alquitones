@@ -10,7 +10,8 @@ const ProductCards = () => {
         try {
             const productsDB = localDB.getAllProducts();
             if (productsDB.length > 0) {
-                setProducts(productsDB);
+                const randomProducts = productsDB.sort(() => Math.random() - 0.5).slice(0, 10);
+                setProducts(randomProducts);
             }
 
         } catch (error) {
@@ -51,21 +52,15 @@ const ProductCards = () => {
 
                             <p className="mb-3 font-normal text-sm text-gray-500">{product.description}</p>
                         </div>
-
-
                         <div className="flex justify-between items-center mt-auto">
-
                             <div>
                                 <p className="text-xs">Precio por dia</p>
                                 <span className="text-lg font-semibold text-gray-900">${product.pricePerDay}</span>
                             </div>
-
-
                             <Link to={`/detail/${product.id}`} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-secondary)">
                                 Ver detalles
                             </Link>
                         </div>
-
                     </div>
                 </div>
             ))}
