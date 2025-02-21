@@ -7,7 +7,8 @@ function CardDetails() {
     const navigate = useNavigate();
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState("");
+    const [showGallery, setShowGallery] = useState(false);
 
     useEffect(() => {
         const product = localDB.getProductById(parseInt(id));
@@ -59,17 +60,14 @@ function CardDetails() {
                         <img key={index} src={img} alt={`Miniatura ${index}`} className="w-full h-47 object-cover rounded-lg" />
                     ))}
                     <div className="relative">
-                    {/* <Link>Ver Más</Link> onClick={() => setShowGallery(true)} */}
-                    <button 
-                    
-                    className="absolute -right-80 bottom-8 bg-white text-(--color-secondary) px-5 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) transition"
-                >
-                    Ver más
-                </button>
-                </div>
+                        <button onClick={() => setShowGallery(true)} className="absolute -right-40 md:-right-52 lg:-right-75 bottom-8 cursor-pointer border bg-white text-(--color-secondary) px-5 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) hover:text-white  transition">
+                        Ver más 👁
+                        </button>
+                    </div>
                 </div>
                 
             </div>
+            
             <div className="mt-6 p-6 bg-white rounded-lg shadow">
                 <div className="flex flex-col lg:flex-row justify-between items-center mb-2.5">
                     <h2 className="text-xl font-bold text-(--color-secondary)">Descripción</h2>
@@ -102,7 +100,28 @@ function CardDetails() {
                     </div>
                 ))}
             </div>
+
+            {/* GALERIA DE IMAGENES */}
+            {showGallery && (
+                    <div className="fixed inset-0 bg-black/75 transition-opacity flex justify-center items-center z-50">
+                        <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold">Galería de Imágenes</h2>
+                                <button onClick={() => setShowGallery(false)} className="text-gray-500 hover:text-gray-700"> ✖ </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <img src={instrument.images[0]} alt={instrument.name} className="w-full h-96 object-cover rounded-lg" />
+                                <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
+                                    {instrument.images.slice(1).map((img, index) => (
+                                        <img key={index} src={img} alt={`Imagen ${index}`} className="w-full h-47 object-cover rounded-lg" />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
         </div>
+        
         
     )
 }
