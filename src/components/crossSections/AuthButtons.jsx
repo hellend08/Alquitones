@@ -4,13 +4,26 @@ import { localDB } from '../../database/LocalDB';
 const AuthButtons = () => {
     const [user, setUser] = useState(null);
 
+    // Efecto para mantener sincronizado el estado del usuario
     useEffect(() => {
-        const currentUser = localDB.getCurrentUser();
-        setUser(currentUser);
+        const checkUser = () => {
+            const currentUser = localDB.getCurrentUser();
+            setUser(currentUser);
+        };
+
+        // Verificar estado inicial
+        checkUser();
+
+        // Crear un intervalo para verificar cambios
+        const interval = setInterval(checkUser, 1000);
+
+        // Limpiar intervalo al desmontar
+        return () => clearInterval(interval);
     }, []);
 
     const handleLogout = () => {
         localDB.logout();
+        setUser(null); // Actualizar estado local inmediatamente
         window.location.href = '/login';
     };
 
@@ -38,7 +51,7 @@ const AuthButtons = () => {
         <div className="flex gap-4">
             <button
                 onClick={() => handleAuth('register')}
-                className="border-2 border-(--color-secondary) text-(--color-secondary)   hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm  py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                className="border-2 border-(--color-secondary) text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-2 px-4 rounded shadow-sm transition-colors duration-200"
             >
                 Crear Cuenta
             </button>
