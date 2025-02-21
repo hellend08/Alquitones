@@ -103,23 +103,23 @@ function CardDetails() {
 
             {/* GALERIA DE IMAGENES */}
             {showGallery && (
-                    <div className="fixed inset-0 bg-black/75 transition-opacity flex justify-center items-center z-50">
-                        <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">Galería de Imágenes</h2>
-                                <button onClick={() => setShowGallery(false)} className="text-gray-500 hover:text-gray-700"> ✖ </button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <img src={instrument.images[0]} alt={instrument.name} className="w-full h-96 object-cover rounded-lg" />
-                                <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
-                                    {instrument.images.slice(1).map((img, index) => (
-                                        <img key={index} src={img} alt={`Imagen ${index}`} className="w-full h-47 object-cover rounded-lg" />
-                                    ))}
-                                </div>
+                <div className="fixed inset-0 bg-black/75 transition-opacity flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold">Galería de Imágenes</h2>
+                            <button onClick={() => setShowGallery(false)} className="text-gray-500 hover:text-gray-700"> ✖ </button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <img src={instrument.images[0]} alt={instrument.name} className="w-full h-96 object-cover rounded-lg" />
+                            <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
+                                {instrument.images.slice(1).map((img, index) => (
+                                    <img key={index} src={img} alt={`Imagen ${index}`} className="w-full h-47 object-cover rounded-lg" />
+                                ))}
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
         </div>
         
         
