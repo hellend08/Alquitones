@@ -12,13 +12,11 @@ function CardDetails() {
 
     useEffect(() => {
         const product = localDB.getProductById(parseInt(id));
-        console.log(product)
         if (product) {
             setInstrument(product);
             loadSuggestions(parseInt(id));
             getCategories();
-            // window.scrollTo({ top: 0, behavior: 'smooth' });
-            window.scrollTo( 0, 0);
+            window.scrollTo(0, 0);
         }
     }, [id]);
 
@@ -40,29 +38,40 @@ function CardDetails() {
 
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
-        return category.name;
+        return category?.name;
     }
 
     if (!instrument) {
         return <div className="text-center py-10">Cargando...</div>;
     }
 
+    // Obtener solo las primeras 5 imágenes para la vista principal
+    const mainViewImages = instrument.images.slice(0, 5);
+    // Obtener todas las imágenes para la galería
+    const allImages = instrument.images;
+
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-(--color-secondary)">{instrument.name} <span className="text-gray-500 text-sm">cod {instrument.id}</span></h1>
                 <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-(--color-secondary) cursor-pointer text-2xl">
-    <span className="material-symbols-outlined">arrow_back</span>
-</button>            </div>
+                    <span className="material-symbols-outlined">arrow_back</span>
+                </button>
+            </div>
+            
+            {/* Vista principal - Solo 5 imágenes */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <img src={instrument.images[0]} alt={instrument.name} className="w-full h-96 object-cover rounded-lg" />
+                <img src={mainViewImages[0]} alt={instrument.name} className="w-full h-96 object-cover rounded-lg" />
                 <div className="grid grid-cols-2 gap-2 md:col-span-2">
-                    {instrument.images.slice(1).map((img, index) => (
+                    {mainViewImages.slice(1, 5).map((img, index) => (
                         <img key={index} src={img} alt={`Miniatura ${index}`} className="w-full h-47 object-cover rounded-lg" />
                     ))}
                     <div className="relative">
-                        <button onClick={() => setShowGallery(true)} className="absolute -right-40 md:-right-52 lg:-right-80 bottom-8 cursor-pointer border bg-white text-(--color-secondary) px-4 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) hover:text-white  transition">
-                        Ver más 👁
+                        <button 
+                            onClick={() => setShowGallery(true)} 
+                            className="absolute -right-40 md:-right-52 lg:-right-80 bottom-8 cursor-pointer border bg-white text-(--color-secondary) px-4 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) hover:text-white transition"
+                        >
+                            Ver más 👁
                         </button>
                     </div>
                 </div>
@@ -78,6 +87,7 @@ function CardDetails() {
                 </div>
                 <p className="text-gray-600 text-lg">{instrument.description}</p>
             </div>
+
             <h2 className="mt-10 text-xl font-bold text-(--color-secondary)">Sugerencias</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 {suggestions.map((product) => (
@@ -101,7 +111,7 @@ function CardDetails() {
                 ))}
             </div>
 
-            {/* GALERIA DE IMAGENES */}
+            {/* Modal de Galería - Todas las imágenes */}
             {showGallery && (
                 <div className="fixed inset-0 bg-black/75 transition-opacity flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75">
@@ -109,13 +119,15 @@ function CardDetails() {
                             <h2 className="text-xl font-bold">Galería de Imágenes</h2>
                             <button onClick={() => setShowGallery(false)} className="text-gray-500 hover:text-gray-700"> ✖ </button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <img src={instrument.images[0]} alt={instrument.name} className="w-full h-96 object-cover rounded-lg" />
-                            <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
-                                {instrument.images.slice(1).map((img, index) => (
-                                    <img key={index} src={img} alt={`Imagen ${index}`} className="w-full h-47 object-cover rounded-lg" />
-                                ))}
-                            </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {allImages.map((img, index) => (
+                                <img 
+                                    key={index} 
+                                    src={img} 
+                                    alt={`Imagen ${index + 1}`} 
+                                    className={`w-full ${index === 0 ? 'md:col-span-2 h-96' : 'h-47'} object-cover rounded-lg`}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>

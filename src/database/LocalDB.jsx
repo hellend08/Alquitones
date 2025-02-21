@@ -51,7 +51,8 @@ categories: [
                         'https://alquitones.s3.us-east-2.amazonaws.com/02.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/03.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/05.webp'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/05.webp',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/06.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
                     createdAt: new Date().toISOString()
@@ -81,7 +82,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/4.PNG',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/5.PNG'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/5.PNG',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/6.jpg'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/3.PNG',
@@ -112,7 +114,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/13.PNG',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/14.PNG'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/14.PNG',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/15.jpg'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/11.PNG',
@@ -145,7 +148,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/23.PNG',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/25.webp'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
@@ -176,7 +180,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/33.PNG',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/34.PNG'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/34.PNG',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/35.jpg'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/32.PNG',
@@ -207,7 +212,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/43.PNG',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/44.PNG'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/44.PNG',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/45.webp'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/41.webp',
@@ -240,7 +246,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/53.PNG',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/54.jpg'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/54.jpg',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/55.webp'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/50.PNG',
@@ -271,7 +278,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/63.jpg',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/64.jpg'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/64.jpg',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/65.jpg'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/61.jpg',
@@ -302,7 +310,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/74.jpg'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/74.jpg',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/75.webp'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
@@ -335,7 +344,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/83.PNG',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/84.webp'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/84.webp',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/85.jpg'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/81.jpg',
@@ -366,7 +376,8 @@ categories: [
                     
                         'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
                     
-                        'https://alquitones.s3.us-east-2.amazonaws.com/94.jpg'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/94.jpg',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/95.jpg'
                     
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
@@ -392,7 +403,8 @@ categories: [
                         'https://alquitones.s3.us-east-2.amazonaws.com/111.webp',
                         'https://alquitones.s3.us-east-2.amazonaws.com/112.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/113.jpg',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg'
+                        'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/115.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg',
                     createdAt: new Date().toISOString()
