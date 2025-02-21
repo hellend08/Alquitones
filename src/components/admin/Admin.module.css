@@ -399,17 +399,21 @@
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Cambio a flex-start para alinear arriba */
+    padding: 2rem;          /* Padding para evitar que toque los bordes */
+    overflow-y: auto;       /* Permitir scroll */
     z-index: 1000;
 }
-
 .modalContent {
     background-color: var(--color-white);
     border-radius: 8px;
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 500px;
+    padding: 1rem;          /* Reducido de 1.5rem a 1rem */
+    width: 90%;            /* Ancho responsive */
+    max-width: 400px;      /* Reducido de 500px a 400px */
+    max-height: 85vh;      /* Altura máxima del 85% de la ventana */
+    overflow-y: auto;      /* Scroll interno */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 1rem auto;     /* Margen automático para centrado */
 }
 
 .modalHeader {
@@ -434,29 +438,29 @@
 }
 
 .formGroup {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;  /* Reducido de 1rem */
 }
 
 .formGroup label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem; /* Reducido de 0.5rem */
     color: var(--color-dark-brown);
     font-weight: 500;
+    font-size: 0.9rem;     /* Texto más pequeño */
 }
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.4rem;       /* Reducido de 0.5rem */
     border: 1px solid var(--color-gray);
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 0.9rem;     /* Texto más pequeño */
 }
-
 .formGroup textarea {
-    resize: vertical;
-    min-height: 100px;
+    max-height: 100px;     /* Altura máxima para el textarea */
+    min-height: 60px;      /* Altura mínima para el textarea */
 }
 
 .formActions {
@@ -564,13 +568,16 @@
 
 .imagePreviewContainer {
     display: flex;
-    gap: 10px;
-    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    max-height: 120px;     /* Altura máxima para las previsualizaciones */
+    overflow-y: auto;
 }
 
 .imagePreview {
-    width: 100px;
-    height: 100px;
+    width: 60px;           /* Reducido el tamaño de las previsualizaciones */
+    height: 60px;
     object-fit: cover;
     border-radius: 4px;
 }
