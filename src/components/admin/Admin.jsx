@@ -23,18 +23,15 @@ const Dashboard = () => (
 // Instruments component (moved from main Admin component)
 const Instruments = () => {
     const [instruments, setInstruments] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-    const ITEMS_PER_PAGE = 10;
 
     useEffect(() => {
         loadInstruments();
-    }, [currentPage, searchTerm]);
+    }, [searchTerm]);
 
     const loadInstruments = () => {
         try {
@@ -47,17 +44,12 @@ const Instruments = () => {
                 );
             }
 
-            const start = (currentPage - 1) * ITEMS_PER_PAGE;
-            const end = start + ITEMS_PER_PAGE;
-
-            setInstruments(filteredProducts.slice(start, end));
-            setTotalPages(Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+            setInstruments(filteredProducts);
         } catch (error) {
             console.error('Error al cargar instrumentos:', error);
             alert('Error al cargar los instrumentos');
         }
     };
-
 
     const getProductCategory = (categoryId) => {
         const categories = localDB.data.categories;
@@ -67,7 +59,6 @@ const Instruments = () => {
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1);
     };
 
     const handleAddInstrument = () => {
@@ -89,7 +80,6 @@ const Instruments = () => {
         const fileInput = document.getElementById('instrument-images');
         const images = fileInput.files;
     
-        // Validar que se hayan seleccionado imágenes
         if (images.length === 0) {
             alert('Debe seleccionar al menos una imagen');
             return;
@@ -100,7 +90,6 @@ const Instruments = () => {
             return;
         }
     
-        // Convertir imágenes a base64
         const imagePromises = Array.from(images).map(file => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -120,7 +109,7 @@ const Instruments = () => {
                 description: form['instrument-description'].value,
                 status: form['instrument-status'].value,
                 images: base64Images,
-                mainImage: base64Images[0]  // Primera imagen como imagen principal
+                mainImage: base64Images[0]
             };
     
             if (modalMode === 'create') {
@@ -133,30 +122,23 @@ const Instruments = () => {
     
             loadInstruments();
             setModalOpen(false);
+            setPreviews([]);
         } catch (error) {
             console.error('Error:', error);
             alert('Error al ' + (modalMode === 'create' ? 'crear' : 'actualizar') + ' el instrumento');
         }
     };
 
-    // Agregar esta nueva función dentro del componente Instruments
     const handleDeleteInstrument = async (instrument) => {
-        // Mostrar mensaje de confirmación
         const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar el instrumento "${instrument.name}"?`);
 
-        // Si el usuario no confirma, salimos de la función
         if (!confirmDelete) {
             return;
         }
 
         try {
-            // Intentar eliminar el producto
             await localDB.deleteProduct(instrument.id);
-
-            // Recargar la lista de instrumentos
             loadInstruments();
-
-            // Mostrar mensaje de éxito
             alert('Instrumento eliminado exitosamente');
         } catch (error) {
             console.error('Error al eliminar instrumento:', error);
@@ -167,36 +149,36 @@ const Instruments = () => {
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
-            <h2>Gestión de Instrumentos</h2>
-            <div className={styles.headerActions}>
-            <div className={styles.searchContainer}>
-                    <span className="material-symbols-outlined" style={{
-                        position: 'absolute', 
-                        left: '10px', 
-                        top: '50%', 
-                        transform: 'translateY(-50%)', 
-                        color: '#9C9C9C', 
-                        fontSize: '20px'
-                    }}>
-                        search
-                    </span>
-                    <input
-                        type="text"
-                        placeholder="Buscar..."
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className={styles.searchInput}
-                        style={{ paddingLeft: '35px' }}
-                    />
+                <h2>Gestión de Instrumentos</h2>
+                <div className={styles.headerActions}>
+                    <div className={styles.searchContainer}>
+                        <span className="material-symbols-outlined" style={{
+                            position: 'absolute',
+                            left: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: '#9C9C9C',
+                            fontSize: '20px'
+                        }}>
+                            search
+                        </span>
+                        <input
+                            type="text"
+                            placeholder="Buscar..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className={styles.searchInput}
+                            style={{ paddingLeft: '35px' }}
+                        />
+                    </div>
+                    <button
+                        onClick={handleAddInstrument}
+                        className={styles.addButton}
+                    >
+                        <i className="fas fa-plus"></i> Agregar Instrumento
+                    </button>
                 </div>
-                <button
-                    onClick={handleAddInstrument}
-                    className={styles.addButton}
-                >
-                    <i className="fas fa-plus"></i> Agregar Instrumento
-                </button>
             </div>
-        </div>
 
             <div className={styles.tableContainer}>
                 <table className={styles.instrumentsTable}>
@@ -223,9 +205,7 @@ const Instruments = () => {
                                     />
                                 </td>
                                 <td>{instrument.name}</td>
-                                <td>
-                                    {getProductCategory(instrument.categoryId)}
-                                </td>
+                                <td>{getProductCategory(instrument.categoryId)}</td>
                                 <td>
                                     <span className={`${styles.statusBadge} ${styles[instrument.status.toLowerCase()]}`}>
                                         {instrument.status}
@@ -233,20 +213,12 @@ const Instruments = () => {
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
                                 <td className={styles.actions}>
-                                    {/* <button
-                                        onClick={() => handleEditInstrument(instrument)}
-                                        className={styles.editButton}
+                                    <button
+                                        onClick={() => handleDeleteInstrument(instrument)}
+                                        className={styles.deleteButton}
                                     >
-                                        <i className="fas fa-edit"></i>
-                                    </button> */}
-<button
-    onClick={() => handleDeleteInstrument(instrument)}
-    className={styles.deleteButton}
->
-    <i className="fas fa-trash"></i>
-</button>
-
-
+                                        <i className="fas fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         ))}
@@ -254,40 +226,16 @@ const Instruments = () => {
                 </table>
             </div>
 
-            <div className={styles.pagination}>
-                <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
-                    className={styles.pageButton}
-                >
-                    Anterior
-                </button>
-                {[...Array(totalPages)].map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setCurrentPage(index + 1)}
-                        className={`${styles.pageButton} ${currentPage === index + 1 ? styles.active : ''}`}
-                    >
-                        {index + 1}
-                    </button>
-                ))}
-                <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
-                    className={styles.pageButton}
-                >
-                    Siguiente
-                </button>
-            </div>
-
-            {/* Modal for adding/editing instruments (similar to previous implementation) */}
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
                             <h3>{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
                             <button
-                                onClick={() => setModalOpen(false)}
+                                onClick={() => {
+                                    setModalOpen(false);
+                                    setPreviews([]);
+                                }}
                                 className={styles.modalClose}
                             >
                                 &times;
@@ -330,31 +278,31 @@ const Instruments = () => {
                                 />
                             </div>
                             <div className={styles.formGroup}>
-    <label htmlFor="instrument-images">Imágenes del Instrumento</label>
-    <input
-        type="file"
-        id="instrument-images"
-        accept="image/*"
-        multiple
-        onChange={(e) => {
-            const files = e.target.files;
-            const previews = Array.from(files).map(file => URL.createObjectURL(file));
-            setPreviews(previews);
-        }}
-    />
-    {previews.length > 0 && (
-        <div className={styles.imagePreviewContainer}>
-            {previews.map((preview, index) => (
-                <img 
-                    key={index} 
-                    src={preview} 
-                    alt={`Preview ${index + 1}`} 
-                    className={styles.imagePreview}
-                />
-            ))}
-        </div>
-    )}
-</div>
+                                <label htmlFor="instrument-images">Imágenes del Instrumento</label>
+                                <input
+                                    type="file"
+                                    id="instrument-images"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={(e) => {
+                                        const files = e.target.files;
+                                        const previews = Array.from(files).map(file => URL.createObjectURL(file));
+                                        setPreviews(previews);
+                                    }}
+                                />
+                                {previews.length > 0 && (
+                                    <div className={styles.imagePreviewContainer}>
+                                        {previews.map((preview, index) => (
+                                            <img
+                                                key={index}
+                                                src={preview}
+                                                alt={`Preview ${index + 1}`}
+                                                className={styles.imagePreview}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="instrument-description">Descripción</label>
                                 <textarea
@@ -379,7 +327,10 @@ const Instruments = () => {
                             <div className={styles.formActions}>
                                 <button
                                     type="button"
-                                    onClick={() => setModalOpen(false)}
+                                    onClick={() => {
+                                        setModalOpen(false);
+                                        setPreviews([]);
+                                    }}
                                     className={styles.modalBtnSecondary}
                                 >
                                     Cancelar

@@ -118,3 +118,31 @@
         padding: 0.625rem;
     }
 }
+
+.authTitle {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.authTitle h2 {
+    color: #413620;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.formSwitch {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #666;
+}
+
+.switchLink {
+    color: #9C6615;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 0.5rem;
+}
+
+.switchLink:hover {
+    color: #413620;
+}
