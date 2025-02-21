@@ -60,7 +60,7 @@ function CardDetails() {
                         <img key={index} src={img} alt={`Miniatura ${index}`} className="w-full h-47 object-cover rounded-lg" />
                     ))}
                     <div className="relative">
-                        <button onClick={() => setShowGallery(true)} className="absolute -right-40 md:-right-52 lg:-right-75 bottom-8 cursor-pointer border bg-white text-(--color-secondary) px-5 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) hover:text-white  transition">
+                        <button onClick={() => setShowGallery(true)} className="absolute -right-40 md:-right-52 lg:-right-80 bottom-8 cursor-pointer border bg-white text-(--color-secondary) px-4 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) hover:text-white  transition">
                         Ver más 👁
                         </button>
                     </div>
