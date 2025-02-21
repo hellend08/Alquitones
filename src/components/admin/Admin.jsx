@@ -77,6 +77,14 @@ const Instruments = () => {
         e.preventDefault();
     
         const form = e.target;
+        const instrumentName = form['instrument-name'].value;
+
+        // Verificar nombre duplicado
+        if (checkDuplicateName(instrumentName)) {
+            alert('Ya existe un instrumento con este nombre. Por favor, elija un nombre diferente.');
+            return;
+        }
+
         const fileInput = document.getElementById('instrument-images');
         const images = fileInput.files;
     
@@ -103,7 +111,7 @@ const Instruments = () => {
             const base64Images = await Promise.all(imagePromises);
     
             const instrumentData = {
-                name: form['instrument-name'].value,
+                name: instrumentName,
                 categoryId: parseInt(form['instrument-category'].value),
                 pricePerDay: parseFloat(form['instrument-price'].value),
                 description: form['instrument-description'].value,
@@ -113,11 +121,27 @@ const Instruments = () => {
             };
     
             if (modalMode === 'create') {
-                await localDB.createProduct(instrumentData);
-                alert('Instrumento creado con éxito');
+                try {
+                    await localDB.createProduct(instrumentData);
+                    alert('Instrumento creado con éxito');
+                } catch (error) {
+                    if (error.message.includes('nombre ya existe')) {
+                        alert('Ya existe un instrumento con este nombre. Por favor, elija un nombre diferente.');
+                        return;
+                    }
+                    throw error;
+                }
             } else {
-                await localDB.updateProduct(currentInstrument.id, instrumentData);
-                alert('Instrumento actualizado con éxito');
+                try {
+                    await localDB.updateProduct(currentInstrument.id, instrumentData);
+                    alert('Instrumento actualizado con éxito');
+                } catch (error) {
+                    if (error.message.includes('nombre ya existe')) {
+                        alert('Ya existe un instrumento con este nombre. Por favor, elija un nombre diferente.');
+                        return;
+                    }
+                    throw error;
+                }
             }
     
             loadInstruments();
@@ -147,6 +171,14 @@ const Instruments = () => {
             console.error('Error al eliminar instrumento:', error);
             alert('Error al eliminar el instrumento');
         }
+    };
+
+    const checkDuplicateName = (name) => {
+        const normalizedName = name.trim().toLowerCase();
+        return instruments.some(instrument => 
+            instrument.name.trim().toLowerCase() === normalizedName &&
+            (modalMode === 'create' || instrument.id !== currentInstrument?.id)
+        );
     };
 
     return (
