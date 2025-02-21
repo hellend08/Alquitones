@@ -464,12 +464,13 @@ const Admin = () => {
 <div className={styles.responsiveMessage}>
     <Header />
     <div className={styles.responsiveContent}>
-        <div className={styles.responsiveIllustration}>
-            <img 
+        <div className="w-[90%]">
+            {/* <img 
                 src="/src/assets/no-disponible.jpg" 
                 alt="Vista no disponible en móviles" 
                 className={styles.responsiveImage}
-            />
+            /> */}
+            <h3 className="pt-3 text-3xl font-semibold">Esta modalidad no esta disponible en móviles.</h3>
         </div>
     </div>
     <Footer />

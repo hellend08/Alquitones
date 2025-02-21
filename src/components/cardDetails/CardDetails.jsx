@@ -114,18 +114,19 @@ function CardDetails() {
             {/* Modal de Galería - Todas las imágenes */}
             {showGallery && (
                 <div className="fixed inset-0 bg-black/75 transition-opacity flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75">
+                    <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75 md:h-[400px] overflow-y-auto">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold">Galería de Imágenes</h2>
                             <button onClick={() => setShowGallery(false)} className="text-gray-500 hover:text-gray-700"> ✖ </button>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {allImages.map((img, index) => (
                                 <img 
                                     key={index} 
                                     src={img} 
                                     alt={`Imagen ${index + 1}`} 
-                                    className={`w-full ${index === 0 ? 'md:col-span-2 h-96' : 'h-47'} object-cover rounded-lg`}
+                                    className="w-full md:col-span-2 h-47 object-cover rounded-lg"
+                                    // className={`w-full ${index === 0 ? 'md:col-span-2 h-60' : 'col-span-2 h-47'} object-cover rounded-lg`}
                                 />
                             ))}
                         </div>

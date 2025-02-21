@@ -401,7 +401,7 @@
     justify-content: center;
     align-items: flex-start; /* Cambio a flex-start para alinear arriba */
     padding: 2rem;          /* Padding para evitar que toque los bordes */
-    overflow-y: auto;       /* Permitir scroll */
+    /* overflow-y: auto;       Permitir scroll */
     z-index: 1000;
 }
 .modalContent {
