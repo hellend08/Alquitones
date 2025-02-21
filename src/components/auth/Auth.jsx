@@ -76,7 +76,7 @@ const Auth = () => {
 
     return (
         <div className={styles.authContainer}>
-            <img src="/src/assets/alquitonesLogo.png" alt="AlquiTones" className={styles.logo}/>
+            {/* <img src="/src/assets/alquitonesLogo.png" alt="AlquiTones" className={styles.logo}/> */}
             <div className={styles.formContainer}>
                 <div className={styles.authTitle}>
                     <h2>{activeForm === 'login' ? 'Iniciar Sesión' : 'Registrarse'}</h2>
