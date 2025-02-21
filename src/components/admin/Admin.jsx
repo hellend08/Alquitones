@@ -138,7 +138,10 @@ const Instruments = () => {
 
         try {
             await localDB.deleteProduct(instrument.id);
-            loadInstruments();
+            // Update the local state immediately by filtering out the deleted instrument
+            setInstruments(prevInstruments => 
+                prevInstruments.filter(item => item.id !== instrument.id)
+            );
             alert('Instrumento eliminado exitosamente');
         } catch (error) {
             console.error('Error al eliminar instrumento:', error);
