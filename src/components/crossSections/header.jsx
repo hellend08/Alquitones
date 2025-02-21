@@ -19,8 +19,8 @@ const Header = () => {
                 </a>
                 <nav className="md:flex md:w-auto p-1 text-sm font-semibold text-(--color-secondary) items-center space-x-4 mr-2">
                     <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Inicio</a>
-                    <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Nosotros</a>
-                    <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Catálogo</a>
+                    {/* <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Nosotros</a>
+                    <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Catálogo</a> */}
                     <AuthButtons />
                 </nav>
             </div>
@@ -39,8 +39,8 @@ const Header = () => {
             {isOpen && (
                 <div className="md:hidden text-sm mx-4 font-bold text-gray-600">
                     <a className='relative block rounded-lg p-2 ' href="/">Inicio</a>
-                    <a className='relative block rounded-lg p-2 ' href="/">Quienes somos</a>
-                    <a className='relative block rounded-lg p-2 ' href="/">Catalogo</a>
+                    {/* <a className='relative block rounded-lg p-2 ' href="/">Quienes somos</a>
+                    <a className='relative block rounded-lg p-2 ' href="/">Catalogo</a> */}
                     <AuthButtons />
                 </div>
             )}
