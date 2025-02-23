@@ -431,6 +431,79 @@ categories: [
         localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
     }
 
+
+// Añadir estos métodos en LocalDB.jsx, dentro de la clase LocalDB
+
+getAllCategories() {
+    return this.data.categories;
+}
+
+getCategoryById(id) {
+    return this.data.categories.find(category => category.id === id);
+}
+
+createCategory(categoryData) {
+    // Validar que el nombre no esté vacío
+    if (!categoryData.name || categoryData.name.trim() === '') {
+        throw new Error('El nombre de la categoría no puede estar vacío');
+    }
+
+    // Validar que no exista una categoría con el mismo nombre
+    const existingCategory = this.data.categories.find(
+        cat => cat.name.toLowerCase() === categoryData.name.toLowerCase()
+    );
+    if (existingCategory) {
+        throw new Error('Ya existe una categoría con este nombre');
+    }
+
+    const newCategory = {
+        id: this.data.categories.length + 1,
+        ...categoryData,
+        icon: categoryData.icon || '/src/assets/icons/default-category.png',
+        isActive: true
+    };
+
+    this.data.categories.push(newCategory);
+    this.saveToStorage();
+    return newCategory;
+}
+
+updateCategory(id, categoryData) {
+    const index = this.data.categories.findIndex(category => category.id === id);
+    if (index === -1) throw new Error('Categoría no encontrada');
+
+    // Validar nombre único
+    const existingCategory = this.data.categories.find(
+        cat => cat.name.toLowerCase() === categoryData.name.toLowerCase() && cat.id !== id
+    );
+    if (existingCategory) {
+        throw new Error('Ya existe una categoría con este nombre');
+    }
+
+    this.data.categories[index] = {
+        ...this.data.categories[index],
+        ...categoryData
+    };
+
+    this.saveToStorage();
+    return this.data.categories[index];
+}
+
+deleteCategory(id) {
+    // Verificar si hay productos con esta categoría
+    const productsInCategory = this.getProductsByCategory(id);
+    if (productsInCategory.length > 0) {
+        throw new Error('No se puede eliminar una categoría con productos asociados');
+    }
+
+    const index = this.data.categories.findIndex(category => category.id === id);
+    if (index === -1) throw new Error('Categoría no encontrada');
+
+    this.data.categories.splice(index, 1);
+    this.saveToStorage();
+    return true;
+}
+
     // CRUD Usuarios
     getAllUsers() {
         return this.data.users;
@@ -561,22 +634,21 @@ getProductsPaginated(page = 1, size = 10) {
     updateProduct(id, productData) {
         const index = this.data.products.findIndex(product => product.id === id);
         if (index === -1) throw new Error('Producto no encontrado');
-
+    
         // Si se actualizan las imágenes, validar que sean 5
-        if (productData.images && productData.images.length !== 5) {
-            throw new Error('El producto debe tener exactamente 5 imágenes');
-        }
-
-        // Si hay nuevas imágenes, actualizar la imagen principal
         if (productData.images) {
-            productData.mainImage = productData.images[0];
+            if (productData.images.length !== 5) {
+                // Si no son 5 imágenes, usar las imágenes existentes
+                productData.images = this.data.products[index].images;
+                productData.mainImage = this.data.products[index].mainImage;
+            }
         }
-
+    
         this.data.products[index] = {
             ...this.data.products[index],
             ...productData
         };
-
+    
         this.saveToStorage();
         return this.data.products[index];
     }
