@@ -496,6 +496,46 @@ categories: [
         return this.data.products;
     }
 
+    // Agregar este método a la clase LocalDB justo después de getAllProducts()
+
+getProductsPaginated(page = 1, size = 10) {
+    try {
+        // Obtener todos los productos
+        const products = this.data.products;
+        const totalProducts = products.length;
+        
+        // Calcular número total de páginas
+        const totalPages = Math.ceil(totalProducts / size);
+        
+        // Validar que la página solicitada sea válida
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+        
+        // Calcular índices de inicio y fin para la página actual
+        const startIndex = (page - 1) * size;
+        const endIndex = Math.min(startIndex + size, totalProducts);
+        
+        // Obtener los productos de la página solicitada
+        const paginatedProducts = products.slice(startIndex, endIndex);
+        
+        // Retornar estructura con metadata de paginación
+        return {
+            products: paginatedProducts,
+            metadata: {
+                currentPage: page,
+                pageSize: size,
+                totalPages: totalPages,
+                totalProducts: totalProducts,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+        };
+    } catch (error) {
+        console.error('Error en paginación:', error);
+        throw new Error('Error al paginar productos');
+    }
+}
+
     getProductById(id) {
         return this.data.products.find(product => product.id === id);
     }
