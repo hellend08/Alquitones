@@ -522,14 +522,24 @@ deleteCategory(id) {
         if (this.getUserByEmail(userData.email)) {
             throw new Error('El email ya está registrado');
         }
-
+    
+        // Verificar que los campos requeridos estén presentes
+        if (!userData.firstName || !userData.lastName || !userData.email || !userData.password) {
+            throw new Error('Todos los campos son obligatorios');
+        }
+    
         const newUser = {
             id: this.data.users.length + 1,
-            ...userData,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            username: userData.username || `${userData.firstName} ${userData.lastName}`,
+            email: userData.email,
+            password: userData.password,
+            role: userData.role || 'client',
             createdAt: new Date().toISOString(),
             isActive: true
         };
-
+    
         this.data.users.push(newUser);
         this.saveToStorage();
         return newUser;

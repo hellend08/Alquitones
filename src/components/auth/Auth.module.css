@@ -146,3 +146,28 @@
 .switchLink:hover {
     color: #413620;
 }
+
+
+.passwordStrength {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+}
+
+.debil {
+    background-color: #ffcccc;
+    color: #cc0000;
+}
+
+.media {
+    background-color: #fff2cc;
+    color: #b88a00;
+}
+
+.fuerte {
+    background-color: #d4edda;
+    color: #155724;
+}
