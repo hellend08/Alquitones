@@ -285,7 +285,7 @@ const Instruments = () => {
                                     </span>
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
-                                <td className={styles.actions}>
+                                <td className="flex items-center gap-4 h-[83.33px]">
                                     <button
                                         onClick={() => handleEditInstrument(instrument)}
                                         className={styles.editButton}
@@ -608,7 +608,7 @@ const Categories = () => {
                                 <td>{category.name}</td>
                                 <td>{category.description}</td>
                                 <td>{localDB.getProductsByCategory(category.id).length}</td>
-                                <td className={styles.actions}>
+                                <td className="flex items-center gap-4 h-[83.33px]">
                                     <button
                                         onClick={() => handleEditCategory(category)}
                                         className={styles.editButton}

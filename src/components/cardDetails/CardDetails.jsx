@@ -114,7 +114,7 @@ function CardDetails() {
             {/* Modal de Galería - Todas las imágenes */}
             {showGallery && (
                 <div className="fixed inset-0 bg-black/75 transition-opacity flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75 md:h-[400px] overflow-y-auto">
+                    <div className="bg-white p-6 rounded-lg max-w-4xl w-full disabled:opacity-75 md:h-[510px] 2xl:h-auto overflow-y-auto">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold">Galería de Imágenes</h2>
                             <button onClick={() => setShowGallery(false)} className="text-gray-500 hover:text-gray-700"> ✖ </button>
