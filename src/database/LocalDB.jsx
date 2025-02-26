@@ -617,20 +617,20 @@ class LocalDB {
     createProduct(productData) {
         // Modificar validación para permitir 1-5 imágenes
         if (!productData.images || productData.images.length < 1 || productData.images.length > 5) {
-            throw new Error('El producto debe por lo menos 1 imagen');
+          throw new Error('El producto debe tener al menos 1 imagen');
         }
-
+      
         const newProduct = {
-            id: this.data.products.length + 1,
-            ...productData,
-            mainImage: productData.mainImage, // Primera imagen como principal
-            createdAt: new Date().toISOString()
+          id: this.data.products.length + 1,
+          ...productData,
+          mainImage: productData.images[0], // Usar primera imagen como principal
+          createdAt: new Date().toISOString()
         };
-
+      
         this.data.products.push(newProduct);
         this.saveToStorage();
         return newProduct;
-    }
+      }
 
     updateProduct(id, productData) {
         const index = this.data.products.findIndex(product => product.id === id);

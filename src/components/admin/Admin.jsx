@@ -81,70 +81,76 @@ const Instruments = () => {
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
-
+      
         const form = e.target;
         const instrumentName = form['instrument-name'].value;
-
+        const fileInput = document.getElementById('instrument-images');
+        const images = Array.from(fileInput.files);
+      
+        // Validación de imágenes
+        if (images.length < 1 || images.length > 5) {
+          alert('Debes seleccionar entre 1 y 5 imágenes');
+          return;
+        }
+      
         // Verificar nombre duplicado
         if (checkDuplicateName(instrumentName)) {
-            alert('Ya existe un instrumento con este nombre. Por favor, elija un nombre diferente.');
-            return;
+          alert('Ya existe un instrumento con este nombre');
+          return;
         }
-
-        const fileInput = document.getElementById('instrument-images');
-        const images = fileInput.files;
-
+      
         try {
-            const instrumentData = {
-                name: instrumentName,
-                categoryId: parseInt(form['instrument-category'].value),
-                pricePerDay: parseFloat(form['instrument-price'].value),
-                description: form['instrument-description'].value,
-                status: form['instrument-status'].value
-            };
-
-            // Recopilar especificaciones
-            const specifications = localDB.getAllSpecifications();
-            const productSpecifications = specifications
-                .map(spec => {
-                    const value = form[`spec-${spec.id}`]?.value;
-                    if (value && value.trim() !== '') {
-                        return {
-                            spValue: value.trim(),
-                            specification: { id: spec.id }
-                        };
-                    }
-                    return null;
-                })
-                .filter(spec => spec !== null);
-
-            if (productSpecifications.length > 0) {
-                instrumentData.specifications = productSpecifications;
-            }
-
-            // Resto del código existente para imágenes...
-
-            // Lógica de creación o actualización
-            if (modalMode === 'create') {
-                await localDB.createProduct(instrumentData);
-                alert('Instrumento creado con éxito');
-            } else {
-                await localDB.updateProduct(currentInstrument.id, instrumentData);
-                alert('Instrumento actualizado con éxito');
-            }
-
-            loadInstruments();
-            setModalOpen(false);
-            setPreviews([]);
+          // Convertir imágenes a URLs base64
+          const imageUrls = await Promise.all(
+            images.map(file => {
+              return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+              });
+            })
+          );
+      
+          // Recopilar especificaciones
+          const specifications = localDB.getAllSpecifications();
+          const productSpecifications = specifications
+            .map(spec => {
+              const value = form[`spec-${spec.id}`]?.value;
+              return value?.trim() ? { 
+                spValue: value.trim(), 
+                specification: { id: spec.id } 
+              } : null;
+            })
+            .filter(spec => spec !== null);
+      
+          const instrumentData = {
+            name: instrumentName,
+            categoryId: parseInt(form['instrument-category'].value),
+            pricePerDay: parseFloat(form['instrument-price'].value),
+            description: form['instrument-description'].value,
+            status: form['instrument-status'].value,
+            images: imageUrls,
+            mainImage: imageUrls[0],
+            specifications: productSpecifications
+          };
+      
+          // Lógica de creación/actualización
+          if (modalMode === 'create') {
+            await localDB.createProduct(instrumentData);
+            alert('Instrumento creado con éxito');
+          } else {
+            await localDB.updateProduct(currentInstrument.id, instrumentData);
+            alert('Instrumento actualizado con éxito');
+          }
+      
+          loadInstruments();
+          setModalOpen(false);
+          setPreviews([]);
         } catch (error) {
-            console.error('Error:', error);
-            if (error.message.includes('nombre ya existe')) {
-                alert('Ya existe un instrumento con este nombre. Por favor, elija un nombre diferente.');
-            } else {
-                alert('Error al ' + (modalMode === 'create' ? 'crear' : 'actualizar') + ' el instrumento');
-            }
+          console.error('Error:', error);
+          alert(error.message);
         }
-    };
+      };
 
     const handleDeleteInstrument = async (instrument) => {
         const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar el instrumento "${instrument.name}"?`);
@@ -335,6 +341,7 @@ const Instruments = () => {
                                     id="instrument-images"
                                     accept="image/*"
                                     multiple
+                                    required
                                     onChange={(e) => {
                                         const files = e.target.files;
                                         const previews = Array.from(files).map(file => URL.createObjectURL(file));
