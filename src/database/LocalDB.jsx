@@ -404,7 +404,7 @@ class LocalDB {
         };
 
         // Forzar actualización de datos
-        localStorage.removeItem('alquitonesDB');
+        
         this.initializeStorage();
     }
 
