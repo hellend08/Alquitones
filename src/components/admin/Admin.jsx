@@ -28,17 +28,17 @@ const Instruments = () => {
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-    
+
 
     useEffect(() => {
         loadInstruments();
-    }, [searchTerm]); 
+    }, [searchTerm]);
 
     const loadInstruments = () => {
         try {
             // Obtener todos los productos sin paginación
             const result = localDB.getProductsPaginated(
-                1, 
+                1,
                 Infinity, // Tamaño infinito para obtener todos
                 searchTerm,
                 false // Desactivar paginación
@@ -75,76 +75,69 @@ const Instruments = () => {
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
-      
+
         const form = e.target;
-        const instrumentName = form['instrument-name'].value;
         const fileInput = document.getElementById('instrument-images');
         const images = Array.from(fileInput.files);
-      
-        // Validación de imágenes
-        if (images.length < 1 || images.length > 5) {
-          alert('Debes seleccionar entre 1 y 5 imágenes');
-          return;
+
+        // Validación de imágenes SOLO para creación
+        if (modalMode === 'create' && (images.length < 1 || images.length > 5)) {
+            alert('Debes seleccionar entre 1 y 5 imágenes');
+            return;
         }
-      
-        // Verificar nombre duplicado
-        if (checkDuplicateName(instrumentName)) {
-          alert('Ya existe un instrumento con este nombre');
-          return;
-        }
-      
+
         try {
-          // Convertir imágenes a URLs base64
-          const imageUrls = await Promise.all(
-            images.map(file => {
-              return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.readAsDataURL(file);
-              });
-            })
-          );
-      
-          // Recopilar especificaciones
-          const specifications = localDB.getAllSpecifications();
-          const productSpecifications = specifications
-            .map(spec => {
-              const value = form[`spec-${spec.id}`]?.value;
-              return value?.trim() ? { 
-                spValue: value.trim(), 
-                specification: { id: spec.id } 
-              } : null;
-            })
-            .filter(spec => spec !== null);
-      
-          const instrumentData = {
-            name: instrumentName,
-            categoryId: parseInt(form['instrument-category'].value),
-            pricePerDay: parseFloat(form['instrument-price'].value),
-            description: form['instrument-description'].value,
-            status: form['instrument-status'].value,
-            images: imageUrls,
-            mainImage: imageUrls[0],
-            specifications: productSpecifications
-          };
-      
-          // Lógica de creación/actualización
-          if (modalMode === 'create') {
-            await localDB.createProduct(instrumentData);
-            alert('Instrumento creado con éxito');
-          } else {
-            await localDB.updateProduct(currentInstrument.id, instrumentData);
-            alert('Instrumento actualizado con éxito');
-          }
-      
-          loadInstruments();
-          setModalOpen(false);
-          setPreviews([]);
+            // Convertir imágenes solo si hay nuevas
+            const imageUrls = images.length > 0
+                ? await Promise.all(images.map(file => {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                }))
+                : null;
+
+            // Recopilar especificaciones
+            const specifications = localDB.getAllSpecifications();
+            const productSpecifications = specifications
+                .map(spec => {
+                    const value = form[`spec-${spec.id}`]?.value;
+                    return value?.trim() ? {
+                        spValue: value.trim(),
+                        specification: { id: spec.id }
+                    } : null;
+                })
+                .filter(spec => spec !== null);
+
+            // Usar valores existentes si los campos están vacíos
+            const instrumentData = {
+                name: form['instrument-name'].value.trim() || currentInstrument?.name,
+                categoryId: parseInt(form['instrument-category'].value) || currentInstrument?.categoryId,
+                pricePerDay: parseFloat(form['instrument-price'].value) || currentInstrument?.pricePerDay,
+                description: form['instrument-description'].value.trim() || currentInstrument?.description,
+                status: form['instrument-status'].value || currentInstrument?.status,
+                images: imageUrls || currentInstrument?.images,
+                mainImage: (imageUrls?.[0]) || currentInstrument?.mainImage,
+                specifications: productSpecifications.length > 0 ? productSpecifications : currentInstrument?.specifications
+            };
+
+            if (modalMode === 'create') {
+                await localDB.createProduct(instrumentData);
+                alert('Instrumento creado con éxito');
+            } else {
+                await localDB.updateProduct(currentInstrument.id, instrumentData);
+                alert('Instrumento actualizado con éxito');
+            }
+
+            loadInstruments();
+            setModalOpen(false);
+            setPreviews([]);
         } catch (error) {
-          console.error('Error:', error);
-          alert(error.message);
+            console.error('Error:', error);
+            alert(error.message);
         }
-      };
+    };
 
     const handleDeleteInstrument = async (instrument) => {
         const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar el instrumento "${instrument.name}"?`);
@@ -168,13 +161,16 @@ const Instruments = () => {
 
     const checkDuplicateName = (name) => {
         const normalizedName = name.trim().toLowerCase();
+        // Permitir campo vacío en edición
+        if (modalMode === 'edit' && !normalizedName) return false;
+
         return instruments.some(instrument =>
             instrument.name.trim().toLowerCase() === normalizedName &&
             (modalMode === 'create' || instrument.id !== currentInstrument?.id)
         );
     };
 
-    
+
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
@@ -283,7 +279,7 @@ const Instruments = () => {
                                     type="text"
                                     id="instrument-name"
                                     defaultValue={currentInstrument?.name || ''}
-                                    required
+
                                 />
                             </div>
                             <div className={styles.formGroup}>
@@ -291,7 +287,7 @@ const Instruments = () => {
                                 <select
                                     id="instrument-category"
                                     defaultValue={currentInstrument?.categoryId || ''}
-                                    required
+
                                 >
                                     <option value="">Seleccionar categoría</option>
                                     {localDB.data.categories.map(category => (
@@ -309,7 +305,7 @@ const Instruments = () => {
                                     min="0"
                                     step="0.01"
                                     defaultValue={currentInstrument?.pricePerDay || ''}
-                                    required
+
                                 />
                             </div>
                             <div className={styles.formGroup}>
@@ -319,7 +315,7 @@ const Instruments = () => {
                                     id="instrument-images"
                                     accept="image/*"
                                     multiple
-                                    required
+                                    required={modalMode === 'create'} // Solo requerido en creación
                                     onChange={(e) => {
                                         const files = e.target.files;
                                         const previews = Array.from(files).map(file => URL.createObjectURL(file));
@@ -366,7 +362,7 @@ const Instruments = () => {
                                     id="instrument-description"
                                     rows="4"
                                     defaultValue={currentInstrument?.description || ''}
-                                    required
+
                                 />
                             </div>
                             <div className={styles.formGroup}>
@@ -374,7 +370,7 @@ const Instruments = () => {
                                 <select
                                     id="instrument-status"
                                     defaultValue={currentInstrument?.status || 'Disponible'}
-                                    required
+
                                 >
                                     <option value="Disponible">Disponible</option>
                                     <option value="Reservado">Reservado</option>
@@ -1184,11 +1180,11 @@ const Admin = () => {
         link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
         link.rel = "stylesheet";
         document.head.appendChild(link);
-      
+
         return () => {
-          document.head.removeChild(link);
+            document.head.removeChild(link);
         };
-      }, []);
+    }, []);
 
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);
