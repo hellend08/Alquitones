@@ -103,54 +103,26 @@ const Instruments = () => {
                 status: form['instrument-status'].value
             };
 
-            // Lógica para manejar imágenes
-            if (modalMode === 'create') {
-                // En modo creación, las imágenes son obligatorias
-                if (images.length === 0) {
-                    alert('Debe seleccionar al menos una imagen');
-                    return;
-                }
-
-                if (images.length > 5) {
-                    alert('Solo puede seleccionar un máximo de 5 imágenes');
-                    return;
-                }
-
-                const imagePromises = Array.from(images).map(file => {
-                    return new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    });
-                });
-
-                const base64Images = await Promise.all(imagePromises);
-                instrumentData.images = base64Images;
-                instrumentData.mainImage = base64Images[0];
-            } else {
-                // En modo edición
-                if (images.length > 0) {
-                    // Si se seleccionaron nuevas imágenes
-                    if (images.length > 5) {
-                        alert('Solo puede seleccionar un máximo de 5 imágenes');
-                        return;
+            // Recopilar especificaciones
+            const specifications = localDB.getAllSpecifications();
+            const productSpecifications = specifications
+                .map(spec => {
+                    const value = form[`spec-${spec.id}`]?.value;
+                    if (value && value.trim() !== '') {
+                        return {
+                            spValue: value.trim(),
+                            specification: { id: spec.id }
+                        };
                     }
+                    return null;
+                })
+                .filter(spec => spec !== null);
 
-                    const imagePromises = Array.from(images).map(file => {
-                        return new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onloadend = () => resolve(reader.result);
-                            reader.onerror = reject;
-                            reader.readAsDataURL(file);
-                        });
-                    });
-
-                    const base64Images = await Promise.all(imagePromises);
-                    instrumentData.images = base64Images;
-                    instrumentData.mainImage = base64Images[0];
-                }
+            if (productSpecifications.length > 0) {
+                instrumentData.specifications = productSpecifications;
             }
+
+            // Resto del código existente para imágenes...
 
             // Lógica de creación o actualización
             if (modalMode === 'create') {
@@ -383,6 +355,27 @@ const Instruments = () => {
                                 )}
                             </div>
                             <div className={styles.formGroup}>
+                                <label>Características</label>
+                                <div className={styles.specificationsContainer}>
+                                    {localDB.getAllSpecifications().map(spec => (
+                                        <div key={spec.id} className={styles.specificationItem}>
+                                            <label htmlFor={`spec-${spec.id}`}>{spec.name}</label>
+                                            <input
+                                                type="text"
+                                                id={`spec-${spec.id}`}
+                                                name={`spec-${spec.id}`}
+                                                placeholder={`Valor para ${spec.name}`}
+                                                defaultValue={
+                                                    currentInstrument?.specifications?.find(
+                                                        s => s.specification.id === spec.id
+                                                    )?.spValue || ''
+                                                }
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className={styles.formGroup}>
                                 <label htmlFor="instrument-description">Descripción</label>
                                 <textarea
                                     id="instrument-description"
@@ -437,7 +430,7 @@ const Categories = () => {
     const [currentCategory, setCurrentCategory] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-    
+
     // Estados para paginación
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -492,8 +485,8 @@ const Categories = () => {
         e.preventDefault();
         const form = e.target;
         const iconInput = document.getElementById('category-icon');
-        const icon = iconInput.files.length > 0 
-            ? URL.createObjectURL(iconInput.files[0]) 
+        const icon = iconInput.files.length > 0
+            ? URL.createObjectURL(iconInput.files[0])
             : (currentCategory?.icon || '/src/assets/icons/default-category.png');
 
         const categoryData = {
@@ -629,22 +622,22 @@ const Categories = () => {
             </div>
 
             <div className={styles.pagination}>
-                <button 
-                    onClick={() => setCurrentPage(1)} 
+                <button
+                    onClick={() => setCurrentPage(1)}
                     disabled={currentPage === 1}
                     className={styles.pageButton}
                 >
                     Primero
                 </button>
-                <button 
-                    onClick={handlePreviousPage} 
+                <button
+                    onClick={handlePreviousPage}
                     disabled={currentPage === 1}
                     className={styles.pageButton}
                 >
                     Anterior
                 </button>
-                <button 
-                    onClick={handleNextPage} 
+                <button
+                    onClick={handleNextPage}
                     disabled={currentPage === totalPages}
                     className={styles.pageButton}
                 >
@@ -718,6 +711,268 @@ const Categories = () => {
                                         setModalOpen(false);
                                         setPreviews([]);
                                     }}
+                                    className={styles.modalBtnSecondary}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={styles.modalBtnPrimary}
+                                >
+                                    {modalMode === 'create' ? 'Crear' : 'Actualizar'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Nuevo componente Specifications para Admin.jsx
+const Specifications = () => {
+    const [specifications, setSpecifications] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('create');
+    const [currentSpecification, setCurrentSpecification] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Estados para paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 10;
+
+    useEffect(() => {
+        loadSpecifications();
+    }, [searchTerm, currentPage]);
+
+    const loadSpecifications = () => {
+        try {
+            const allSpecifications = localDB.getAllSpecifications();
+            let filteredSpecifications = allSpecifications;
+
+            if (searchTerm) {
+                filteredSpecifications = allSpecifications.filter(spec =>
+                    spec.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            // Calcular paginación manualmente
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedSpecifications = filteredSpecifications.slice(startIndex, endIndex);
+
+            setSpecifications(paginatedSpecifications);
+            setTotalPages(Math.ceil(filteredSpecifications.length / itemsPerPage));
+        } catch (error) {
+            console.error('Error al cargar características:', error);
+            alert('Error al cargar las características');
+        }
+    };
+
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); // Reiniciar a primera página al buscar
+    };
+
+    const handleAddSpecification = () => {
+        setModalMode('create');
+        setCurrentSpecification(null);
+        setModalOpen(true);
+    };
+
+    const handleEditSpecification = (specification) => {
+        setModalMode('edit');
+        setCurrentSpecification(specification);
+        setModalOpen(true);
+    };
+
+    const handleModalSubmit = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+
+        const specificationData = {
+            name: form['specification-name'].value,
+            description: form['specification-description'].value
+        };
+
+        try {
+            if (modalMode === 'create') {
+                await localDB.createSpecification(specificationData);
+                alert('Característica creada con éxito');
+            } else {
+                await localDB.updateSpecification(currentSpecification.id, specificationData);
+                alert('Característica actualizada con éxito');
+            }
+
+            loadSpecifications();
+            setModalOpen(false);
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message);
+        }
+    };
+
+    const handleDeleteSpecification = async (specification) => {
+        const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar la característica "${specification.name}"?`);
+
+        if (!confirmDelete) return;
+
+        try {
+            await localDB.deleteSpecification(specification.id);
+            loadSpecifications();
+            alert('Característica eliminada exitosamente');
+        } catch (error) {
+            console.error('Error al eliminar característica:', error);
+            alert(error.message);
+        }
+    };
+
+    // Manejadores de paginación
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    return (
+        <div className={styles.specificationsSection}>
+            <div className={styles.sectionHeader}>
+                <h2>Gestión de Características</h2>
+                <div className={styles.headerActions}>
+                    <div className={styles.searchContainer}>
+                        <span className="material-symbols-outlined" style={{
+                            position: 'absolute',
+                            left: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: '#9C9C9C',
+                            fontSize: '20px'
+                        }}>
+                            search
+                        </span>
+                        <input
+                            type="text"
+                            placeholder="Buscar..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className={styles.searchInput}
+                            style={{ paddingLeft: '35px' }}
+                        />
+                    </div>
+                    <button
+                        onClick={handleAddSpecification}
+                        className={styles.addButton}
+                    >
+                        <i className="fas fa-plus"></i> Agregar Característica
+                    </button>
+                </div>
+            </div>
+
+            <div className={styles.tableContainer}>
+                <table className={styles.instrumentsTable}>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Productos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {specifications.map(specification => (
+                            <tr key={specification.id}>
+                                <td>{specification.id}</td>
+                                <td>{specification.name}</td>
+                                <td>{specification.description}</td>
+                                <td>{localDB.getProductsBySpecification(specification.id).length}</td>
+                                <td className="flex items-center gap-4 h-[83.33px]">
+                                    <button
+                                        onClick={() => handleEditSpecification(specification)}
+                                        className={styles.editButton}
+                                    >
+                                        <i className="fas fa-edit"></i>
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteSpecification(specification)}
+                                        className={styles.deleteButton}
+                                    >
+                                        <i className="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className={styles.pagination}>
+                <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Primero
+                </button>
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Anterior
+                </button>
+                <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Siguiente
+                </button>
+            </div>
+
+            {modalOpen && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.modalHeader}>
+                            <h3>{modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}</h3>
+                            <button
+                                onClick={() => setModalOpen(false)}
+                                className={styles.modalClose}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                        <form onSubmit={handleModalSubmit} className={styles.modalForm}>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="specification-name">Nombre de la Característica</label>
+                                <input
+                                    type="text"
+                                    id="specification-name"
+                                    defaultValue={currentSpecification?.name || ''}
+                                    required
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="specification-description">Descripción</label>
+                                <textarea
+                                    id="specification-description"
+                                    rows="4"
+                                    defaultValue={currentSpecification?.description || ''}
+                                    required
+                                />
+                            </div>
+                            <div className={styles.formActions}>
+                                <button
+                                    type="button"
+                                    onClick={() => setModalOpen(false)}
                                     className={styles.modalBtnSecondary}
                                 >
                                     Cancelar
@@ -830,6 +1085,11 @@ const Admin = () => {
                                 </Link>
                             </li>
                             <li>
+                                <Link to="/admin/specifications">
+                                    <i className="fas fa-list-ul"></i> Características
+                                </Link>
+                            </li>
+                            <li>
                                 <Link to="/admin/rentals">
                                     <i className="fas fa-calendar-alt"></i> Alquileres
                                 </Link>
@@ -853,6 +1113,7 @@ const Admin = () => {
                         <Routes>
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
+                            <Route path="specifications" element={<Specifications />} />
                             <Route path="rentals" element={<Rentals />} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />

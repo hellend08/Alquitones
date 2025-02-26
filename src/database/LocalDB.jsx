@@ -29,6 +29,15 @@ categories: [
                     isActive: true
                 }
             ],
+
+            specifications: [
+                { id: 1, name: 'Marca', description: 'Marca del instrumento' },
+                { id: 2, name: 'Modelo', description: 'Modelo específico del instrumento' },
+                { id: 3, name: 'Material', description: 'Material principal del instrumento' },
+                { id: 4, name: 'Tipo', description: 'Tipo o clasificación del instrumento' },
+                { id: 5, name: 'Características técnicas', description: 'Detalles técnicos específicos' },
+                { id: 6, name: 'Accesorios', description: 'Elementos incluidos con el instrumento' }
+            ],
             products: [
                 // CUERDAS (ID: 1)
                 {
@@ -39,12 +48,10 @@ categories: [
                     pricePerDay: 45.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Fender' },
-                        { label: 'Modelo', value: 'Stratocaster Player' },
-                        { label: 'Cuerpo', value: 'Aliso' },
-                        { label: 'Mástil', value: 'Arce' },
-                        { label: 'Pastillas', value: '3 Single-coil' },
-                        { label: 'Trastes', value: '22 Medium Jumbo' }
+                        { spValue: 'Fender', specification: { id: 1 } },
+                        { spValue: 'Stratocaster Player', specification: { id: 2 } },
+                        { spValue: 'Aliso y Arce', specification: { id: 3 } },
+                        { spValue: '3 Single-coil, 22 trastes Medium Jumbo', specification: { id: 5 } }
                     ],
                     images: [
                         'https://alquitones.s3.us-east-2.amazonaws.com/01.PNG',
@@ -65,12 +72,10 @@ categories: [
                     pricePerDay: 50.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Tipo', value: 'Réplica Stradivarius' },
-                        { label: 'Tamaño', value: '4/4' },
-                        { label: 'Tapa', value: 'Abeto macizo' },
-                        { label: 'Fondo', value: 'Arce flameado' },
-                        { label: 'Arco', value: 'Madera de Brasil' },
-                        { label: 'Incluye', value: 'Estuche y resina' }
+                        { spValue: 'Réplica Stradivarius', specification: { id: 4 } },
+                        { spValue: '4/4', specification: { id: 5 } },
+                        { spValue: 'Abeto macizo y Arce flameado', specification: { id: 3 } },
+                        { spValue: 'Estuche y resina, Arco de Madera de Brasil', specification: { id: 6 } }
                     ],
                     images: [
 
@@ -97,12 +102,10 @@ categories: [
                     pricePerDay: 55.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Music Man' },
-                        { label: 'Modelo', value: 'StingRay' },
-                        { label: 'Cuerpo', value: 'Fresno' },
-                        { label: 'Mástil', value: 'Arce tostado' },
-                        { label: 'Pastillas', value: 'Humbucker' },
-                        { label: 'Electrónica', value: 'Activa 3 bandas' }
+                        { spValue: 'Music Man', specification: { id: 1 } },
+                        { spValue: 'StingRay', specification: { id: 2 } },
+                        { spValue: 'Fresno y Arce tostado', specification: { id: 3 } },
+                        { spValue: 'Humbucker, Electrónica Activa 3 bandas', specification: { id: 5 } }
                     ],
                     images: [
 
@@ -131,12 +134,10 @@ categories: [
                     pricePerDay: 65.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Selmer Paris' },
-                        { label: 'Modelo', value: 'Series III' },
-                        { label: 'Material', value: 'Latón' },
-                        { label: 'Acabado', value: 'Chapado en oro' },
-                        { label: 'Boquilla', value: 'S80 C*' },
-                        { label: 'Incluye', value: 'Estuche premium' }
+                        { spValue: 'Selmer Paris', specification: { id: 1 } },
+                        { spValue: 'Series III', specification: { id: 2 } },
+                        { spValue: 'Latón chapado en oro', specification: { id: 3 } },
+                        { spValue: 'Boquilla S80 C*, Estuche premium', specification: { id: 6 } }
                     ],
                     images: [
 
@@ -163,12 +164,10 @@ categories: [
                     pricePerDay: 45.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Buffet Crampon' },
-                        { label: 'Modelo', value: 'R13' },
-                        { label: 'Material', value: 'Granadilla' },
-                        { label: 'Sistema', value: 'Boehm' },
-                        { label: 'Llaves', value: 'Plateadas' },
-                        { label: 'Barril', value: '66mm' }
+                        { spValue: 'Buffet Crampon', specification: { id: 1 } },
+                        { spValue: 'R13', specification: { id: 2 } },
+                        { spValue: 'Granadilla', specification: { id: 3 } },
+                        { spValue: 'Sistema Boehm, Llaves plateadas, Barril 66mm', specification: { id: 5 } }
                     ],
                     images: [
 
@@ -195,12 +194,10 @@ categories: [
                     pricePerDay: 50.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Bach' },
-                        { label: 'Modelo', value: 'Stradivarius 180S' },
-                        { label: 'Material', value: 'Latón dorado' },
-                        { label: 'Acabado', value: 'Plateado' },
-                        { label: 'Campana', value: '4.8"' },
-                        { label: 'Boquilla', value: 'Bach 3C' }
+                        { spValue: 'Bach', specification: { id: 1 } },
+                        { spValue: 'Stradivarius 180S', specification: { id: 2 } },
+                        { spValue: 'Latón dorado con acabado plateado', specification: { id: 3 } },
+                        { spValue: 'Campana 4.8", Boquilla Bach 3C', specification: { id: 5 } }
                     ],
                     images: [
 
@@ -229,12 +226,11 @@ categories: [
                     pricePerDay: 75.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'DW Drums' },
-                        { label: 'Serie', value: 'Collectors' },
-                        { label: 'Material', value: 'Arce' },
-                        { label: 'Piezas', value: '6 cuerpos' },
-                        { label: 'Herrajes', value: 'DW 9000' },
-                        { label: 'Platillos', value: 'No incluidos' }
+                        { spValue: 'DW Drums', specification: { id: 1 } },
+                        { spValue: 'Collectors', specification: { id: 2 } },
+                        { spValue: 'Arce', specification: { id: 3 } },
+                        { spValue: '6 cuerpos, Herrajes DW 9000', specification: { id: 5 } },
+                        { spValue: 'Platillos no incluidos', specification: { id: 6 } }
                     ],
                     images: [
 
@@ -261,12 +257,11 @@ categories: [
                     pricePerDay: 45.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Latin Percussion' },
-                        { label: 'Modelo', value: 'Galaxy Giovanni' },
-                        { label: 'Material', value: 'Fibra de vidrio' },
-                        { label: 'Tamaños', value: '11" y 12"' },
-                        { label: 'Parches', value: 'LP Galaxy' },
-                        { label: 'Acabado', value: 'Gold Sparkle' }
+                        { spValue: 'Latin Percussion', specification: { id: 1 } },
+                        { spValue: 'Galaxy Giovanni', specification: { id: 2 } },
+                        { spValue: 'Fibra de vidrio', specification: { id: 3 } },
+                        { spValue: 'Tamaños 11" y 12", Acabado Gold Sparkle', specification: { id: 5 } },
+                        { spValue: 'Parches LP Galaxy', specification: { id: 6 } }
                     ],
                     images: [
 
@@ -293,12 +288,10 @@ categories: [
                     pricePerDay: 55.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Zildjian' },
-                        { label: 'Serie', value: 'K Custom Dark' },
-                        { label: 'Hi-hat', value: '14"' },
-                        { label: 'Crash', value: '16" y 18"' },
-                        { label: 'Ride', value: '20"' },
-                        { label: 'Material', value: 'B20 Bronze' }
+                        { spValue: 'Zildjian', specification: { id: 1 } },
+                        { spValue: 'K Custom Dark', specification: { id: 2 } },
+                        { spValue: 'B20 Bronze', specification: { id: 3 } },
+                        { spValue: 'Hi-hat 14", Crash 16" y 18", Ride 20"', specification: { id: 5 } }
                     ],
                     images: [
 
@@ -327,12 +320,11 @@ categories: [
                     pricePerDay: 150.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Steinway & Sons' },
-                        { label: 'Modelo', value: 'D-274' },
-                        { label: 'Longitud', value: '274 cm' },
-                        { label: 'Teclas', value: '88 marfil sintético' },
-                        { label: 'Acabado', value: 'Negro pulido' },
-                        { label: 'Pedales', value: '3 tradicionales' }
+                        { spValue: 'Steinway & Sons', specification: { id: 1 } },
+                        { spValue: 'D-274', specification: { id: 2 } },
+                        { spValue: 'Madera con acabado negro pulido', specification: { id: 3 } },
+                        { spValue: 'Longitud 274 cm, 88 teclas de marfil sintético', specification: { id: 5 } },
+                        { spValue: '3 pedales tradicionales', specification: { id: 6 } }
                     ],
                     images: [
 
@@ -359,12 +351,11 @@ categories: [
                     pricePerDay: 85.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Moog' },
-                        { label: 'Modelo', value: 'One' },
-                        { label: 'Voces', value: '16 polifónicas' },
-                        { label: 'Osciladores', value: '3 por voz' },
-                        { label: 'Teclado', value: '61 teclas' },
-                        { label: 'Memoria', value: '64 bancos' }
+                        { spValue: 'Moog', specification: { id: 1 } },
+                        { spValue: 'One', specification: { id: 2 } },
+                        { spValue: 'Metal y plástico de alta resistencia', specification: { id: 3 } },
+                        { spValue: '16 voces polifónicas, 3 osciladores por voz', specification: { id: 5 } },
+                        { spValue: 'Teclado de 61 teclas, 64 bancos de memoria', specification: { id: 6 } }
                     ],
                     images: [
 
@@ -391,12 +382,11 @@ categories: [
                     pricePerDay: 70.00,
                     status: 'Disponible',
                     specifications: [
-                        { label: 'Marca', value: 'Nord' },
-                        { label: 'Modelo', value: 'Stage 3' },
-                        { label: 'Teclas', value: '88 contrapesadas' },
-                        { label: 'Secciones', value: 'Piano/Synth/Organ' },
-                        { label: 'Memoria', value: '2GB piano' },
-                        { label: 'Efectos', value: 'Múltiples por sección' }
+                        { spValue: 'Nord', specification: { id: 1 } },
+                        { spValue: 'Stage 3', specification: { id: 2 } },
+                        { spValue: 'Plástico de alta resistencia y metal', specification: { id: 3 } },
+                        { spValue: '88 teclas contrapesadas, Memoria 2GB piano', specification: { id: 5 } },
+                        { spValue: 'Secciones Piano/Synth/Organ, Múltiples efectos', specification: { id: 6 } }
                     ],
                     images: [
                         'https://alquitones.s3.us-east-2.amazonaws.com/110.jpg',
@@ -645,13 +635,14 @@ getProductsPaginated(page = 1, size = 10) {
         const index = this.data.products.findIndex(product => product.id === id);
         if (index === -1) throw new Error('Producto no encontrado');
     
-        // Si se actualizan las imágenes, validar que sean 5
-        if (productData.images) {
-            if (productData.images.length !== 5) {
-                // Si no son 5 imágenes, usar las imágenes existentes
-                productData.images = this.data.products[index].images;
-                productData.mainImage = this.data.products[index].mainImage;
-            }
+        // Manejar las especificaciones del producto
+        if (productData.specifications) {
+            // Validar que cada especificación exista
+            productData.specifications.forEach(spec => {
+                if (!this.getSpecificationById(spec.specification.id)) {
+                    throw new Error(`La característica con ID ${spec.specification.id} no existe`);
+                }
+            });
         }
     
         this.data.products[index] = {
@@ -734,7 +725,89 @@ getProductsPaginated(page = 1, size = 10) {
         const user = this.getCurrentUser();
         return user?.role === 'admin';
     }
+
+    // Métodos para gestionar especificaciones
+getAllSpecifications() {
+    return this.data.specifications;
 }
+
+getSpecificationById(id) {
+    return this.data.specifications.find(spec => spec.id === id);
+}
+
+createSpecification(specificationData) {
+    // Validar que el nombre no esté vacío
+    if (!specificationData.name || specificationData.name.trim() === '') {
+        throw new Error('El nombre de la característica no puede estar vacío');
+    }
+
+    // Validar que no exista una característica con el mismo nombre
+    const existingSpecification = this.data.specifications.find(
+        spec => spec.name.toLowerCase() === specificationData.name.toLowerCase()
+    );
+    if (existingSpecification) {
+        throw new Error('Ya existe una característica con este nombre');
+    }
+
+    const newSpecification = {
+        id: this.data.specifications.length + 1,
+        name: specificationData.name,
+        description: specificationData.description || ''
+    };
+
+    this.data.specifications.push(newSpecification);
+    this.saveToStorage();
+    return newSpecification;
+}
+
+updateSpecification(id, specificationData) {
+    const index = this.data.specifications.findIndex(spec => spec.id === id);
+    if (index === -1) throw new Error('Característica no encontrada');
+
+    // Validar nombre único
+    const existingSpecification = this.data.specifications.find(
+        spec => spec.name.toLowerCase() === specificationData.name.toLowerCase() && spec.id !== id
+    );
+    if (existingSpecification) {
+        throw new Error('Ya existe una característica con este nombre');
+    }
+
+    this.data.specifications[index] = {
+        ...this.data.specifications[index],
+        ...specificationData
+    };
+
+    this.saveToStorage();
+    return this.data.specifications[index];
+}
+
+deleteSpecification(id) {
+    // Verificar si hay productos con esta característica
+    const productsWithSpecification = this.getProductsBySpecification(id);
+    if (productsWithSpecification.length > 0) {
+        throw new Error('No se puede eliminar una característica que está siendo utilizada por productos');
+    }
+
+    const index = this.data.specifications.findIndex(spec => spec.id === id);
+    if (index === -1) throw new Error('Característica no encontrada');
+
+    this.data.specifications.splice(index, 1);
+    this.saveToStorage();
+    return true;
+}
+
+// Método para obtener productos que usan una característica específica
+getProductsBySpecification(specificationId) {
+    return this.data.products.filter(product => 
+        product.specifications && 
+        product.specifications.some(spec => spec.specification.id === specificationId)
+    );
+}
+
+}
+
+
+
 
 // Exportar una única instancia
 export const localDB = new LocalDB();
