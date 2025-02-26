@@ -572,29 +572,38 @@ class LocalDB {
 
     // Agregar este método a la clase LocalDB justo después de getAllProducts()
 
-    getProductsPaginated(page = 1, size = 10) {
+    getProductsPaginated(page = 1, size = 10, searchQuery = '', paginate = true) {
         try {
-            // Obtener todos los productos
-            const products = this.data.products;
+            let products = this.data.products;
+            
+            // Aplicar filtro de búsqueda primero
+            if (searchQuery) {
+                const lowerQuery = searchQuery.toLowerCase();
+                products = products.filter(product => 
+                    product.name.toLowerCase().includes(lowerQuery) ||
+                    product.description.toLowerCase().includes(lowerQuery)
+                );
+            }
+    
+            if (!paginate) { // Si no se requiere paginación
+                return {
+                    products: products,
+                    metadata: {
+                        totalProducts: products.length
+                    }
+                };
+            }
+    
             const totalProducts = products.length;
-
-            // Calcular número total de páginas
             const totalPages = Math.ceil(totalProducts / size);
-
-            // Validar que la página solicitada sea válida
-            if (page < 1) page = 1;
-            if (page > totalPages) page = totalPages;
-
-            // Calcular índices de inicio y fin para la página actual
+            
+            page = Math.max(1, Math.min(page, totalPages));
+            
             const startIndex = (page - 1) * size;
-            const endIndex = Math.min(startIndex + size, totalProducts);
-
-            // Obtener los productos de la página solicitada
-            const paginatedProducts = products.slice(startIndex, endIndex);
-
-            // Retornar estructura con metadata de paginación
+            const endIndex = startIndex + size;
+            
             return {
-                products: paginatedProducts,
+                products: products.slice(startIndex, endIndex),
                 metadata: {
                     currentPage: page,
                     pageSize: size,

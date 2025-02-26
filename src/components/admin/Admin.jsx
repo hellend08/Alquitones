@@ -28,29 +28,23 @@ const Instruments = () => {
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-    // Estados para paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 10;
+    
 
     useEffect(() => {
         loadInstruments();
-    }, [searchTerm, currentPage]);
+    }, [searchTerm]); 
 
     const loadInstruments = () => {
         try {
-            const paginatedResult = localDB.getProductsPaginated(currentPage, itemsPerPage);
+            // Obtener todos los productos sin paginación
+            const result = localDB.getProductsPaginated(
+                1, 
+                Infinity, // Tamaño infinito para obtener todos
+                searchTerm,
+                false // Desactivar paginación
+            );
 
-            // Filtrar si hay término de búsqueda
-            let filteredProducts = paginatedResult.products;
-            if (searchTerm) {
-                filteredProducts = filteredProducts.filter(product =>
-                    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
-
-            setInstruments(filteredProducts);
-            setTotalPages(paginatedResult.metadata.totalPages);
+            setInstruments(result.products);
         } catch (error) {
             console.error('Error al cargar instrumentos:', error);
             alert('Error al cargar los instrumentos');
@@ -180,23 +174,7 @@ const Instruments = () => {
         );
     };
 
-    // Manejadores de paginación
-    const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
-
-    const handleFirstPage = () => {
-        setCurrentPage(1);
-    };
-
+    
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
@@ -626,30 +604,6 @@ const Categories = () => {
                         ))}
                     </tbody>
                 </table>
-            </div>
-
-            <div className={styles.pagination}>
-                <button
-                    onClick={() => setCurrentPage(1)}
-                    disabled={currentPage === 1}
-                    className={styles.pageButton}
-                >
-                    Primero
-                </button>
-                <button
-                    onClick={handlePreviousPage}
-                    disabled={currentPage === 1}
-                    className={styles.pageButton}
-                >
-                    Anterior
-                </button>
-                <button
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                    className={styles.pageButton}
-                >
-                    Siguiente
-                </button>
             </div>
 
             {modalOpen && (
