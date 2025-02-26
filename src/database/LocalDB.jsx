@@ -738,9 +738,10 @@ class LocalDB {
 
     // Métodos para gestionar especificaciones
     getAllSpecifications() {
-        return this.data.specifications;
+        return this.data.specifications || [];
     }
 
+    
     getSpecificationById(id) {
         return this.data.specifications.find(spec => spec.id === id);
     }

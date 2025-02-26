@@ -765,7 +765,7 @@ const Specifications = () => {
 
     const loadSpecifications = () => {
         try {
-            const allSpecifications = localDB.getAllSpecifications();
+            const allSpecifications = localDB.getAllSpecifications() || [];
             let filteredSpecifications = allSpecifications;
 
             if (searchTerm) {
