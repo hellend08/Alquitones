@@ -731,12 +731,14 @@ const Categories = () => {
 };
 
 // Nuevo componente Specifications para Admin.jsx
+// Nuevo componente Specifications actualizado con iconos
 const Specifications = () => {
     const [specifications, setSpecifications] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentSpecification, setCurrentSpecification] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [previews, setPreviews] = useState([]);
 
     // Estados para paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -746,6 +748,63 @@ const Specifications = () => {
     useEffect(() => {
         loadSpecifications();
     }, [searchTerm, currentPage]);
+
+    useEffect(() => {
+        // Añadir lógica de toggle para mostrar/ocultar selectores basado en radio button
+        if (modalOpen) {
+            const radioFontAwesome = document.querySelector('input[name="icon-type"][value="font-awesome"]');
+            const radioImage = document.querySelector('input[name="icon-type"][value="image"]');
+            const fontAwesomeSelector = document.getElementById('font-awesome-selector');
+            const imageSelector = document.getElementById('image-selector');
+            const iconClassSelect = document.getElementById('icon-class');
+            const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
+
+            const updateVisibility = () => {
+                if (radioFontAwesome.checked) {
+                    fontAwesomeSelector.style.display = 'block';
+                    imageSelector.style.display = 'none';
+                } else {
+                    fontAwesomeSelector.style.display = 'none';
+                    imageSelector.style.display = 'block';
+                }
+            };
+
+            const updateIconPreview = () => {
+                const selectedIcon = iconClassSelect.value;
+                iconPreviewContainer.querySelectorAll('i').forEach(icon => {
+                    icon.classList.remove(styles.selectedIcon);
+                    if (icon.classList.contains(selectedIcon)) {
+                        icon.classList.add(styles.selectedIcon);
+                    }
+                });
+            };
+
+            const handleIconSelection = (e) => {
+                if (e.target.classList.contains('fas')) {
+                    iconClassSelect.value = e.target.classList[1];
+                    updateIconPreview();
+                }
+            };
+
+            // Actualizar visibilidad inicial
+            updateVisibility();
+            updateIconPreview();
+
+            // Añadir event listeners
+            radioFontAwesome.addEventListener('change', updateVisibility);
+            radioImage.addEventListener('change', updateVisibility);
+            iconClassSelect.addEventListener('change', updateIconPreview);
+            iconPreviewContainer.addEventListener('click', handleIconSelection);
+
+            // Cleanup
+            return () => {
+                radioFontAwesome?.removeEventListener('change', updateVisibility);
+                radioImage?.removeEventListener('change', updateVisibility);
+                iconClassSelect?.removeEventListener('change', updateIconPreview);
+                iconPreviewContainer?.removeEventListener('click', handleIconSelection);
+            };
+        }
+    }, [modalOpen]);
 
     const loadSpecifications = () => {
         try {
@@ -779,22 +838,36 @@ const Specifications = () => {
     const handleAddSpecification = () => {
         setModalMode('create');
         setCurrentSpecification(null);
+        setPreviews([]);
         setModalOpen(true);
     };
 
     const handleEditSpecification = (specification) => {
         setModalMode('edit');
         setCurrentSpecification(specification);
+        setPreviews([]);
         setModalOpen(true);
     };
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
+        const iconInput = document.getElementById('specification-icon');
+
+        // Obtener el icono (ya sea una imagen subida o seleccionado del dropdown)
+        let icon;
+        if (form['icon-type'].value === 'font-awesome') {
+            icon = form['icon-class'].value;
+        } else {
+            icon = iconInput.files.length > 0
+                ? URL.createObjectURL(iconInput.files[0])
+                : (currentSpecification?.icon || 'fa-tag');
+        }
 
         const specificationData = {
             name: form['specification-name'].value,
-            description: form['specification-description'].value
+            description: form['specification-description'].value,
+            icon: icon
         };
 
         try {
@@ -808,6 +881,7 @@ const Specifications = () => {
 
             loadSpecifications();
             setModalOpen(false);
+            setPreviews([]);
         } catch (error) {
             console.error('Error:', error);
             alert(error.message);
@@ -841,6 +915,33 @@ const Specifications = () => {
             setCurrentPage(currentPage + 1);
         }
     };
+
+    // Iconos de Font Awesome disponibles para características
+    const fontAwesomeIcons = [
+        { value: 'fa-trademark', label: 'Marca (Trademark)' },
+        { value: 'fa-certificate', label: 'Certificado' },
+        { value: 'fa-tag', label: 'Etiqueta' },
+        { value: 'fa-cube', label: 'Cubo (Modelo)' },
+        { value: 'fa-boxes', label: 'Cajas' },
+        { value: 'fa-barcode', label: 'Código de barras' },
+        { value: 'fa-layer-group', label: 'Capas (Material)' },
+        { value: 'fa-atom', label: 'Átomo' },
+        { value: 'fa-tree', label: 'Árbol (Madera)' },
+        { value: 'fa-shapes', label: 'Formas (Tipo)' },
+        { value: 'fa-project-diagram', label: 'Diagrama' },
+        { value: 'fa-th-large', label: 'Cuadrícula' },
+        { value: 'fa-cogs', label: 'Engranajes (Técnico)' },
+        { value: 'fa-sliders-h', label: 'Controles' },
+        { value: 'fa-tachometer-alt', label: 'Tacómetro' },
+        { value: 'fa-plug', label: 'Enchufe (Accesorios)' },
+        { value: 'fa-tools', label: 'Herramientas' },
+        { value: 'fa-puzzle-piece', label: 'Puzzle' },
+        { value: 'fa-guitar', label: 'Guitarra' },
+        { value: 'fa-drum', label: 'Batería' },
+        { value: 'fa-music', label: 'Nota musical' },
+        { value: 'fa-volume-up', label: 'Volumen' },
+        { value: 'fa-microphone', label: 'Micrófono' }
+    ];
 
     return (
         <div className={styles.specificationsSection}>
@@ -881,6 +982,7 @@ const Specifications = () => {
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Icono</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
                             <th>Productos</th>
@@ -891,6 +993,17 @@ const Specifications = () => {
                         {specifications.map(specification => (
                             <tr key={specification.id}>
                                 <td>{specification.id}</td>
+                                <td>
+                                    {specification.icon?.startsWith('fa-') ? (
+                                        <i className={`fas ${specification.icon} fa-2x`} style={{ color: '#9C6615' }}></i>
+                                    ) : (
+                                        <img
+                                            src={specification.icon}
+                                            alt={`Icono de ${specification.name}`}
+                                            className={styles.productImage}
+                                        />
+                                    )}
+                                </td>
                                 <td>{specification.name}</td>
                                 <td>{specification.description}</td>
                                 <td>{localDB.getProductsBySpecification(specification.id).length}</td>
@@ -944,7 +1057,10 @@ const Specifications = () => {
                         <div className={styles.modalHeader}>
                             <h3>{modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}</h3>
                             <button
-                                onClick={() => setModalOpen(false)}
+                                onClick={() => {
+                                    setModalOpen(false);
+                                    setPreviews([]);
+                                }}
                                 className={styles.modalClose}
                             >
                                 &times;
@@ -969,10 +1085,93 @@ const Specifications = () => {
                                     required
                                 />
                             </div>
+                            <div className={styles.formGroup}>
+                                <label>Tipo de Icono</label>
+                                <div className={styles.iconTypeSelector}>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="icon-type"
+                                            value="font-awesome"
+                                            defaultChecked={currentSpecification?.icon?.startsWith('fa-') || !currentSpecification}
+                                        />
+                                        Icono Font Awesome
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="icon-type"
+                                            value="image"
+                                            defaultChecked={currentSpecification?.icon && !currentSpecification.icon.startsWith('fa-')}
+                                        />
+                                        Imagen personalizada
+                                    </label>
+                                </div>
+                            </div>
+                            <div className={styles.formGroup} id="font-awesome-selector">
+                                <label htmlFor="icon-class">Seleccionar Icono</label>
+                                <select
+                                    id="icon-class"
+                                    name="icon-class"
+                                    defaultValue={currentSpecification?.icon?.startsWith('fa-') ? currentSpecification.icon : 'fa-tag'}
+                                >
+                                    {fontAwesomeIcons.map((icon, index) => (
+                                        <option key={index} value={icon.value}>
+                                            {icon.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className={styles.iconPreview}>
+                                    <p>Vista previa:</p>
+                                    <div className={styles.iconPreviewBox}>
+                                        {fontAwesomeIcons.map((icon, index) => (
+                                            <i
+                                                key={index}
+                                                className={`fas ${icon.value} fa-2x`}
+                                                title={icon.label}
+                                                style={{
+                                                    display: 'inline-block',
+                                                    margin: '5px',
+                                                    cursor: 'pointer',
+                                                    color: '#9C6615'
+                                                }}
+                                            ></i>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={styles.formGroup} id="image-selector">
+                                <label htmlFor="specification-icon">Imagen Personalizada</label>
+                                <input
+                                    type="file"
+                                    id="specification-icon"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const files = e.target.files;
+                                        const previews = Array.from(files).map(file => URL.createObjectURL(file));
+                                        setPreviews(previews);
+                                    }}
+                                />
+                                {previews.length > 0 && (
+                                    <div className={styles.imagePreviewContainer}>
+                                        {previews.map((preview, index) => (
+                                            <img
+                                                key={index}
+                                                src={preview}
+                                                alt={`Preview ${index + 1}`}
+                                                className={styles.imagePreview}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                             <div className={styles.formActions}>
                                 <button
                                     type="button"
-                                    onClick={() => setModalOpen(false)}
+                                    onClick={() => {
+                                        setModalOpen(false);
+                                        setPreviews([]);
+                                    }}
                                     className={styles.modalBtnSecondary}
                                 >
                                     Cancelar
@@ -1024,11 +1223,11 @@ const Admin = () => {
         link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
         link.rel = "stylesheet";
         document.head.appendChild(link);
-
+      
         return () => {
-            document.head.removeChild(link); // Limpia al desmontar el componente
+          document.head.removeChild(link);
         };
-    }, []);
+      }, []);
 
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);

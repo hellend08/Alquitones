@@ -3,12 +3,12 @@ class LocalDB {
     constructor() {
         this.data = {
             // En LocalDB.jsx, actualiza categories:
-categories: [
-    { id: 1, name: 'Cuerdas', icon: '/src/assets/icons/guitar.png', description: 'Instrumentos de cuerda' },
-    { id: 2, name: 'Viento', icon: '/src/assets/icons/flute.png', description: 'Instrumentos de viento' },
-    { id: 3, name: 'Percusión', icon: '/src/assets/icons/drums.png', description: 'Instrumentos de percusión' },
-    { id: 4, name: 'Teclados', icon: '/src/assets/icons/piano.png', description: 'Instrumentos de teclado' }
-],
+            categories: [
+                { id: 1, name: 'Cuerdas', icon: '/src/assets/icons/guitar.png', description: 'Instrumentos de cuerda' },
+                { id: 2, name: 'Viento', icon: '/src/assets/icons/flute.png', description: 'Instrumentos de viento' },
+                { id: 3, name: 'Percusión', icon: '/src/assets/icons/drums.png', description: 'Instrumentos de percusión' },
+                { id: 4, name: 'Teclados', icon: '/src/assets/icons/piano.png', description: 'Instrumentos de teclado' }
+            ],
             users: [
                 {
                     id: 1,
@@ -30,13 +30,14 @@ categories: [
                 }
             ],
 
+            // En el constructor de LocalDB, actualiza el array specifications:
             specifications: [
-                { id: 1, name: 'Marca', description: 'Marca del instrumento' },
-                { id: 2, name: 'Modelo', description: 'Modelo específico del instrumento' },
-                { id: 3, name: 'Material', description: 'Material principal del instrumento' },
-                { id: 4, name: 'Tipo', description: 'Tipo o clasificación del instrumento' },
-                { id: 5, name: 'Características técnicas', description: 'Detalles técnicos específicos' },
-                { id: 6, name: 'Accesorios', description: 'Elementos incluidos con el instrumento' }
+                { id: 1, name: 'Marca', description: 'Marca del instrumento', icon: 'fa-trademark' },
+                { id: 2, name: 'Modelo', description: 'Modelo específico del instrumento', icon: 'fa-cube' },
+                { id: 3, name: 'Material', description: 'Material principal del instrumento', icon: 'fa-tree' },
+                { id: 4, name: 'Tipo', description: 'Tipo o clasificación del instrumento', icon: 'fa-shapes' },
+                { id: 5, name: 'Características técnicas', description: 'Detalles técnicos específicos', icon: 'fa-cogs' },
+                { id: 6, name: 'Accesorios', description: 'Elementos incluidos con el instrumento', icon: 'fa-plug' }
             ],
             products: [
                 // CUERDAS (ID: 1)
@@ -80,16 +81,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/1.webp',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/2.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/3.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/4.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/5.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/6.jpg'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/3.PNG',
                     createdAt: new Date().toISOString()
@@ -110,16 +111,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/10.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/11.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/12.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/13.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/14.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/15.jpg'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/11.PNG',
                     createdAt: new Date().toISOString()
@@ -142,16 +143,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/20.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/21.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/22.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/23.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/25.webp'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
                     createdAt: new Date().toISOString()
@@ -172,16 +173,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/30.webp',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/31.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/32.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/33.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/34.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/35.jpg'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/32.PNG',
                     createdAt: new Date().toISOString()
@@ -202,16 +203,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/40.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/41.webp',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/42.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/43.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/44.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/45.webp'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/41.webp',
                     createdAt: new Date().toISOString()
@@ -235,16 +236,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/50.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/51.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/52.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/53.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/54.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/55.webp'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/50.PNG',
                     createdAt: new Date().toISOString()
@@ -266,16 +267,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/60.webp',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/61.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/62.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/63.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/64.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/65.jpg'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/61.jpg',
                     createdAt: new Date().toISOString()
@@ -296,16 +297,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/70.webp',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/71.webp',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/72.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/74.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/75.webp'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
                     createdAt: new Date().toISOString()
@@ -329,16 +330,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/80.png',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/81.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/82.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/83.PNG',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/84.webp',
                         'https://alquitones.s3.us-east-2.amazonaws.com/85.jpg'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/81.jpg',
                     createdAt: new Date().toISOString()
@@ -360,16 +361,16 @@ categories: [
                     images: [
 
                         'https://alquitones.s3.us-east-2.amazonaws.com/90.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/91.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/92.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
-                    
+
                         'https://alquitones.s3.us-east-2.amazonaws.com/94.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/95.jpg'
-                    
+
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
                     createdAt: new Date().toISOString()
@@ -401,7 +402,7 @@ categories: [
                 }
             ]
         };
-        
+
         // Forzar actualización de datos
         localStorage.removeItem('alquitonesDB');
         this.initializeStorage();
@@ -422,77 +423,77 @@ categories: [
     }
 
 
-// Añadir estos métodos en LocalDB.jsx, dentro de la clase LocalDB
+    // Añadir estos métodos en LocalDB.jsx, dentro de la clase LocalDB
 
-getAllCategories() {
-    return this.data.categories;
-}
-
-getCategoryById(id) {
-    return this.data.categories.find(category => category.id === id);
-}
-
-createCategory(categoryData) {
-    // Validar que el nombre no esté vacío
-    if (!categoryData.name || categoryData.name.trim() === '') {
-        throw new Error('El nombre de la categoría no puede estar vacío');
+    getAllCategories() {
+        return this.data.categories;
     }
 
-    // Validar que no exista una categoría con el mismo nombre
-    const existingCategory = this.data.categories.find(
-        cat => cat.name.toLowerCase() === categoryData.name.toLowerCase()
-    );
-    if (existingCategory) {
-        throw new Error('Ya existe una categoría con este nombre');
+    getCategoryById(id) {
+        return this.data.categories.find(category => category.id === id);
     }
 
-    const newCategory = {
-        id: this.data.categories.length + 1,
-        ...categoryData,
-        icon: categoryData.icon || '/src/assets/icons/default-category.png',
-        isActive: true
-    };
+    createCategory(categoryData) {
+        // Validar que el nombre no esté vacío
+        if (!categoryData.name || categoryData.name.trim() === '') {
+            throw new Error('El nombre de la categoría no puede estar vacío');
+        }
 
-    this.data.categories.push(newCategory);
-    this.saveToStorage();
-    return newCategory;
-}
+        // Validar que no exista una categoría con el mismo nombre
+        const existingCategory = this.data.categories.find(
+            cat => cat.name.toLowerCase() === categoryData.name.toLowerCase()
+        );
+        if (existingCategory) {
+            throw new Error('Ya existe una categoría con este nombre');
+        }
 
-updateCategory(id, categoryData) {
-    const index = this.data.categories.findIndex(category => category.id === id);
-    if (index === -1) throw new Error('Categoría no encontrada');
+        const newCategory = {
+            id: this.data.categories.length + 1,
+            ...categoryData,
+            icon: categoryData.icon || '/src/assets/icons/default-category.png',
+            isActive: true
+        };
 
-    // Validar nombre único
-    const existingCategory = this.data.categories.find(
-        cat => cat.name.toLowerCase() === categoryData.name.toLowerCase() && cat.id !== id
-    );
-    if (existingCategory) {
-        throw new Error('Ya existe una categoría con este nombre');
+        this.data.categories.push(newCategory);
+        this.saveToStorage();
+        return newCategory;
     }
 
-    this.data.categories[index] = {
-        ...this.data.categories[index],
-        ...categoryData
-    };
+    updateCategory(id, categoryData) {
+        const index = this.data.categories.findIndex(category => category.id === id);
+        if (index === -1) throw new Error('Categoría no encontrada');
 
-    this.saveToStorage();
-    return this.data.categories[index];
-}
+        // Validar nombre único
+        const existingCategory = this.data.categories.find(
+            cat => cat.name.toLowerCase() === categoryData.name.toLowerCase() && cat.id !== id
+        );
+        if (existingCategory) {
+            throw new Error('Ya existe una categoría con este nombre');
+        }
 
-deleteCategory(id) {
-    // Verificar si hay productos con esta categoría
-    const productsInCategory = this.getProductsByCategory(id);
-    if (productsInCategory.length > 0) {
-        throw new Error('No se puede eliminar una categoría con productos asociados');
+        this.data.categories[index] = {
+            ...this.data.categories[index],
+            ...categoryData
+        };
+
+        this.saveToStorage();
+        return this.data.categories[index];
     }
 
-    const index = this.data.categories.findIndex(category => category.id === id);
-    if (index === -1) throw new Error('Categoría no encontrada');
+    deleteCategory(id) {
+        // Verificar si hay productos con esta categoría
+        const productsInCategory = this.getProductsByCategory(id);
+        if (productsInCategory.length > 0) {
+            throw new Error('No se puede eliminar una categoría con productos asociados');
+        }
 
-    this.data.categories.splice(index, 1);
-    this.saveToStorage();
-    return true;
-}
+        const index = this.data.categories.findIndex(category => category.id === id);
+        if (index === -1) throw new Error('Categoría no encontrada');
+
+        this.data.categories.splice(index, 1);
+        this.saveToStorage();
+        return true;
+    }
 
     // CRUD Usuarios
     getAllUsers() {
@@ -512,12 +513,12 @@ deleteCategory(id) {
         if (this.getUserByEmail(userData.email)) {
             throw new Error('El email ya está registrado');
         }
-    
+
         // Verificar que los campos requeridos estén presentes
         if (!userData.firstName || !userData.lastName || !userData.email || !userData.password) {
             throw new Error('Todos los campos son obligatorios');
         }
-    
+
         const newUser = {
             id: this.data.users.length + 1,
             firstName: userData.firstName,
@@ -529,7 +530,7 @@ deleteCategory(id) {
             createdAt: new Date().toISOString(),
             isActive: true
         };
-    
+
         this.data.users.push(newUser);
         this.saveToStorage();
         return newUser;
@@ -571,43 +572,43 @@ deleteCategory(id) {
 
     // Agregar este método a la clase LocalDB justo después de getAllProducts()
 
-getProductsPaginated(page = 1, size = 10) {
-    try {
-        // Obtener todos los productos
-        const products = this.data.products;
-        const totalProducts = products.length;
-        
-        // Calcular número total de páginas
-        const totalPages = Math.ceil(totalProducts / size);
-        
-        // Validar que la página solicitada sea válida
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
-        
-        // Calcular índices de inicio y fin para la página actual
-        const startIndex = (page - 1) * size;
-        const endIndex = Math.min(startIndex + size, totalProducts);
-        
-        // Obtener los productos de la página solicitada
-        const paginatedProducts = products.slice(startIndex, endIndex);
-        
-        // Retornar estructura con metadata de paginación
-        return {
-            products: paginatedProducts,
-            metadata: {
-                currentPage: page,
-                pageSize: size,
-                totalPages: totalPages,
-                totalProducts: totalProducts,
-                hasNextPage: page < totalPages,
-                hasPrevPage: page > 1
-            }
-        };
-    } catch (error) {
-        console.error('Error en paginación:', error);
-        throw new Error('Error al paginar productos');
+    getProductsPaginated(page = 1, size = 10) {
+        try {
+            // Obtener todos los productos
+            const products = this.data.products;
+            const totalProducts = products.length;
+
+            // Calcular número total de páginas
+            const totalPages = Math.ceil(totalProducts / size);
+
+            // Validar que la página solicitada sea válida
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            // Calcular índices de inicio y fin para la página actual
+            const startIndex = (page - 1) * size;
+            const endIndex = Math.min(startIndex + size, totalProducts);
+
+            // Obtener los productos de la página solicitada
+            const paginatedProducts = products.slice(startIndex, endIndex);
+
+            // Retornar estructura con metadata de paginación
+            return {
+                products: paginatedProducts,
+                metadata: {
+                    currentPage: page,
+                    pageSize: size,
+                    totalPages: totalPages,
+                    totalProducts: totalProducts,
+                    hasNextPage: page < totalPages,
+                    hasPrevPage: page > 1
+                }
+            };
+        } catch (error) {
+            console.error('Error en paginación:', error);
+            throw new Error('Error al paginar productos');
+        }
     }
-}
 
     getProductById(id) {
         return this.data.products.find(product => product.id === id);
@@ -618,14 +619,14 @@ getProductsPaginated(page = 1, size = 10) {
         if (!productData.images || productData.images.length < 1 || productData.images.length > 5) {
             throw new Error('El producto debe por lo menos 1 imagen');
         }
-    
+
         const newProduct = {
             id: this.data.products.length + 1,
             ...productData,
             mainImage: productData.mainImage, // Primera imagen como principal
             createdAt: new Date().toISOString()
         };
-    
+
         this.data.products.push(newProduct);
         this.saveToStorage();
         return newProduct;
@@ -634,7 +635,7 @@ getProductsPaginated(page = 1, size = 10) {
     updateProduct(id, productData) {
         const index = this.data.products.findIndex(product => product.id === id);
         if (index === -1) throw new Error('Producto no encontrado');
-    
+
         // Manejar las especificaciones del producto
         if (productData.specifications) {
             // Validar que cada especificación exista
@@ -644,12 +645,12 @@ getProductsPaginated(page = 1, size = 10) {
                 }
             });
         }
-    
+
         this.data.products[index] = {
             ...this.data.products[index],
             ...productData
         };
-    
+
         this.saveToStorage();
         return this.data.products[index];
     }
@@ -666,14 +667,14 @@ getProductsPaginated(page = 1, size = 10) {
     // Métodos de búsqueda y filtrado
     searchProducts(query) {
         const lowercaseQuery = query.toLowerCase();
-        return this.data.products.filter(product => 
+        return this.data.products.filter(product =>
             product.name.toLowerCase().includes(lowercaseQuery) ||
             product.description.toLowerCase().includes(lowercaseQuery)
         );
     }
 
     getProductsByCategory(categoryId) {
-        return this.data.products.filter(product => 
+        return this.data.products.filter(product =>
             product.categoryId === categoryId
         );
     }
@@ -689,7 +690,7 @@ getProductsPaginated(page = 1, size = 10) {
             }, {})
         };
     }
-    
+
 
     getUserStats() {
         return {
@@ -727,82 +728,84 @@ getProductsPaginated(page = 1, size = 10) {
     }
 
     // Métodos para gestionar especificaciones
-getAllSpecifications() {
-    return this.data.specifications;
-}
-
-getSpecificationById(id) {
-    return this.data.specifications.find(spec => spec.id === id);
-}
-
-createSpecification(specificationData) {
-    // Validar que el nombre no esté vacío
-    if (!specificationData.name || specificationData.name.trim() === '') {
-        throw new Error('El nombre de la característica no puede estar vacío');
+    getAllSpecifications() {
+        return this.data.specifications;
     }
 
-    // Validar que no exista una característica con el mismo nombre
-    const existingSpecification = this.data.specifications.find(
-        spec => spec.name.toLowerCase() === specificationData.name.toLowerCase()
-    );
-    if (existingSpecification) {
-        throw new Error('Ya existe una característica con este nombre');
+    getSpecificationById(id) {
+        return this.data.specifications.find(spec => spec.id === id);
     }
 
-    const newSpecification = {
-        id: this.data.specifications.length + 1,
-        name: specificationData.name,
-        description: specificationData.description || ''
-    };
+    createSpecification(specificationData) {
+        // Validar que el nombre no esté vacío
+        if (!specificationData.name || specificationData.name.trim() === '') {
+            throw new Error('El nombre de la característica no puede estar vacío');
+        }
 
-    this.data.specifications.push(newSpecification);
-    this.saveToStorage();
-    return newSpecification;
-}
+        // Validar que no exista una característica con el mismo nombre
+        const existingSpecification = this.data.specifications.find(
+            spec => spec.name.toLowerCase() === specificationData.name.toLowerCase()
+        );
+        if (existingSpecification) {
+            throw new Error('Ya existe una característica con este nombre');
+        }
 
-updateSpecification(id, specificationData) {
-    const index = this.data.specifications.findIndex(spec => spec.id === id);
-    if (index === -1) throw new Error('Característica no encontrada');
+        const newSpecification = {
+            id: this.data.specifications.length + 1,
+            name: specificationData.name,
+            description: specificationData.description || '',
+            icon: specificationData.icon || 'fa-tag' // Nuevo campo
+          };
 
-    // Validar nombre único
-    const existingSpecification = this.data.specifications.find(
-        spec => spec.name.toLowerCase() === specificationData.name.toLowerCase() && spec.id !== id
-    );
-    if (existingSpecification) {
-        throw new Error('Ya existe una característica con este nombre');
+        this.data.specifications.push(newSpecification);
+        this.saveToStorage();
+        return newSpecification;
     }
 
-    this.data.specifications[index] = {
-        ...this.data.specifications[index],
-        ...specificationData
-    };
+    updateSpecification(id, specificationData) {
+        const index = this.data.specifications.findIndex(spec => spec.id === id);
+        if (index === -1) throw new Error('Característica no encontrada');
 
-    this.saveToStorage();
-    return this.data.specifications[index];
-}
+        // Validar nombre único
+        const existingSpecification = this.data.specifications.find(
+            spec => spec.name.toLowerCase() === specificationData.name.toLowerCase() && spec.id !== id
+        );
+        if (existingSpecification) {
+            throw new Error('Ya existe una característica con este nombre');
+        }
 
-deleteSpecification(id) {
-    // Verificar si hay productos con esta característica
-    const productsWithSpecification = this.getProductsBySpecification(id);
-    if (productsWithSpecification.length > 0) {
-        throw new Error('No se puede eliminar una característica que está siendo utilizada por productos');
+        this.data.specifications[index] = {
+            ...this.data.specifications[index],
+            ...specificationData,
+            icon: specificationData.icon // Asegurar que se actualice el icono
+          };
+
+        this.saveToStorage();
+        return this.data.specifications[index];
     }
 
-    const index = this.data.specifications.findIndex(spec => spec.id === id);
-    if (index === -1) throw new Error('Característica no encontrada');
+    deleteSpecification(id) {
+        // Verificar si hay productos con esta característica
+        const productsWithSpecification = this.getProductsBySpecification(id);
+        if (productsWithSpecification.length > 0) {
+            throw new Error('No se puede eliminar una característica que está siendo utilizada por productos');
+        }
 
-    this.data.specifications.splice(index, 1);
-    this.saveToStorage();
-    return true;
-}
+        const index = this.data.specifications.findIndex(spec => spec.id === id);
+        if (index === -1) throw new Error('Característica no encontrada');
 
-// Método para obtener productos que usan una característica específica
-getProductsBySpecification(specificationId) {
-    return this.data.products.filter(product => 
-        product.specifications && 
-        product.specifications.some(spec => spec.specification.id === specificationId)
-    );
-}
+        this.data.specifications.splice(index, 1);
+        this.saveToStorage();
+        return true;
+    }
+
+    // Método para obtener productos que usan una característica específica
+    getProductsBySpecification(specificationId) {
+        return this.data.products.filter(product =>
+            product.specifications &&
+            product.specifications.some(spec => spec.specification.id === specificationId)
+        );
+    }
 
 }
 
