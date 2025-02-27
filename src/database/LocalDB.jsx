@@ -738,7 +738,7 @@ class LocalDB {
 
     // Métodos para gestionar especificaciones
     getAllSpecifications() {
-        return this.data.specifications || [];
+        return Array.isArray(this.data.specifications) ? this.data.specifications : [];
     }
 
     

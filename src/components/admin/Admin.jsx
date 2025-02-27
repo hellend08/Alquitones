@@ -765,14 +765,15 @@ const Specifications = () => {
 
     const loadSpecifications = () => {
         try {
-            const allSpecifications = localDB.getAllSpecifications() || [];
-            let filteredSpecifications = allSpecifications;
-
-            if (searchTerm) {
-                filteredSpecifications = allSpecifications.filter(spec =>
-                    spec.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
+            const allSpecifications = localDB.getAllSpecifications();
+            // Verificación adicional
+            if (!Array.isArray(allSpecifications)) {
+                console.error("Las especificaciones no son un array");
+                setSpecifications([]);
+                setTotalPages(1);
+                return;
             }
+            let filteredSpecifications = allSpecifications;
 
             // Calcular paginación manualmente
             const startIndex = (currentPage - 1) * itemsPerPage;
