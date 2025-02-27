@@ -1426,34 +1426,34 @@ const Users = () => {
                             </p>
                             
                             {pendingRoleChange.currentRole === 'admin' && pendingRoleChange.newRole !== 'admin' && (
-                                <div style={{ 
-                                    backgroundColor: '#FFEBEE', 
-                                    color: '#D32F2F', 
-                                    padding: '0.5rem', 
-                                    borderRadius: '4px',
-                                    marginBottom: '1rem'
-                                }}>
-                                    <p style={{ fontWeight: 'bold' }}>
-                                        <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
-                                        Advertencia: Estás removiendo privilegios de administrador
-                                    </p>
-                                </div>
-                            )}
-                            
-                            {pendingRoleChange.newRole === 'admin' && (
-                                <div style={{ 
-                                    backgroundColor: '#E8F5E9', 
-                                    color: '#388E3C', 
-                                    padding: '0.5rem', 
-                                    borderRadius: '4px',
-                                    marginBottom: '1rem'
-                                }}>
-                                    <p>
-                                        <i className="fas fa-info-circle" style={{ marginRight: '0.5rem' }}></i>
-                                        Estás otorgando acceso completo al panel de administración
-                                    </p>
-                                </div>
-                            )}
+    <div style={{ 
+        backgroundColor: '#FFF3CD', 
+        color: '#856404', 
+        padding: '0.5rem', 
+        borderRadius: '4px',
+        marginBottom: '1rem'
+    }}>
+        <p style={{ fontWeight: 'bold' }}>
+            <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
+            Advertencia: Estás removiendo privilegios de administrador
+        </p>
+    </div>
+)}
+
+{pendingRoleChange.newRole === 'admin' && (
+    <div style={{ 
+        backgroundColor: '#FFF3CD', 
+        color: '#856404', 
+        padding: '0.5rem', 
+        borderRadius: '4px',
+        marginBottom: '1rem'
+    }}>
+        <p style={{ fontWeight: 'bold' }}>
+            <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
+            Advertencia: Estás otorgando acceso completo al panel de administración
+        </p>
+    </div>
+)}
                         </div>
                         <div className="flex gap-4 justify-end p-4">
                             <button
