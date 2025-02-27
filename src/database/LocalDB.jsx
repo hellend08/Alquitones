@@ -545,11 +545,26 @@ class LocalDB {
 
     // Inicialización
     initializeStorage() {
-        localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
+        // Verificar si existe data en localStorage
         if (!localStorage.getItem('alquitonesDB')) {
+            // Si no existe, inicializar con los datos por defecto
             localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
         } else {
+            // Si ya existe, cargar los datos del localStorage
             this.data = JSON.parse(localStorage.getItem('alquitonesDB'));
+        }
+        
+        // También asegurarse de que el currentUser esté disponible
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            // Verificar que el usuario exista en la base de datos actualizada
+            const userData = JSON.parse(currentUser);
+            const userExists = this.data.users.some(u => u.id === userData.id);
+            
+            // Si el usuario ya no existe, limpiar la sesión
+            if (!userExists) {
+                localStorage.removeItem('currentUser');
+            }
         }
     }
 
@@ -675,19 +690,31 @@ class LocalDB {
     updateUser(id, userData) {
         const index = this.data.users.findIndex(user => user.id === id);
         if (index === -1) throw new Error('Usuario no encontrado');
-
+    
         // Si se está actualizando el email, verificar que no exista
         if (userData.email && userData.email !== this.data.users[index].email) {
             if (this.getUserByEmail(userData.email)) {
                 throw new Error('El email ya está registrado');
             }
         }
-
+    
+        // Actualizar el usuario en la base de datos
         this.data.users[index] = {
             ...this.data.users[index],
             ...userData
         };
-
+    
+        // Actualizar el usuario en la sesión si es el usuario actual
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.id === id) {
+            // Actualizar solo los campos que cambiaron en la sesión
+            const updatedCurrentUser = {
+                ...currentUser,
+                ...userData
+            };
+            localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
+        }
+    
         this.saveToStorage();
         return this.data.users[index];
     }
@@ -846,6 +873,11 @@ class LocalDB {
     }
 
     login(email, password) {
+        // Primero asegurémonos de que estamos trabajando con datos actualizados
+        if (localStorage.getItem('alquitonesDB')) {
+            this.data = JSON.parse(localStorage.getItem('alquitonesDB'));
+        }
+        
         const user = this.getUserByEmail(email);
         if (!user || user.password !== password) {
             throw new Error('Credenciales inválidas');
@@ -853,9 +885,19 @@ class LocalDB {
         if (!user.isActive) {
             throw new Error('Cuenta desactivada');
         }
-        // Almacenar sesión en localStorage
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        return user;
+        
+        // Almacenar solo la información necesaria en la sesión
+        const sessionUser = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+        };
+        
+        localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+        console.log('Usuario logueado:', sessionUser);
+        
+        return sessionUser;
     }
 
     logout() {
@@ -864,7 +906,38 @@ class LocalDB {
     }
 
     getCurrentUser() {
-        return JSON.parse(localStorage.getItem('currentUser'));
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            return null;
+        }
+        
+        try {
+            const userData = JSON.parse(currentUser);
+            
+            // Verificar que el usuario sigue existiendo en la base de datos
+            const userExists = this.data.users.some(u => u.id === userData.id);
+            if (!userExists) {
+                console.warn('Usuario en sesión no encontrado en la base de datos');
+                localStorage.removeItem('currentUser');
+                return null;
+            }
+            
+            // Actualizar los datos del usuario desde la base de datos
+            const updatedUser = this.getUserById(userData.id);
+            if (updatedUser) {
+                // Si el rol ha cambiado, actualizar en la sesión
+                if (updatedUser.role !== userData.role) {
+                    userData.role = updatedUser.role;
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                }
+            }
+            
+            return userData;
+        } catch (e) {
+            console.error('Error al obtener el usuario actual:', e);
+            localStorage.removeItem('currentUser');
+            return null;
+        }
     }
 
     isAdmin() {
