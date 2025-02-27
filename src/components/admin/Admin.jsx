@@ -1455,16 +1455,16 @@ const Users = () => {
                                 </div>
                             )}
                         </div>
-                        <div className={styles.formActions}>
+                        <div className="flex gap-4 justify-end p-4">
                             <button
                                 onClick={cancelRoleChange}
-                                className={styles.modalBtnSecondary}
+                                className="border-2 border-(--color-secondary) text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-2 px-4 rounded shadow-sm transition-colors duration-200"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={executeRoleChange}
-                                className={styles.modalBtnPrimary}
+                                className="bg-(--color-primary) hover:bg-(--color-secondary) text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
                             >
                                 Confirmar cambio
                             </button>
