@@ -27,6 +27,141 @@ class LocalDB {
                     role: 'client',
                     createdAt: new Date().toISOString(),
                     isActive: true
+                },
+                {
+                    id: 3,
+                    username: 'mariaperez',
+                    email: 'maria@ejemplo.com',
+                    password: 'maria123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 4,
+                    username: 'juangarcia',
+                    email: 'juan@ejemplo.com',
+                    password: 'juan123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 5,
+                    username: 'carlosmendez',
+                    email: 'carlos@ejemplo.com',
+                    password: 'carlos123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 6,
+                    username: 'luisafernandez',
+                    email: 'luisa@ejemplo.com',
+                    password: 'luisa123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 7,
+                    username: 'pedroramirez',
+                    email: 'pedro@ejemplo.com',
+                    password: 'pedro123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 8,
+                    username: 'sofiavega',
+                    email: 'sofia@ejemplo.com', 
+                    password: 'sofia123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 9,
+                    username: 'davidmartinez',
+                    email: 'david@ejemplo.com',
+                    password: 'david123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 10,
+                    username: 'anaromero',
+                    email: 'ana@ejemplo.com',
+                    password: 'ana123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 11,
+                    username: 'josegonzalez',
+                    email: 'jose@ejemplo.com',
+                    password: 'jose123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: false
+                },
+                {
+                    id: 12,
+                    username: 'laurarodriguez',
+                    email: 'laura@ejemplo.com',
+                    password: 'laura123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 13,
+                    username: 'albertorivas',
+                    email: 'alberto@ejemplo.com',
+                    password: 'alberto123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 14,
+                    username: 'martacortes',
+                    email: 'marta@ejemplo.com',
+                    password: 'marta123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 15,
+                    username: 'felipeduran',
+                    email: 'felipe@ejemplo.com',
+                    password: 'felipe123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 16,
+                    username: 'paolaherrera',
+                    email: 'paola@ejemplo.com',
+                    password: 'paola123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 17,
+                    username: 'robertocastro',
+                    email: 'roberto@ejemplo.com',
+                    password: 'roberto123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: false
                 }
             ],
 
@@ -410,6 +545,7 @@ class LocalDB {
 
     // Inicialización
     initializeStorage() {
+        localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
         if (!localStorage.getItem('alquitonesDB')) {
             localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
         } else {

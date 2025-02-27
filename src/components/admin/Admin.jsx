@@ -1163,17 +1163,195 @@ const Rentals = () => (
 );
 
 // Users component
-const Users = () => (
-    <div className={styles.usersContent}>
-        <div className={styles.placeholderContainer}>
-            <img
-                src="/src/assets/no-disponible.jpg"
-                alt="No disponible"
-                className={styles.placeholderImage}
-            />
+// Actualizar el componente Users en Admin.jsx
+const Users = () => {
+    const [users, setUsers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 10;
+    
+    useEffect(() => {
+        loadUsers();
+    }, [searchTerm, currentPage]);
+    
+    const loadUsers = () => {
+        try {
+            const allUsers = localDB.getAllUsers();
+            console.log('Todos los usuarios:', allUsers); // Añadir para depuración
+            
+            let filteredUsers = allUsers;
+            
+            if (searchTerm) {
+                filteredUsers = allUsers.filter(user => 
+                    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+            
+            // Calcular paginación
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+            
+            console.log('Usuarios paginados:', paginatedUsers); // Añadir para depuración
+            
+            setUsers(paginatedUsers);
+            setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
+        } catch (error) {
+            console.error('Error al cargar usuarios:', error);
+            alert('Error al cargar los usuarios');
+        }
+    };
+    
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+    
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            // Obtener el usuario actual para verificar que no se quite permisos a sí mismo
+            const currentUser = localDB.getCurrentUser();
+            if (currentUser && currentUser.id === userId && newRole !== 'admin') {
+                alert('No puedes quitarte permisos de administrador a ti mismo');
+                return;
+            }
+            
+            // Actualizar el rol del usuario
+            await localDB.updateUser(userId, { role: newRole });
+            
+            // Recargar la lista de usuarios
+            loadUsers();
+            alert(`Permisos actualizados correctamente`);
+        } catch (error) {
+            console.error('Error al cambiar permisos:', error);
+            alert(`Error al cambiar permisos: ${error.message}`);
+        }
+    };
+    
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+    
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+    
+    return (
+        <div className={styles.usersSection}>
+            <div className={styles.sectionHeader}>
+                <h2>Gestión de Usuarios</h2>
+                <div className={styles.headerActions}>
+                    <div className={styles.searchContainer}>
+                        <span className="material-symbols-outlined" style={{
+                            position: 'absolute',
+                            left: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: '#9C9C9C',
+                            fontSize: '20px'
+                        }}>
+                            search
+                        </span>
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre o email..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className={styles.searchInput}
+                            style={{ paddingLeft: '35px' }}
+                        />
+                    </div>
+                </div>
+            </div>
+            
+            <div className={styles.tableContainer}>
+                <table className={styles.instrumentsTable}>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Fecha de creación</th>
+                            {/* <th>Estado</th> */}
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map(user => (
+                            <tr key={user.id}>
+                                <td>{user.id}</td>
+                                <td>{user.username}</td>
+                                <td>{user.email}</td>
+                                <td>
+                                    <span className={`${styles.statusBadge} ${user.role === 'admin' ? styles.disponible : styles.reservado}`}>
+                                        {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                                    </span>
+                                </td>
+                                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                {/* <td>
+                                    <span className={`${styles.statusBadge} ${user.isActive ? styles.disponible : styles.mantenimiento}`}>
+                                        {user.isActive ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </td> */}
+                                <td>
+                                    <select
+                                        value={user.role}
+                                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                        className={styles.roleSelector}
+                                    >
+                                        <option value="client">Cliente</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div className={styles.pagination}>
+                <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Primero
+                </button>
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Anterior
+                </button>
+                <span className="mx-2">
+                    Página {currentPage} de {totalPages}
+                </span>
+                <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Siguiente
+                </button>
+                <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Último
+                </button>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const Admin = () => {
     useEffect(() => {
