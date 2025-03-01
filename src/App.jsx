@@ -8,6 +8,8 @@ import Admin from './components/admin/Admin';
 import { localDB } from './database/LocalDB';
 import MainLayout from './Layaouts/MainLayout';
 import CardDetails from './components/cardDetails/CardDetails';
+import AccountConfirmation from './components/auth/AccountConfirmation';
+import UserProfile from './components/userProfile/UserProfile';
 
 // Protected Route Component solo para rutas que requieren autenticación
 // eslint-disable-next-line react/prop-types
@@ -31,7 +33,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />} >
           {/* Rutas públicas */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<UserProfile />} />
           <Route path="/detail/:id" element={<CardDetails />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
@@ -51,7 +53,7 @@ function App() {
             path="/profile" 
             element={
               <ProtectedRoute>
-                <div>Profile Page</div>
+                <UserProfile/>
               </ProtectedRoute>
             } 
           />

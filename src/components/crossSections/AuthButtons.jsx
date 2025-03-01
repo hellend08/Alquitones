@@ -31,15 +31,22 @@ const AuthButtons = () => {
         window.location.href = `/${type}`;
     };
 
+
     if (user) {
         return (
             <div className="flex items-center gap-4">
-                <span className="text-gray-700 font-medium">
-                    Bienvenido, {user.username}
-                </span>
+                <div>
+                    <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+                        <span className="font-medium text-gray-600 dark:text-gray-300">{user.username[0]}</span>
+                    </div>
+                    <span className="text-gray-700 font-medium">
+                        {user.username}
+                    </span>
+                </div>
+
                 <button
                     onClick={handleLogout}
-                    className="bg-(--color-secondary) hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                    className="bg-(--color-secondary) hover:bg-(--color-primary) text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
                 >
                     Cerrar Sesión
                 </button>

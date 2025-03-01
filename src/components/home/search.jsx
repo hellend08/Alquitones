@@ -23,7 +23,7 @@ const SearchBar = ({ onSearch }) => {
             // Verificar y obtener productos con valor por defecto
             const dbProducts = localDB.getAllProducts() || {instruments: []};
             // Dentro de handleSearch, cambiar esta línea:
-const allProducts = localDB.getAllProducts(); // Eliminar .instruments
+            const allProducts = localDB.getAllProducts(); // Eliminar .instruments
             
             const results = allProducts.filter(product => 
                 product.name.toLowerCase().includes(newSearchTerm.toLowerCase())
