@@ -3,6 +3,11 @@ import { localDB } from '../../database/LocalDB';
 
 const AuthButtons = () => {
     const [user, setUser] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleClick = () => {
+        setIsOpen(!isOpen)
+    }
 
     // Efecto para mantener sincronizado el estado del usuario
     useEffect(() => {
@@ -32,24 +37,31 @@ const AuthButtons = () => {
     };
 
 
+
     if (user) {
         return (
-            <div className="flex items-center gap-4">
-                <div>
-                    <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
-                        <span className="font-medium text-gray-600 dark:text-gray-300">{user.username[0]}</span>
+            <div className="flex items-center ">
+                <div className="flex items-center" onClick={handleClick}>
+                    <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-(--color-primary) rounded-full ">
+                        <span className="text-xl text-white">{user.username[0].toUpperCase()}</span>
                     </div>
-                    <span className="text-gray-700 font-medium">
+                    <span className="text-(--color-secundary) font-medium pl-2">
                         {user.username}
                     </span>
                 </div>
 
-                <button
-                    onClick={handleLogout}
-                    className="bg-(--color-secondary) hover:bg-(--color-primary) text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
-                >
-                    Cerrar Sesión
-                </button>
+                {isOpen && (
+                    <div className="absolute z-10 mt-35 bg-white sm:border sm:border-gray-200 rounded-lg sm:shadow-lg sm:max-h-60 overflow-y-auto text-sm mx-1 p-2 font-normal text-(--color-secondary) w-full md:w-auto">
+                        <a className='relative block rounded-lg p-2 px-4 ' href="/profile">Mi Perfil</a>
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 px-4 text-red-800">
+                            Cerrar Sesión
+                        </button>
+                    </div>
+                )}
+
+
             </div>
         );
     }
