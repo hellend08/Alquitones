@@ -680,7 +680,8 @@ class LocalDB {
             role: userData.role || 'client',
             createdAt: new Date().toISOString(),
             isActive: true,
-            emailVerified: userData.emailVerified || false // Añadir este campo
+            // Eliminar el campo emailVerified
+            // emailVerified: userData.emailVerified || false
         };
     
         this.data.users.push(newUser);
@@ -863,19 +864,16 @@ class LocalDB {
             throw new Error('Cuenta desactivada');
         }
         
-        // Verificar si el email está confirmado para cuentas que no son admin
-        if (user.role !== 'admin' && !user.emailVerified) {
-            // Verificar también en localStorage (podría haberse confirmado en otro navegador)
-            const confirmedInStorage = localStorage.getItem(`email_confirmed_${email}`) === 'true';
-            
-            if (confirmedInStorage) {
-                // Actualizar el usuario en la BD
-                user.emailVerified = true;
-                this.updateUser(user.id, { emailVerified: true });
-            } else {
-                throw new Error('Por favor confirma tu cuenta de correo electrónico antes de iniciar sesión');
-            }
-        }
+        // Eliminar solo la verificación de correo electrónico
+        // if (user.role !== 'admin' && !user.emailVerified) {
+        //     const confirmedInStorage = localStorage.getItem(`email_confirmed_${email}`) === 'true';
+        //     if (confirmedInStorage) {
+        //         user.emailVerified = true;
+        //         this.updateUser(user.id, { emailVerified: true });
+        //     } else {
+        //         throw new Error('Por favor confirma tu cuenta de correo electrónico antes de iniciar sesión');
+        //     }
+        // }
         
         // Almacenar sesión en localStorage
         localStorage.setItem('currentUser', JSON.stringify(user));

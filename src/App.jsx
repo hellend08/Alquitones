@@ -1,4 +1,4 @@
-// App.jsx - Actualizado con ruta para confirmación de cuenta
+// App.jsx
 
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
@@ -37,7 +37,6 @@ function App() {
           <Route path="/detail/:id" element={<CardDetails />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
-          <Route path="/confirm-account" element={<AccountConfirmation />} />
           
           {/* Rutas protegidas */}
           <Route 
