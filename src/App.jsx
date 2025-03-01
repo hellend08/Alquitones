@@ -8,7 +8,6 @@ import Admin from './components/admin/Admin';
 import { localDB } from './database/LocalDB';
 import MainLayout from './Layaouts/MainLayout';
 import CardDetails from './components/cardDetails/CardDetails';
-import AccountConfirmation from './components/auth/AccountConfirmation';
 import UserProfile from './components/userProfile/UserProfile';
 
 // Protected Route Component solo para rutas que requieren autenticación
