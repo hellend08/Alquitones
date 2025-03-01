@@ -1,3 +1,5 @@
+// App.jsx - Actualizado con ruta para confirmación de cuenta
+
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Auth from './components/auth/Auth';
@@ -6,7 +8,7 @@ import Admin from './components/admin/Admin';
 import { localDB } from './database/LocalDB';
 import MainLayout from './Layaouts/MainLayout';
 import CardDetails from './components/cardDetails/CardDetails';
-
+import AccountConfirmation from './components/auth/AccountConfirmation';
 
 // Protected Route Component solo para rutas que requieren autenticación
 // eslint-disable-next-line react/prop-types
@@ -34,6 +36,7 @@ function App() {
           <Route path="/detail/:id" element={<CardDetails />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
+          <Route path="/confirm-account" element={<AccountConfirmation />} />
           
           {/* Rutas protegidas */}
           <Route 

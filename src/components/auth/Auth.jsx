@@ -1,8 +1,9 @@
-// Auth.jsx
+// Auth.jsx con integración de EmailJS
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Auth.module.css';
+import EmailConfirmationService from '../../services/emailConfirmationService';
 
 const Auth = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Auth = () => {
         confirmPassword: ''
     });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     // Check URL and set active form accordingly
     useEffect(() => {
@@ -65,31 +67,49 @@ const Auth = () => {
                 return;
             }
             
-            await localDB.createUser({
+            setLoading(true);
+            
+            const userData = {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 username: `${formData.firstName} ${formData.lastName}`,
                 email: formData.email,
                 password: formData.password,
-                role: 'client'
-            });
+                role: 'client',
+                emailVerified: false // Inicialmente no verificado
+            };
             
-            setActiveForm('login');
-            setError('Registro exitoso, por favor inicia sesión');
-            setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-            });
+            // Crear el usuario en la base de datos local
+            await localDB.createUser(userData);
             
-            // Opcional: redirigir automáticamente después de un breve retraso
-            setTimeout(() => {
-                navigate('/login');
-            }, 2000);
+            // Enviar correo de confirmación
+            const emailResult = await EmailConfirmationService.sendConfirmationEmail(userData);
+            
+            if (emailResult.success) {
+                setActiveForm('login');
+                setError('Registro exitoso. Por favor revisa tu correo para confirmar tu cuenta.');
+                
+                // Limpiar formulario
+                setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
+                
+                // Opcional: redirigir después de un breve retraso
+                setTimeout(() => {
+                    navigate('/login');
+                }, 2000);
+            } else {
+                // Si el email falló pero el usuario fue creado
+                setError('Tu cuenta fue creada pero hubo un problema al enviar el correo de confirmación. Por favor, contacta a soporte.');
+            }
         } catch (error) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -104,18 +124,54 @@ const Auth = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true);
+            
+            // Verificar si el email está confirmado
+            const isConfirmed = EmailConfirmationService.isAccountConfirmed(formData.email);
+            
+            // Si no está confirmado, mostrar mensaje de error y opción para reenviar
+            if (!isConfirmed) {
+                setError('Tu cuenta aún no ha sido confirmada. Por favor revisa tu correo o haz clic para reenviar el correo de confirmación.');
+                setLoading(false);
+                return;
+            }
+            
+            // Continuar con el login normal
             const user = await localDB.login(formData.email, formData.password);
             if (user) {
                 navigate(user.role === 'admin' ? '/admin' : '/');
             }
         } catch (error) {
             setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResendConfirmation = async () => {
+        if (!formData.email) {
+            setError('Por favor ingresa tu correo electrónico primero');
+            return;
+        }
+        
+        try {
+            setLoading(true);
+            const result = await EmailConfirmationService.resendConfirmationEmail(formData.email);
+            
+            if (result.success) {
+                setError('Se ha reenviado el correo de confirmación. Por favor revisa tu bandeja de entrada.');
+            } else {
+                setError('Error al reenviar el correo: ' + (result.error || 'Inténtalo más tarde'));
+            }
+        } catch (error) {
+            setError('Error al reenviar el correo: ' + error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className={styles.authContainer}>
-            {/* <img src="/src/assets/alquitonesLogo.png" alt="AlquiTones" className={styles.logo}/> */}
             <div className={styles.formContainer}>
                 <div className={styles.authTitle}>
                     <h2>{activeForm === 'login' ? 'Iniciar Sesión' : 'Registrarse'}</h2>
@@ -138,6 +194,7 @@ const Auth = () => {
                                 onChange={handleChange}
                                 required
                                 minLength={2}
+                                disabled={loading}
                             />
                         </div>
                         <div className={styles.inputGroup}>
@@ -149,6 +206,7 @@ const Auth = () => {
                                 onChange={handleChange}
                                 required
                                 minLength={2}
+                                disabled={loading}
                             />
                         </div>
                         <div className={styles.inputGroup}>
@@ -159,26 +217,28 @@ const Auth = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                disabled={loading}
                             />
                             <small className={styles.helpText}>Ingrese un correo electrónico válido</small>
                         </div>
                         <div className={styles.inputGroup}>
-    <label>Contraseña</label>
-    <input
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-        minLength={6}
-    />
-    {formData.password && (
-    <div className={`${styles.passwordStrength} ${styles[getPasswordStrength(formData.password)]}`}>
-        Fuerza: {getPasswordStrength(formData.password) === 'debil' ? 'Débil' : 
-                getPasswordStrength(formData.password) === 'media' ? 'Media' : 'Fuerte'}
-    </div>
-)}
-</div>
+                            <label>Contraseña</label>
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                minLength={6}
+                                disabled={loading}
+                            />
+                            {formData.password && (
+                                <div className={`${styles.passwordStrength} ${styles[getPasswordStrength(formData.password)]}`}>
+                                    Fuerza: {getPasswordStrength(formData.password) === 'debil' ? 'Débil' : 
+                                            getPasswordStrength(formData.password) === 'media' ? 'Media' : 'Fuerte'}
+                                </div>
+                            )}
+                        </div>
                         <div className={styles.inputGroup}>
                             <label>Verificar Contraseña</label>
                             <input
@@ -188,10 +248,15 @@ const Auth = () => {
                                 onChange={handleChange}
                                 required
                                 minLength={6}
+                                disabled={loading}
                             />
                         </div>
-                        <button type="submit" className={styles.submitButton}>
-                            Registrarse
+                        <button 
+                            type="submit" 
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? 'Procesando...' : 'Registrarse'}
                         </button>
                     </form>
                 ) : (
@@ -204,23 +269,43 @@ const Auth = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                disabled={loading}
                             />
                             <small className={styles.helpText}>Ingrese un correo electrónico válido (ejemplo: usuario@dominio.com)</small>
                         </div>
                         <div className={styles.inputGroup}>
-    <label>Contraseña</label>
-    <input
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-        minLength={6}
-    />
-</div>
-                        <button type="submit" className={styles.submitButton}>
-                            Iniciar Sesión
+                            <label>Contraseña</label>
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                minLength={6}
+                                disabled={loading}
+                            />
+                        </div>
+                        <button 
+                            type="submit" 
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? 'Procesando...' : 'Iniciar Sesión'}
                         </button>
+
+                        {/* Botón para reenviar correo de confirmación */}
+                        {error && error.includes('no ha sido confirmada') && (
+                            <div className={styles.resendContainer}>
+                                <button
+                                    type="button"
+                                    onClick={handleResendConfirmation}
+                                    className={styles.resendButton}
+                                    disabled={loading}
+                                >
+                                    Reenviar correo de confirmación
+                                </button>
+                            </div>
+                        )}
                     </form>
                 )}
 
