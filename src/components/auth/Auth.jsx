@@ -1,4 +1,4 @@
-// Auth.jsx con integración de EmailJS
+// Auth.jsx - Simplified email sending
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -38,20 +38,17 @@ const Auth = () => {
     };
 
     const validateForm = () => {
-        // Expresión regular mejorada para validar correos electrónicos
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|co|io|info|biz)$/;
         if (!emailRegex.test(formData.email)) {
             setError('Por favor ingrese un correo electrónico válido con un dominio reconocido');
             return false;
         }
 
-        // Validación de contraseña
         if (formData.password.length < 6) {
             setError('La contraseña debe tener al menos 6 caracteres');
             return false;
         }
 
-        // Validación de coincidencia de contraseñas
         if (formData.password !== formData.confirmPassword) {
             setError('Las contraseñas no coinciden');
             return false;
@@ -75,19 +72,18 @@ const Auth = () => {
                 username: `${formData.firstName} ${formData.lastName}`,
                 email: formData.email,
                 password: formData.password,
-                role: 'client',
-                emailVerified: false // Inicialmente no verificado
+                role: 'client'
             };
             
             // Crear el usuario en la base de datos local
             await localDB.createUser(userData);
             
-            // Enviar correo de confirmación
-            const emailResult = await EmailConfirmationService.sendConfirmationEmail(userData);
+            // Mantener el envío del correo de bienvenida
+            const emailResult = await EmailConfirmationService.sendWelcomeEmail(userData);
             
             if (emailResult.success) {
                 setActiveForm('login');
-                setError('Registro exitoso. Por favor revisa tu correo para confirmar tu cuenta.');
+                setError('Registro exitoso. Se ha enviado un correo de bienvenida.');
                 
                 // Limpiar formulario
                 setFormData({
@@ -103,8 +99,8 @@ const Auth = () => {
                     navigate('/login');
                 }, 2000);
             } else {
-                // Si el email falló pero el usuario fue creado
-                setError('Tu cuenta fue creada pero hubo un problema al enviar el correo de confirmación. Por favor, contacta a soporte.');
+                // Si el email falló
+                setError('Tu cuenta fue creada pero hubo un problema al enviar el correo.');
             }
         } catch (error) {
             setError(error.message);
@@ -113,10 +109,9 @@ const Auth = () => {
         }
     };
 
-    // Agregar un indicador de fuerza de contraseña
     const getPasswordStrength = (password) => {
         if (!password) return '';
-        if (password.length < 6) return 'debil'; // Sin acento
+        if (password.length < 6) return 'debil';
         if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) return 'fuerte';
         return 'media';
     };
@@ -126,45 +121,12 @@ const Auth = () => {
         try {
             setLoading(true);
             
-            // Verificar si el email está confirmado
-            const isConfirmed = EmailConfirmationService.isAccountConfirmed(formData.email);
-            
-            // Si no está confirmado, mostrar mensaje de error y opción para reenviar
-            if (!isConfirmed) {
-                setError('Tu cuenta aún no ha sido confirmada. Por favor revisa tu correo o haz clic para reenviar el correo de confirmación.');
-                setLoading(false);
-                return;
-            }
-            
-            // Continuar con el login normal
             const user = await localDB.login(formData.email, formData.password);
             if (user) {
                 navigate(user.role === 'admin' ? '/admin' : '/');
             }
         } catch (error) {
             setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleResendConfirmation = async () => {
-        if (!formData.email) {
-            setError('Por favor ingresa tu correo electrónico primero');
-            return;
-        }
-        
-        try {
-            setLoading(true);
-            const result = await EmailConfirmationService.resendConfirmationEmail(formData.email);
-            
-            if (result.success) {
-                setError('Se ha reenviado el correo de confirmación. Por favor revisa tu bandeja de entrada.');
-            } else {
-                setError('Error al reenviar el correo: ' + (result.error || 'Inténtalo más tarde'));
-            }
-        } catch (error) {
-            setError('Error al reenviar el correo: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -292,20 +254,6 @@ const Auth = () => {
                         >
                             {loading ? 'Procesando...' : 'Iniciar Sesión'}
                         </button>
-
-                        {/* Botón para reenviar correo de confirmación */}
-                        {error && error.includes('no ha sido confirmada') && (
-                            <div className={styles.resendContainer}>
-                                <button
-                                    type="button"
-                                    onClick={handleResendConfirmation}
-                                    className={styles.resendButton}
-                                    disabled={loading}
-                                >
-                                    Reenviar correo de confirmación
-                                </button>
-                            </div>
-                        )}
                     </form>
                 )}
 
