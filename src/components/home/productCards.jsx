@@ -1,39 +1,28 @@
 import { useState, useEffect } from "react";
-import { localDB } from "../../database/LocalDB";
+import { apiService } from "../../services/apiService";
 import { Link } from "react-router-dom";
 
 const ProductCards = () => {
     const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState("");
+    const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 10;
 
-    const recomendedProducts = () => {
-        try {
-            const productsDB = localDB.getAllProducts();
-            if (productsDB.length > 0) {
-                // Obtener todos los productos en orden aleatorio
-                const randomProducts = productsDB.sort(() => Math.random() - 0.5);
-                setProducts(randomProducts);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await apiService.getInstruments();
+            setProducts(data);
+        };
 
-    const getCategories = () => {
-        try {
-            const categoriesDB = localDB.data.categories;
-            setCategories(categoriesDB);
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
+        fetchData();
+    }, []);
 
     useEffect(() => {
-        getCategories();
-        recomendedProducts();
+        const fetchData = async () => {
+            const data = await apiService.getCategories();
+            setCategories(data);
+        };
+        fetchData();
     }, []);
 
     const getCategoryName = (categoryId) => {
@@ -60,7 +49,7 @@ const ProductCards = () => {
                     <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
                         <img 
                             className="h-48 w-96 mx-auto object-contain rounded-t-lg" 
-                            src={product.images[0]} 
+                            src={product.mainImage} 
                             alt={product.name} 
                         />
                         <div className="p-5 border-t border-gray-300">
