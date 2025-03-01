@@ -1,0 +1,250 @@
+/* Auth.module.css */
+.authContainer {
+    min-height: 100vh;
+    background-color: #FFD791;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+}
+
+.logo {
+    width: 200px;
+    margin-bottom: 2rem;
+}
+
+.formContainer {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.formToggle {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.toggleButton {
+    flex: 1;
+    padding: 0.75rem;
+    background: none;
+    border: 2px solid #9C6615;
+    color: #9C6615;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.toggleButton.active {
+    background-color: #9C6615;
+    color: white;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inputGroup label {
+    color: #413620;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.inputGroup input {
+    padding: 0.75rem;
+    border: 2px solid #CDD1DE;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: #9C6615;
+    box-shadow: 0 0 0 3px rgba(156, 102, 21, 0.1);
+}
+
+.submitButton {
+    padding: 0.75rem;
+    background-color: #9C6615;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.submitButton:hover {
+    background-color: #9F7833;
+}
+
+.errorMessage {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.errorMessage.success {
+    background-color: #dcfce7;
+    border-left-color: #22c55e;
+    color: #166534;
+}
+
+@media (max-width: 480px) {
+    .formContainer {
+        padding: 1.5rem;
+    }
+    
+    .inputGroup input,
+    .submitButton {
+        padding: 0.625rem;
+    }
+}
+
+.authTitle {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.authTitle h2 {
+    color: #413620;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.formSwitch {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #666;
+}
+
+.switchLink {
+    color: #9C6615;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 0.5rem;
+}
+
+.switchLink:hover {
+    color: #413620;
+}
+
+
+.passwordStrength {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+}
+
+.debil {
+    background-color: #ffcccc;
+    color: #cc0000;
+}
+
+.media {
+    background-color: #fff2cc;
+    color: #b88a00;
+}
+
+.fuerte {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+
+/* Estilos para el componente de confirmación de cuenta */
+.confirmationMessage {
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .confirmationMessage.verifying {
+    background-color: #fff2cc;
+    color: #b88a00;
+  }
+  
+  .confirmationMessage.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .confirmationMessage.error {
+    background-color: #ffcccc;
+    color: #cc0000;
+  }
+  
+  .statusIcon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .smallText {
+    font-size: 0.85rem;
+    margin-top: 1rem;
+  }
+  
+  .errorActions {
+    margin-top: 1.5rem;
+  }
+  
+  /* Botón para reenviar correo */
+  .resendButton {
+    background-color: #9C6615;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+  
+  .resendButton:hover {
+    background-color: #9F7833;
+  }
+  
+  .resendContainer {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  /* Mensaje de éxito o error */
+  .errorMessage {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  
+  .errorMessage.success {
+    background-color: #dcfce7;
+    border-left-color: #22c55e;
+    color: #166534;
+  }
