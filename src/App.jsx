@@ -32,7 +32,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />} >
           {/* Rutas públicas */}
-          <Route path="/" element={<UserProfile />} />
+          <Route path="/" element={<Home />} />
           <Route path="/detail/:id" element={<CardDetails />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
