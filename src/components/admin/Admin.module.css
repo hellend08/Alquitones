@@ -318,7 +318,6 @@
 }
 
 .actions {
-    /* display: flex; */
     gap: 0.5rem;
 }
 
@@ -401,7 +400,6 @@
     justify-content: center;
     align-items: flex-start; /* Cambio a flex-start para alinear arriba */
     padding: 2rem;          /* Padding para evitar que toque los bordes */
-    /* overflow-y: auto;       Permitir scroll */
     z-index: 1000;
 }
 .modalContent {
@@ -506,7 +504,7 @@
     
 }
 
-/* Add these to your existing Admin.module.css */
+
 .sectionHeader {
     display: flex;
     justify-content: space-between;
@@ -618,7 +616,7 @@
     line-height: 1.6;
 }
 
-/* Añadir a Admin.module.css */
+
 .specificationsContainer {
     display: flex;
     flex-direction: column;
@@ -653,7 +651,6 @@
     border-radius: 4px;
 }
 
-/* Añadir a Admin.module.css */
 .iconTypeSelector {
     display: flex;
     gap: 1rem;
@@ -701,4 +698,24 @@
     border: 2px solid #007bff;
     border-radius: 50%;
     padding: 5px;
+}
+
+.roleSelector {
+    padding: 0.5rem;
+    border: 1px solid var(--color-gray);
+    border-radius: 4px;
+    background-color: var(--color-white);
+    color: var(--color-dark-brown);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.roleSelector:hover, .roleSelector:focus {
+    border-color: var(--color-golden);
+    outline: none;
+}
+
+.roleSelector option {
+    padding: 0.5rem;
 }

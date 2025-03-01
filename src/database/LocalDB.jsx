@@ -27,6 +27,141 @@ class LocalDB {
                     role: 'client',
                     createdAt: new Date().toISOString(),
                     isActive: true
+                },
+                {
+                    id: 3,
+                    username: 'mariaperez',
+                    email: 'maria@ejemplo.com',
+                    password: 'maria123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 4,
+                    username: 'juangarcia',
+                    email: 'juan@ejemplo.com',
+                    password: 'juan123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 5,
+                    username: 'carlosmendez',
+                    email: 'carlos@ejemplo.com',
+                    password: 'carlos123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 6,
+                    username: 'luisafernandez',
+                    email: 'luisa@ejemplo.com',
+                    password: 'luisa123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 7,
+                    username: 'pedroramirez',
+                    email: 'pedro@ejemplo.com',
+                    password: 'pedro123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 8,
+                    username: 'sofiavega',
+                    email: 'sofia@ejemplo.com', 
+                    password: 'sofia123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 9,
+                    username: 'davidmartinez',
+                    email: 'david@ejemplo.com',
+                    password: 'david123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 10,
+                    username: 'anaromero',
+                    email: 'ana@ejemplo.com',
+                    password: 'ana123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 11,
+                    username: 'josegonzalez',
+                    email: 'jose@ejemplo.com',
+                    password: 'jose123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: false
+                },
+                {
+                    id: 12,
+                    username: 'laurarodriguez',
+                    email: 'laura@ejemplo.com',
+                    password: 'laura123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 13,
+                    username: 'albertorivas',
+                    email: 'alberto@ejemplo.com',
+                    password: 'alberto123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 14,
+                    username: 'martacortes',
+                    email: 'marta@ejemplo.com',
+                    password: 'marta123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 15,
+                    username: 'felipeduran',
+                    email: 'felipe@ejemplo.com',
+                    password: 'felipe123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 16,
+                    username: 'paolaherrera',
+                    email: 'paola@ejemplo.com',
+                    password: 'paola123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                },
+                {
+                    id: 17,
+                    username: 'robertocastro',
+                    email: 'roberto@ejemplo.com',
+                    password: 'roberto123',
+                    role: 'client',
+                    createdAt: new Date().toISOString(),
+                    isActive: false
                 }
             ],
 
@@ -410,10 +545,26 @@ class LocalDB {
 
     // Inicialización
     initializeStorage() {
+        // Verificar si existe data en localStorage
         if (!localStorage.getItem('alquitonesDB')) {
+            // Si no existe, inicializar con los datos por defecto
             localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
         } else {
+            // Si ya existe, cargar los datos del localStorage
             this.data = JSON.parse(localStorage.getItem('alquitonesDB'));
+        }
+        
+        // También asegurarse de que el currentUser esté disponible
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            // Verificar que el usuario exista en la base de datos actualizada
+            const userData = JSON.parse(currentUser);
+            const userExists = this.data.users.some(u => u.id === userData.id);
+            
+            // Si el usuario ya no existe, limpiar la sesión
+            if (!userExists) {
+                localStorage.removeItem('currentUser');
+            }
         }
     }
 
@@ -513,12 +664,12 @@ class LocalDB {
         if (this.getUserByEmail(userData.email)) {
             throw new Error('El email ya está registrado');
         }
-
+    
         // Verificar que los campos requeridos estén presentes
         if (!userData.firstName || !userData.lastName || !userData.email || !userData.password) {
             throw new Error('Todos los campos son obligatorios');
         }
-
+    
         const newUser = {
             id: this.data.users.length + 1,
             firstName: userData.firstName,
@@ -528,9 +679,10 @@ class LocalDB {
             password: userData.password,
             role: userData.role || 'client',
             createdAt: new Date().toISOString(),
-            isActive: true
+            isActive: true,
+            emailVerified: userData.emailVerified || false // Añadir este campo
         };
-
+    
         this.data.users.push(newUser);
         this.saveToStorage();
         return newUser;
@@ -539,19 +691,12 @@ class LocalDB {
     updateUser(id, userData) {
         const index = this.data.users.findIndex(user => user.id === id);
         if (index === -1) throw new Error('Usuario no encontrado');
-
-        // Si se está actualizando el email, verificar que no exista
-        if (userData.email && userData.email !== this.data.users[index].email) {
-            if (this.getUserByEmail(userData.email)) {
-                throw new Error('El email ya está registrado');
-            }
-        }
-
+    
         this.data.users[index] = {
             ...this.data.users[index],
             ...userData
         };
-
+    
         this.saveToStorage();
         return this.data.users[index];
     }
@@ -717,6 +862,21 @@ class LocalDB {
         if (!user.isActive) {
             throw new Error('Cuenta desactivada');
         }
+        
+        // Verificar si el email está confirmado para cuentas que no son admin
+        if (user.role !== 'admin' && !user.emailVerified) {
+            // Verificar también en localStorage (podría haberse confirmado en otro navegador)
+            const confirmedInStorage = localStorage.getItem(`email_confirmed_${email}`) === 'true';
+            
+            if (confirmedInStorage) {
+                // Actualizar el usuario en la BD
+                user.emailVerified = true;
+                this.updateUser(user.id, { emailVerified: true });
+            } else {
+                throw new Error('Por favor confirma tu cuenta de correo electrónico antes de iniciar sesión');
+            }
+        }
+        
         // Almacenar sesión en localStorage
         localStorage.setItem('currentUser', JSON.stringify(user));
         return user;
@@ -728,7 +888,38 @@ class LocalDB {
     }
 
     getCurrentUser() {
-        return JSON.parse(localStorage.getItem('currentUser'));
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            return null;
+        }
+        
+        try {
+            const userData = JSON.parse(currentUser);
+            
+            // Verificar que el usuario sigue existiendo en la base de datos
+            const userExists = this.data.users.some(u => u.id === userData.id);
+            if (!userExists) {
+                console.warn('Usuario en sesión no encontrado en la base de datos');
+                localStorage.removeItem('currentUser');
+                return null;
+            }
+            
+            // Actualizar los datos del usuario desde la base de datos
+            const updatedUser = this.getUserById(userData.id);
+            if (updatedUser) {
+                // Si el rol ha cambiado, actualizar en la sesión
+                if (updatedUser.role !== userData.role) {
+                    userData.role = updatedUser.role;
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                }
+            }
+            
+            return userData;
+        } catch (e) {
+            console.error('Error al obtener el usuario actual:', e);
+            localStorage.removeItem('currentUser');
+            return null;
+        }
     }
 
     isAdmin() {
@@ -738,9 +929,10 @@ class LocalDB {
 
     // Métodos para gestionar especificaciones
     getAllSpecifications() {
-        return this.data.specifications;
+        return Array.isArray(this.data.specifications) ? this.data.specifications : [];
     }
 
+    
     getSpecificationById(id) {
         return this.data.specifications.find(spec => spec.id === id);
     }

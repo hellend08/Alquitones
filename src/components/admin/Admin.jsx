@@ -766,13 +766,14 @@ const Specifications = () => {
     const loadSpecifications = () => {
         try {
             const allSpecifications = localDB.getAllSpecifications();
-            let filteredSpecifications = allSpecifications;
-
-            if (searchTerm) {
-                filteredSpecifications = allSpecifications.filter(spec =>
-                    spec.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
+            // Verificación adicional
+            if (!Array.isArray(allSpecifications)) {
+                console.error("Las especificaciones no son un array");
+                setSpecifications([]);
+                setTotalPages(1);
+                return;
             }
+            let filteredSpecifications = allSpecifications;
 
             // Calcular paginación manualmente
             const startIndex = (currentPage - 1) * itemsPerPage;
@@ -1162,17 +1163,318 @@ const Rentals = () => (
 );
 
 // Users component
-const Users = () => (
-    <div className={styles.usersContent}>
-        <div className={styles.placeholderContainer}>
-            <img
-                src="/src/assets/no-disponible.jpg"
-                alt="No disponible"
-                className={styles.placeholderImage}
-            />
-        </div>
+// Actualizar el componente Users en Admin.jsx
+// Users component con popup de confirmación
+const Users = () => {
+    const [users, setUsers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 10;
+    
+    // Estados para el popup de confirmación
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [pendingRoleChange, setPendingRoleChange] = useState(null);
+    
+    useEffect(() => {
+        loadUsers();
+    }, [searchTerm, currentPage]);
+    
+    const loadUsers = () => {
+        try {
+            const allUsers = localDB.getAllUsers();
+            console.log('Todos los usuarios:', allUsers);
+            
+            let filteredUsers = allUsers;
+            
+            if (searchTerm) {
+                filteredUsers = allUsers.filter(user => 
+                    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+            
+            // Calcular paginación
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+            
+            setUsers(paginatedUsers);
+            setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
+        } catch (error) {
+            console.error('Error al cargar usuarios:', error);
+            alert('Error al cargar los usuarios');
+        }
+    };
+    
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+    
+    // Modificado para mostrar la confirmación
+    const initiateRoleChange = (userId, newRole, currentRole) => {
+        // Si no hay cambio, no hacer nada
+        if (newRole === currentRole) return;
+        
+        // Obtener información del usuario
+        const user = users.find(u => u.id === userId);
+        if (!user) return;
+        
+        // Guardar la información del cambio pendiente
+        setPendingRoleChange({
+            userId,
+            username: user.username,
+            currentRole,
+            newRole
+        });
+        
+        // Mostrar el popup de confirmación
+        setShowConfirmation(true);
+    };
+    
+    // Ejecutar el cambio de rol después de la confirmación
+    const executeRoleChange = async () => {
+        if (!pendingRoleChange) return;
+        
+        try {
+            // Obtener el usuario actual para verificar que no se quite permisos a sí mismo
+            const currentUser = localDB.getCurrentUser();
+            if (currentUser && currentUser.id === pendingRoleChange.userId && pendingRoleChange.newRole !== 'admin') {
+                alert('No puedes quitarte permisos de administrador a ti mismo');
+                setShowConfirmation(false);
+                return;
+            }
+            
+            // Actualizar el rol del usuario
+            await localDB.updateUser(pendingRoleChange.userId, { role: pendingRoleChange.newRole });
+            
+            // Verificar explícitamente que los cambios se guardaron correctamente
+            const updatedUsers = localDB.getAllUsers();
+            const updatedUser = updatedUsers.find(u => u.id === pendingRoleChange.userId);
+            
+            if (!updatedUser || updatedUser.role !== pendingRoleChange.newRole) {
+                throw new Error('Error: Los cambios no se aplicaron correctamente');
+            }
+            
+            // Forzar una actualización de localStorage
+            localDB.saveToStorage();
+            
+            // Si el usuario modificado es el actual, actualizar la sesión
+            if (currentUser && currentUser.id === pendingRoleChange.userId) {
+                // Actualizar el usuario en sesión con el nuevo rol
+                const updatedCurrentUser = {
+                    ...currentUser,
+                    role: pendingRoleChange.newRole
+                };
+                localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
+            }
+            
+            // Recargar la lista de usuarios
+            loadUsers();
+            alert(`Permisos actualizados correctamente`);
+        } catch (error) {
+            console.error('Error al cambiar permisos:', error);
+            alert(`Error al cambiar permisos: ${error.message}`);
+        } finally {
+            // Cerrar el popup y limpiar el estado
+            setShowConfirmation(false);
+            setPendingRoleChange(null);
+        }
+    };
+    
+    // Cancelar el cambio de rol
+    const cancelRoleChange = () => {
+        setShowConfirmation(false);
+        setPendingRoleChange(null);
+        // Recargar los usuarios para restaurar los selectores
+        loadUsers();
+    };
+    
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+    
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+    
+    return (
+        <div className={styles.usersSection}>
+            <div className={styles.sectionHeader}>
+                <h2>Gestión de Usuarios</h2>
+                <div className={styles.headerActions}>
+                    <div className={styles.searchContainer}>
+                        <span className="material-symbols-outlined" style={{
+                            position: 'absolute',
+                            left: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: '#9C9C9C',
+                            fontSize: '20px'
+                        }}>
+                            search
+                        </span>
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre o email..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className={styles.searchInput}
+                            style={{ paddingLeft: '35px' }}
+                        />
+                    </div>
+                </div>
+            </div>
+            
+            <div className={styles.tableContainer}>
+                <table className={styles.instrumentsTable}>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Fecha de creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map(user => (
+                            <tr key={user.id}>
+                                <td>{user.id}</td>
+                                <td>{user.username}</td>
+                                <td>{user.email}</td>
+                                <td>
+                                    <span className={`${styles.statusBadge} ${user.role === 'admin' ? styles.disponible : styles.reservado}`}>
+                                        {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                                    </span>
+                                </td>
+                                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                <td>
+                                    <select
+                                        value={user.role}
+                                        onChange={(e) => initiateRoleChange(user.id, e.target.value, user.role)}
+                                        className={styles.roleSelector}
+                                    >
+                                        <option value="client">Cliente</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div className={styles.pagination}>
+                <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Primero
+                </button>
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Anterior
+                </button>
+                <span className="mx-2">
+                    Página {currentPage} de {totalPages}
+                </span>
+                <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Siguiente
+                </button>
+                <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Último
+                </button>
+            </div>
+            
+            {/* Popup de confirmación */}
+            {showConfirmation && pendingRoleChange && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent} style={{ maxWidth: '400px' }}>
+                        <div className={styles.modalHeader}>
+                            <h3>Confirmar cambio de rol</h3>
+                            <button
+                                onClick={cancelRoleChange}
+                                className={styles.modalClose}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                        <div style={{ padding: '1rem' }}>
+                            <p style={{ marginBottom: '1rem' }}>
+                                ¿Estás seguro de que deseas cambiar el rol de <strong>{pendingRoleChange.username}</strong> de 
+                                <strong> {pendingRoleChange.currentRole === 'admin' ? 'Administrador' : 'Cliente'}</strong> a 
+                                <strong> {pendingRoleChange.newRole === 'admin' ? 'Administrador' : 'Cliente'}</strong>?
+                            </p>
+                            
+                            {pendingRoleChange.currentRole === 'admin' && pendingRoleChange.newRole !== 'admin' && (
+    <div style={{ 
+        backgroundColor: '#FFF3CD', 
+        color: '#856404', 
+        padding: '0.5rem', 
+        borderRadius: '4px',
+        marginBottom: '1rem'
+    }}>
+        <p style={{ fontWeight: 'bold' }}>
+            <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
+            Advertencia: Estás removiendo privilegios de administrador
+        </p>
     </div>
-);
+)}
+
+{pendingRoleChange.newRole === 'admin' && (
+    <div style={{ 
+        backgroundColor: '#FFF3CD', 
+        color: '#856404', 
+        padding: '0.5rem', 
+        borderRadius: '4px',
+        marginBottom: '1rem'
+    }}>
+        <p style={{ fontWeight: 'bold' }}>
+            <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
+            Advertencia: Estás otorgando acceso completo al panel de administración
+        </p>
+    </div>
+)}
+                        </div>
+                        <div className="flex gap-4 justify-end p-4">
+                            <button
+                                onClick={cancelRoleChange}
+                                className="border-2 border-(--color-secondary) text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={executeRoleChange}
+                                className="bg-(--color-primary) hover:bg-(--color-secondary) text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                            >
+                                Confirmar cambio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 const Admin = () => {
     useEffect(() => {
