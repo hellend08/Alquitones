@@ -1,8 +1,9 @@
-// Auth.jsx
+// Auth.jsx - Simplified email sending
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Auth.module.css';
+import EmailConfirmationService from '../../services/emailConfirmationService';
 
 const Auth = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Auth = () => {
         confirmPassword: ''
     });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     // Check URL and set active form accordingly
     useEffect(() => {
@@ -36,20 +38,17 @@ const Auth = () => {
     };
 
     const validateForm = () => {
-        // Expresión regular mejorada para validar correos electrónicos
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|co|io|info|biz)$/;
         if (!emailRegex.test(formData.email)) {
             setError('Por favor ingrese un correo electrónico válido con un dominio reconocido');
             return false;
         }
 
-        // Validación de contraseña
         if (formData.password.length < 6) {
             setError('La contraseña debe tener al menos 6 caracteres');
             return false;
         }
 
-        // Validación de coincidencia de contraseñas
         if (formData.password !== formData.confirmPassword) {
             setError('Las contraseñas no coinciden');
             return false;
@@ -65,38 +64,54 @@ const Auth = () => {
                 return;
             }
             
-            await localDB.createUser({
+            setLoading(true);
+            
+            const userData = {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 username: `${formData.firstName} ${formData.lastName}`,
                 email: formData.email,
                 password: formData.password,
                 role: 'client'
-            });
+            };
             
-            setActiveForm('login');
-            setError('Registro exitoso, por favor inicia sesión');
-            setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-            });
+            // Crear el usuario en la base de datos local
+            await localDB.createUser(userData);
             
-            // Opcional: redirigir automáticamente después de un breve retraso
-            setTimeout(() => {
-                navigate('/login');
-            }, 2000);
+            // Mantener el envío del correo de bienvenida
+            const emailResult = await EmailConfirmationService.sendWelcomeEmail(userData);
+            
+            if (emailResult.success) {
+                setActiveForm('login');
+                setError('Registro exitoso. Se ha enviado un correo de bienvenida.');
+                
+                // Limpiar formulario
+                setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
+                
+                // Opcional: redirigir después de un breve retraso
+                setTimeout(() => {
+                    navigate('/login');
+                }, 2000);
+            } else {
+                // Si el email falló
+                setError('Tu cuenta fue creada pero hubo un problema al enviar el correo.');
+            }
         } catch (error) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Agregar un indicador de fuerza de contraseña
     const getPasswordStrength = (password) => {
         if (!password) return '';
-        if (password.length < 6) return 'debil'; // Sin acento
+        if (password.length < 6) return 'debil';
         if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) return 'fuerte';
         return 'media';
     };
@@ -104,18 +119,21 @@ const Auth = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true);
+            
             const user = await localDB.login(formData.email, formData.password);
             if (user) {
                 navigate(user.role === 'admin' ? '/admin' : '/');
             }
         } catch (error) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className={styles.authContainer}>
-            {/* <img src="/src/assets/alquitonesLogo.png" alt="AlquiTones" className={styles.logo}/> */}
             <div className={styles.formContainer}>
                 <div className={styles.authTitle}>
                     <h2>{activeForm === 'login' ? 'Iniciar Sesión' : 'Registrarse'}</h2>
@@ -138,6 +156,7 @@ const Auth = () => {
                                 onChange={handleChange}
                                 required
                                 minLength={2}
+                                disabled={loading}
                             />
                         </div>
                         <div className={styles.inputGroup}>
@@ -149,6 +168,7 @@ const Auth = () => {
                                 onChange={handleChange}
                                 required
                                 minLength={2}
+                                disabled={loading}
                             />
                         </div>
                         <div className={styles.inputGroup}>
@@ -159,26 +179,28 @@ const Auth = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                disabled={loading}
                             />
                             <small className={styles.helpText}>Ingrese un correo electrónico válido</small>
                         </div>
                         <div className={styles.inputGroup}>
-    <label>Contraseña</label>
-    <input
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-        minLength={6}
-    />
-    {formData.password && (
-    <div className={`${styles.passwordStrength} ${styles[getPasswordStrength(formData.password)]}`}>
-        Fuerza: {getPasswordStrength(formData.password) === 'debil' ? 'Débil' : 
-                getPasswordStrength(formData.password) === 'media' ? 'Media' : 'Fuerte'}
-    </div>
-)}
-</div>
+                            <label>Contraseña</label>
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                minLength={6}
+                                disabled={loading}
+                            />
+                            {formData.password && (
+                                <div className={`${styles.passwordStrength} ${styles[getPasswordStrength(formData.password)]}`}>
+                                    Fuerza: {getPasswordStrength(formData.password) === 'debil' ? 'Débil' : 
+                                            getPasswordStrength(formData.password) === 'media' ? 'Media' : 'Fuerte'}
+                                </div>
+                            )}
+                        </div>
                         <div className={styles.inputGroup}>
                             <label>Verificar Contraseña</label>
                             <input
@@ -188,10 +210,15 @@ const Auth = () => {
                                 onChange={handleChange}
                                 required
                                 minLength={6}
+                                disabled={loading}
                             />
                         </div>
-                        <button type="submit" className={styles.submitButton}>
-                            Registrarse
+                        <button 
+                            type="submit" 
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? 'Procesando...' : 'Registrarse'}
                         </button>
                     </form>
                 ) : (
@@ -204,22 +231,28 @@ const Auth = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                disabled={loading}
                             />
                             <small className={styles.helpText}>Ingrese un correo electrónico válido (ejemplo: usuario@dominio.com)</small>
                         </div>
                         <div className={styles.inputGroup}>
-    <label>Contraseña</label>
-    <input
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-        minLength={6}
-    />
-</div>
-                        <button type="submit" className={styles.submitButton}>
-                            Iniciar Sesión
+                            <label>Contraseña</label>
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                minLength={6}
+                                disabled={loading}
+                            />
+                        </div>
+                        <button 
+                            type="submit" 
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? 'Procesando...' : 'Iniciar Sesión'}
                         </button>
                     </form>
                 )}

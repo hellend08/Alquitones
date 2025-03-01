@@ -171,3 +171,80 @@
     background-color: #d4edda;
     color: #155724;
 }
+
+
+/* Estilos para el componente de confirmación de cuenta */
+.confirmationMessage {
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .confirmationMessage.verifying {
+    background-color: #fff2cc;
+    color: #b88a00;
+  }
+  
+  .confirmationMessage.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .confirmationMessage.error {
+    background-color: #ffcccc;
+    color: #cc0000;
+  }
+  
+  .statusIcon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .smallText {
+    font-size: 0.85rem;
+    margin-top: 1rem;
+  }
+  
+  .errorActions {
+    margin-top: 1.5rem;
+  }
+  
+  /* Botón para reenviar correo */
+  .resendButton {
+    background-color: #9C6615;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+  
+  .resendButton:hover {
+    background-color: #9F7833;
+  }
+  
+  .resendContainer {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  /* Mensaje de éxito o error */
+  .errorMessage {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  
+  .errorMessage.success {
+    background-color: #dcfce7;
+    border-left-color: #22c55e;
+    color: #166534;
+  }
