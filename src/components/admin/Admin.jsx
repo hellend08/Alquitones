@@ -3,7 +3,7 @@ import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
-import Footer from '../crossSections/Footer';
+import Footer from '../crossSections/footer';
 
 
 
