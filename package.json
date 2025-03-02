@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "start": "vite"
+    "start": "vite preview"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
