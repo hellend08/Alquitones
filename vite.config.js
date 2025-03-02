@@ -16,6 +16,7 @@ export default defineConfig({
     preview: {
         host: '0.0.0.0',  // Expone el preview públicamente
         port:  4173,
-        strictPort: true
+        strictPort: true,
+        allowedHosts: ["alquitonesfront-production.up.railway.app"]
     }
 });
