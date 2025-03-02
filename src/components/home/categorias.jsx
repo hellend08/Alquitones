@@ -1,4 +1,4 @@
-import { localDB } from "../../database/LocalDB";
+import { apiService } from "../../services/apiService";
 import { useEffect, useState } from "react";
 
 
@@ -6,18 +6,12 @@ const Category = () => {
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
-        getCategories();
+        const fetchData = async () => {
+            const data = await apiService.getCategories();
+            setCategories(data);
+        };
+        fetchData();
     }, []);
-
-    const getCategories = () => {
-        try {
-            const categoriesDB = localDB.data.categories;
-            setCategories(categoriesDB);
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
 
     return (
         <div className="mx-4">

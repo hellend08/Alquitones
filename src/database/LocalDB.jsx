@@ -178,7 +178,7 @@ class LocalDB {
                 // CUERDAS (ID: 1)
                 {
                     id: 1,
-                    name: 'Guitarra Eléctrica Fender Stratocaster',
+                    name: 'Guitarra Eléctrica Fender StratocasterDB',
                     description: 'Guitarra eléctrica profesional con pastillas single-coil',
                     categoryId: 1,
                     pricePerDay: 45.00,

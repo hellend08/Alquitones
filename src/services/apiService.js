@@ -17,8 +17,12 @@ const fetchData = async (endpoint, localFallback) => {
     console.log(`Backend disponible: ${backendAvailable}`);
     
     if (backendAvailable) {
+        console.log(`Fetching ${endpoint} from backend.`);
+        
         try {
             const response = await axios.get(`${API_BASE_URL}${endpoint}`);
+            console.log(`Data fetched from backend:`, response.data);
+            
             return response.data;
         } catch (error) {
             console.error(`Error fetching ${endpoint} from backend:`, error);
@@ -26,10 +30,34 @@ const fetchData = async (endpoint, localFallback) => {
     }
     
     console.warn(`Backend no disponible, usando datos locales para ${endpoint}.`);
-    return localFallback();
+    return localFallback;
 };
 // Objeto con los servicios de la API
 export const apiService = {
-    getInstruments: () => fetchData("/instruments/random/40", localDB.getAllProducts().sort(() => Math.random() - 0.5)),
+    getInstruments: async() => {
+        let instruments = await fetchData("/instruments/random/40", localDB.getAllProducts().sort(() => Math.random() - 0.5))
+        //instruments es un objeto de que contiene varios instrument quiero chequear si un instrument.category es un objeto, en ese caso quiero convertirlo en un numero que sea el id de category y que se llame categoryId (o sea, instrument.categoryId)
+        instruments = instruments.map(instrument => {
+            if (typeof instrument.category === "object") {
+                instrument.categoryId = instrument.category.id;
+            }
+            return instrument;
+        }
+        );
+        return instruments;
+    },
     getCategories: () => fetchData("/categories", () => localDB.getAllCategories()),
+    getInstrumentsPagined: async (page, size, searchQuery, paginated) => {
+        console.log(`Fetching page ${page} of size ${size} with search query "${searchQuery}" and paginated ${paginated}`);
+        
+        let instrumentsPaginated = await fetchData(`/instruments/page?page=${page}&size=${size}&search=${searchQuery}&paginated=${paginated}`, localDB.getProductsPaginated(page, size, searchQuery, paginated));
+        instrumentsPaginated.products = instrumentsPaginated.products.map(instrument => {
+            if (typeof instrument.category === "object") {
+                instrument.categoryId = instrument.category.id;
+            }
+            return instrument;
+        }
+        );
+        return  instrumentsPaginated;
+    }
 };
