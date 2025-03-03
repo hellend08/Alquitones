@@ -664,12 +664,12 @@ class LocalDB {
         if (this.getUserByEmail(userData.email)) {
             throw new Error('El email ya está registrado');
         }
-
+    
         // Verificar que los campos requeridos estén presentes
         if (!userData.firstName || !userData.lastName || !userData.email || !userData.password) {
             throw new Error('Todos los campos son obligatorios');
         }
-
+    
         const newUser = {
             id: this.data.users.length + 1,
             firstName: userData.firstName,
@@ -679,9 +679,11 @@ class LocalDB {
             password: userData.password,
             role: userData.role || 'client',
             createdAt: new Date().toISOString(),
-            isActive: true
+            isActive: true,
+            // Eliminar el campo emailVerified
+            // emailVerified: userData.emailVerified || false
         };
-
+    
         this.data.users.push(newUser);
         this.saveToStorage();
         return newUser;
@@ -691,29 +693,10 @@ class LocalDB {
         const index = this.data.users.findIndex(user => user.id === id);
         if (index === -1) throw new Error('Usuario no encontrado');
     
-        // Si se está actualizando el email, verificar que no exista
-        if (userData.email && userData.email !== this.data.users[index].email) {
-            if (this.getUserByEmail(userData.email)) {
-                throw new Error('El email ya está registrado');
-            }
-        }
-    
-        // Actualizar el usuario en la base de datos
         this.data.users[index] = {
             ...this.data.users[index],
             ...userData
         };
-    
-        // Actualizar el usuario en la sesión si es el usuario actual
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (currentUser && currentUser.id === id) {
-            // Actualizar solo los campos que cambiaron en la sesión
-            const updatedCurrentUser = {
-                ...currentUser,
-                ...userData
-            };
-            localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
-        }
     
         this.saveToStorage();
         return this.data.users[index];
@@ -873,11 +856,6 @@ class LocalDB {
     }
 
     login(email, password) {
-        // Primero asegurémonos de que estamos trabajando con datos actualizados
-        if (localStorage.getItem('alquitonesDB')) {
-            this.data = JSON.parse(localStorage.getItem('alquitonesDB'));
-        }
-        
         const user = this.getUserByEmail(email);
         if (!user || user.password !== password) {
             throw new Error('Credenciales inválidas');
@@ -886,18 +864,20 @@ class LocalDB {
             throw new Error('Cuenta desactivada');
         }
         
-        // Almacenar solo la información necesaria en la sesión
-        const sessionUser = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            role: user.role
-        };
+        // Eliminar solo la verificación de correo electrónico
+        // if (user.role !== 'admin' && !user.emailVerified) {
+        //     const confirmedInStorage = localStorage.getItem(`email_confirmed_${email}`) === 'true';
+        //     if (confirmedInStorage) {
+        //         user.emailVerified = true;
+        //         this.updateUser(user.id, { emailVerified: true });
+        //     } else {
+        //         throw new Error('Por favor confirma tu cuenta de correo electrónico antes de iniciar sesión');
+        //     }
+        // }
         
-        localStorage.setItem('currentUser', JSON.stringify(sessionUser));
-        console.log('Usuario logueado:', sessionUser);
-        
-        return sessionUser;
+        // Almacenar sesión en localStorage
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        return user;
     }
 
     logout() {

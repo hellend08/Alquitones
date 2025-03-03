@@ -8,31 +8,22 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState(null);
+    const [categoryFiltered, setCategoryFiltered] = useState(false);
 
     useEffect(() => {
-        // const allProducts = localDB.getAllProducts(); // Eliminar .instruments
-        // setProducts(allProducts);
-        getProducts();
-        getCategories();
-    }, []);
-
-    const getProducts = () => {
         const allProducts = localDB.getAllProducts();
         setProducts(allProducts);
-    }
-
-    const getCategories = () => {
-        try {
-            const categoriesDB = localDB.getAllCategories();
-            setCategories(categoriesDB);
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
+    }, []);
 
     const handleSearch = (results) => {
         setFilteredProducts(results);
+        setCategoryFiltered(false); // Resetear filtro de categoría cuando se busca
+    };
+
+    const handleCategoryFilter = (filteredResults) => {
+        console.log("Home recibió productos filtrados:", filteredResults.length);
+        setFilteredProducts(filteredResults);
+        setCategoryFiltered(true);
     };
 
     return (
@@ -41,16 +32,15 @@ const Home = () => {
                 <div className="bg-(--color-primary) py-4 mb-4">
                     <SearchBar onSearch={handleSearch} />
                 </div>
-                <div className="py-4 mb-4 flex justify-around">
-                    {categories.map((category) => (
-                        <Category key={category.id} category={category}/>
-                        )
-                    )}
+                <div className="py-4 mb-4">
+                    <Category onFilterChange={handleCategoryFilter} />
                 </div>
                 
                 <div className="py-4 mb-4 flex flex-col">
                     <h1 className="text-2xl font-bold text-(--color-secondary) mb-8">
-                        {filteredProducts ? 'Resultados de búsqueda' : 'Recomendaciones'}
+                        {filteredProducts 
+                            ? (categoryFiltered ? 'Filtrado por categoría' : 'Resultados de búsqueda') 
+                            : 'Recomendaciones'}
                     </h1>
                     <ProductCards products={filteredProducts || products} />
                 </div>

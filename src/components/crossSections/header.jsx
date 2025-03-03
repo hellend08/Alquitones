@@ -3,7 +3,7 @@ import AuthButtons from './AuthButtons';
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
-
+    
     const handleClick = () => {
         setIsOpen(!isOpen)
     }
@@ -21,7 +21,7 @@ const Header = () => {
                     <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Inicio</a>
                     {/* <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Nosotros</a>
                     <a className='relative block rounded-lg p-2 transition hover:bg-(--color-quinary)' href="/">Catálogo</a> */}
-                    <AuthButtons />
+                    {<AuthButtons />}
                 </nav>
             </div>
 

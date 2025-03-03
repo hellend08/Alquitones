@@ -404,6 +404,7 @@ const Instruments = () => {
 };
 
 // Categories component
+// Categories component with icon selection
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
@@ -420,6 +421,70 @@ const Categories = () => {
     useEffect(() => {
         loadCategories();
     }, [searchTerm, currentPage]);
+
+    // Efecto para manejar la interacción con los iconos
+    useEffect(() => {
+        // Añadir lógica de toggle para mostrar/ocultar selectores basado en radio button
+        if (modalOpen) {
+            const radioFontAwesome = document.querySelector('input[name="icon-type"][value="font-awesome"]');
+            const radioImage = document.querySelector('input[name="icon-type"][value="image"]');
+            const fontAwesomeSelector = document.getElementById('font-awesome-selector');
+            const imageSelector = document.getElementById('image-selector');
+            const iconClassSelect = document.getElementById('icon-class');
+            const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
+
+            if (!radioFontAwesome || !radioImage) return;
+
+            const updateVisibility = () => {
+                if (radioFontAwesome.checked) {
+                    if (fontAwesomeSelector) fontAwesomeSelector.style.display = 'block';
+                    if (imageSelector) imageSelector.style.display = 'none';
+                } else {
+                    if (fontAwesomeSelector) fontAwesomeSelector.style.display = 'none';
+                    if (imageSelector) imageSelector.style.display = 'block';
+                }
+            };
+
+            const updateIconPreview = () => {
+                if (!iconClassSelect || !iconPreviewContainer) return;
+                
+                const selectedIcon = iconClassSelect.value;
+                iconPreviewContainer.querySelectorAll('i').forEach(icon => {
+                    icon.classList.remove(styles.selectedIcon);
+                    if (icon.classList.contains(selectedIcon)) {
+                        icon.classList.add(styles.selectedIcon);
+                    }
+                });
+            };
+
+            const handleIconSelection = (e) => {
+                if (!iconClassSelect) return;
+                
+                if (e.target.classList.contains('fas')) {
+                    iconClassSelect.value = e.target.classList[1];
+                    updateIconPreview();
+                }
+            };
+
+            // Actualizar visibilidad inicial
+            updateVisibility();
+            updateIconPreview();
+
+            // Añadir event listeners
+            radioFontAwesome.addEventListener('change', updateVisibility);
+            radioImage.addEventListener('change', updateVisibility);
+            if (iconClassSelect) iconClassSelect.addEventListener('change', updateIconPreview);
+            if (iconPreviewContainer) iconPreviewContainer.addEventListener('click', handleIconSelection);
+
+            // Cleanup
+            return () => {
+                radioFontAwesome?.removeEventListener('change', updateVisibility);
+                radioImage?.removeEventListener('change', updateVisibility);
+                iconClassSelect?.removeEventListener('change', updateIconPreview);
+                iconPreviewContainer?.removeEventListener('click', handleIconSelection);
+            };
+        }
+    }, [modalOpen]);
 
     const loadCategories = () => {
         try {
@@ -465,10 +530,18 @@ const Categories = () => {
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        const iconInput = document.getElementById('category-icon');
-        const icon = iconInput.files.length > 0
-            ? URL.createObjectURL(iconInput.files[0])
-            : (currentCategory?.icon || '/src/assets/icons/default-category.png');
+        
+        // Determinar el icono en función del tipo seleccionado
+        let icon;
+        if (form['icon-type'].value === 'font-awesome') {
+            icon = form['icon-class'].value; // Usar el valor del select para Font Awesome
+        } else {
+            // Usar la imagen subida o una por defecto si no hay
+            const iconInput = document.getElementById('category-icon');
+            icon = iconInput.files.length > 0
+                ? URL.createObjectURL(iconInput.files[0])
+                : (currentCategory?.icon || '/src/assets/icons/default-category.png');
+        }
 
         const categoryData = {
             name: form['category-name'].value,
@@ -522,6 +595,39 @@ const Categories = () => {
         }
     };
 
+    // Iconos específicos para categorías de instrumentos musicales
+    const categoryIcons = [
+        // Instrumentos de cuerda
+        { value: 'fa-guitar', label: 'Guitarra' },
+        { value: 'fa-violin', label: 'Violín' },
+        { value: 'fa-mandolin', label: 'Mandolina' },
+        
+        // Instrumentos de viento
+        { value: 'fa-saxophone', label: 'Saxofón' },
+        { value: 'fa-trumpet', label: 'Trompeta' },
+        { value: 'fa-flute', label: 'Flauta' },
+        { value: 'fa-wind', label: 'Viento' },
+        
+        // Instrumentos de percusión
+        { value: 'fa-drum', label: 'Batería' },
+        { value: 'fa-drum-steelpan', label: 'Percusión' },
+        { value: 'fa-bells', label: 'Campanas' },
+        
+        // Instrumentos de teclado
+        { value: 'fa-piano-keyboard', label: 'Piano' },
+        { value: 'fa-keyboard', label: 'Teclado' },
+        
+        // Otros instrumentos y categorías generales
+        { value: 'fa-music', label: 'Nota musical' },
+        { value: 'fa-microphone', label: 'Micrófono' },
+        { value: 'fa-record-vinyl', label: 'Vinilo' },
+        { value: 'fa-headphones', label: 'Auriculares' },
+        { value: 'fa-volume-up', label: 'Amplificación' },
+        { value: 'fa-sliders-h', label: 'Controles' },
+        { value: 'fa-compact-disc', label: 'Disco' },
+        { value: 'fa-tags', label: 'Categorías' }
+    ];
+
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
@@ -573,11 +679,20 @@ const Categories = () => {
                             <tr key={category.id}>
                                 <td>{category.id}</td>
                                 <td>
-                                    <img
-                                        src={category.icon}
-                                        alt={category.name}
-                                        className={styles.productImage}
-                                    />
+                                    {category.icon?.startsWith('fa-') ? (
+                                        <i className={`fas ${category.icon} fa-2x`} style={{ color: '#9C6615' }}></i>
+                                    ) : (
+                                        <img
+                                            src={category.icon}
+                                            alt={category.name}
+                                            className={styles.productImage}
+                                            onError={(e) => {
+                                                console.error(`Error loading image: ${category.icon}`);
+                                                e.target.onerror = null;
+                                                e.target.src = '/src/assets/icons/default-category.png';
+                                            }}
+                                        />
+                                    )}
                                 </td>
                                 <td>{category.name}</td>
                                 <td>{category.description}</td>
@@ -636,8 +751,69 @@ const Categories = () => {
                                     required
                                 />
                             </div>
+
+                            {/* Selector de tipo de icono */}
                             <div className={styles.formGroup}>
-                                <label htmlFor="category-icon">Ícono de Categoría</label>
+                                <label>Tipo de Icono</label>
+                                <div className={styles.iconTypeSelector}>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="icon-type"
+                                            value="font-awesome"
+                                            defaultChecked={currentCategory?.icon?.startsWith('fa-') || !currentCategory}
+                                        />
+                                        Icono predefinido
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="icon-type"
+                                            value="image"
+                                            defaultChecked={currentCategory?.icon && !currentCategory.icon.startsWith('fa-')}
+                                        />
+                                        Imagen personalizada
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Selector de iconos de Font Awesome */}
+                            <div className={styles.formGroup} id="font-awesome-selector">
+                                <label htmlFor="icon-class">Seleccionar Icono</label>
+                                <select
+                                    id="icon-class"
+                                    name="icon-class"
+                                    defaultValue={currentCategory?.icon?.startsWith('fa-') ? currentCategory.icon : 'fa-music'}
+                                >
+                                    {categoryIcons.map((icon, index) => (
+                                        <option key={index} value={icon.value}>
+                                            {icon.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className={styles.iconPreview}>
+                                    <p>Vista previa:</p>
+                                    <div className={styles.iconPreviewBox}>
+                                        {categoryIcons.map((icon, index) => (
+                                            <i
+                                                key={index}
+                                                className={`fas ${icon.value} fa-2x`}
+                                                title={icon.label}
+                                                style={{
+                                                    display: 'inline-block',
+                                                    margin: '5px',
+                                                    cursor: 'pointer',
+                                                    color: '#9C6615'
+                                                }}
+                                            ></i>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Selector de imagen personalizada */}
+                            <div className={styles.formGroup} id="image-selector">
+                                <label htmlFor="category-icon">Imagen Personalizada</label>
                                 <input
                                     type="file"
                                     id="category-icon"
@@ -661,6 +837,7 @@ const Categories = () => {
                                     </div>
                                 )}
                             </div>
+
                             <div className={styles.formActions}>
                                 <button
                                     type="button"
