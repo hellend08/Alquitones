@@ -5,7 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api"
 // Función para verificar si el backend está disponible
 const checkBackendStatus = async () => {
     try {
-        await axios.get(`${API_BASE_URL}/health/ping`); // El backend debe tener un endpoint /ping que devuelva un simple "ok"
+        await axios.get(`${API_BASE_URL}/health/ping`);
         return true;
     } catch (error) {
         return false;
@@ -18,7 +18,6 @@ const fetchData = async (endpoint, localFallback) => {
     
     if (backendAvailable) {
         console.log(`>>> Obteniendo datos de ${endpoint} desde el backend...`);
-        
         try {
             const response = await axios.get(`${API_BASE_URL}${endpoint}`);
             console.log(`Datos obtenidos de ${endpoint}: `, response.data);
@@ -45,7 +44,7 @@ export const apiService = {
         }
         return instruments;
     },
-    getCategories: () => fetchData("/categories", () => localDB.getAllCategories()),
+    getCategories: () => fetchData("/categories", localDB.getAllCategories()),
     getInstrumentsPagined: async (page, size, searchQuery, paginated) => {
         
         let instrumentsPaginated = await fetchData(`/instruments/results?page=${page}&size=${size}&search=${searchQuery}&paginated=${paginated}`, localDB.getProductsPaginated(page, size, searchQuery, paginated));
@@ -95,5 +94,4 @@ for (let pair of formData.entries()) {
             },
         });
     },
-    
 };
