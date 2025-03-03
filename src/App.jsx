@@ -37,15 +37,14 @@ function App() {
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
           
-          {/* Rutas protegidas */}
           <Route 
-            path="/admin/*" 
-            element={
-              <ProtectedRoute adminOnly={true}>
-                <Admin />
-              </ProtectedRoute>
-            } 
-          />
+  path="/administracion/*" 
+  element={
+    <ProtectedRoute adminOnly={true}>
+      <Admin />
+    </ProtectedRoute>
+  } 
+/>
           
           {/* Rutas de usuario autenticado */}
           <Route 

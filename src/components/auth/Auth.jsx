@@ -123,7 +123,7 @@ const Auth = () => {
             
             const user = await localDB.login(formData.email, formData.password);
             if (user) {
-                navigate(user.role === 'admin' ? '/admin' : '/');
+                navigate(user.role === 'admin' ? '/administracion' : '/');
             }
         } catch (error) {
             setError(error.message);
