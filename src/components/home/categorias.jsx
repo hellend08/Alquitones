@@ -147,9 +147,9 @@ const Category = ({ onFilterChange = () => { } }) => {
     return (
         <div className="mb-12 py-4 relative max-w-6xl mx-3 lg:mx-auto">
             <section className="flex items-center mb-6 gap-2 justify-between">
-        <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-(--color-primary)">Categorías</h2>
-            <span className="text-base text-gray-500">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+            <h2 className="text-sm md:text-lg font-semibold text-(--color-primary)">Categorías</h2>
+            <span className="text-sm md:text-base text-gray-500">
                 {selectedCategories.length > 0
                     ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
                     : `Total: ${totalProducts} productos`}
@@ -202,7 +202,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                             <div className={`w-20 h-20 sm:w-24 sm:h-24 flex justify-center items-center rounded-full relative 
                                 z-10 
                                 ${selectedCategories.some(id => Number(id) === Number(category.id))
-                                    ? 'bg-(--color-primary-light) border-2 border-(--color-primary)'
+                                    ? 'bg-(--color-primary) opacity-80 border-2 border-(--color-primary)'
                                     : 'bg-(--color-grey)'}`}>
                                 {renderCategoryIcon(category)}
                                 {/* group-hover:scale-95 transition-transform duration-200 */}
