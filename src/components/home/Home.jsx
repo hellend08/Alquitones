@@ -35,7 +35,6 @@ const Home = () => {
                 <div className="py-4 mb-4">
                     <Category onFilterChange={handleCategoryFilter} />
                 </div>
-                
                 <div className="py-4 mb-4 flex flex-col">
                     <h1 className="text-2xl font-bold text-(--color-secondary) mb-8">
                         {filteredProducts 
