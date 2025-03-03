@@ -6,7 +6,6 @@ import { localDB } from '../../database/LocalDB';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState(null);
     const [categoryFiltered, setCategoryFiltered] = useState(false);
 
@@ -32,10 +31,10 @@ const Home = () => {
                 <div className="bg-(--color-primary) py-4 mb-4">
                     <SearchBar onSearch={handleSearch} />
                 </div>
-                <div className="py-4 mb-4">
+                {/* <div className="py-4 mb-4"> */}
                     <Category onFilterChange={handleCategoryFilter} />
-                </div>
-                <div className="py-4 mb-4 flex flex-col">
+                {/* </div> */}
+                <div className="py-4 mb-4 flex flex-col mx-3 lg:mx-0">
                     <h1 className="text-2xl font-bold text-(--color-secondary) mb-8">
                         {filteredProducts 
                             ? (categoryFiltered ? 'Filtrado por categoría' : 'Resultados de búsqueda') 

@@ -145,19 +145,19 @@ const Category = ({ onFilterChange = () => { } }) => {
     };
 
     return (
-        <div className="mb-8 relative max-w-6xl mx-auto">
-            <div className="flex flex-col mb-4">
-                <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
+        <div className="mb-12 py-4 relative max-w-6xl mx-3 lg:mx-auto">
+            <section className="flex items-center mb-6 gap-2">
+                {/* <div className="flex justify-between items-center mb-2"> */}
+                    {/* <div className="flex items-center gap-2"> */}
                         <h2 className="text-lg font-semibold text-(--color-primary)">Categorías</h2>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-base text-gray-500">
                             {selectedCategories.length > 0
                                 ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
                                 : `Total: ${totalProducts} productos`}
                         </span>
-                    </div>
-                </div>
-            </div>
+                    {/* </div> */}
+                {/* </div> */}
+            </section>
 
             <div className="relative">
                 {/* Left Navigation Arrow */}
@@ -171,7 +171,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                 {/* Category Slider */}
                 <div
                     ref={sliderRef}
-                    className="flex overflow-x-auto scroll-smooth no-scrollbar"
+                    className="flex overflow-x-auto scroll-smooth no-scrollbar px-3 mx-6"
                     style={{
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
