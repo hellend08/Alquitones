@@ -146,18 +146,28 @@ const Category = ({ onFilterChange = () => { } }) => {
 
     return (
         <div className="mb-12 py-4 relative max-w-6xl mx-3 lg:mx-auto">
-            <section className="flex items-center mb-6 gap-2">
-                {/* <div className="flex justify-between items-center mb-2"> */}
-                    {/* <div className="flex items-center gap-2"> */}
-                        <h2 className="text-lg font-semibold text-(--color-primary)">Categorías</h2>
-                        <span className="text-base text-gray-500">
-                            {selectedCategories.length > 0
-                                ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
-                                : `Total: ${totalProducts} productos`}
-                        </span>
-                    {/* </div> */}
-                {/* </div> */}
-            </section>
+            <section className="flex items-center mb-6 gap-2 justify-between">
+        <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-(--color-primary)">Categorías</h2>
+            <span className="text-base text-gray-500">
+                {selectedCategories.length > 0
+                    ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
+                    : `Total: ${totalProducts} productos`}
+            </span>
+        </div>
+        
+        {/* Botón de borrar filtros - solo visible cuando hay categorías seleccionadas */}
+        {selectedCategories.length > 0 && (
+            <button 
+                onClick={clearFilters}
+                className="text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full flex items-center transition-all duration-200 hover:shadow-sm"
+            >
+                <i className="fas fa-times-circle mr-1"></i>
+                <span className="hidden sm:inline">Borrar Filtros</span>
+                <span className="sm:hidden">Borrar</span>
+            </button>
+        )}
+    </section>
 
             <div className="relative">
                 {/* Left Navigation Arrow */}
