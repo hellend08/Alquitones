@@ -160,11 +160,11 @@ const Category = ({ onFilterChange = () => {} }) => {
                     )}
                 </div>
                 
-                {selectedCategories.length > 0 && (
+                {/* {selectedCategories.length > 0 && (
                     <div className="text-sm text-(--color-secondary) mb-2">
-                        Mostrando {filteredProducts.length} de {totalProducts} productos
+                        Filtrado aplicado
                     </div>
-                )}
+                )} */}
             </div>
 
             <div className="flex justify-around flex-wrap gap-4">
