@@ -8,10 +8,13 @@ const Category = ({ onFilterChange = () => {} }) => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [totalProducts, setTotalProducts] = useState(0);
+    const [iconErrors, setIconErrors] = useState({});
 
     useEffect(() => {
         getCategories();
         getAllProducts();
+        // Cargar Font Awesome si no está ya cargado
+        loadFontAwesome();
     }, []);
 
     // Effect to update filtered products when selection changes
@@ -19,9 +22,19 @@ const Category = ({ onFilterChange = () => {} }) => {
         filterProducts();
     }, [selectedCategories]);
 
+    // Función para cargar Font Awesome dinámicamente si no está ya cargado
+    const loadFontAwesome = () => {
+        if (!document.querySelector('link[href*="font-awesome"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+            document.head.appendChild(link);
+        }
+    };
+
     const getCategories = () => {
         try {
-            // Cambiando para usar directamente data.categories como en tu código original
+            // Usar directamente las categorías de la base de datos
             const categoriesDB = localDB.data.categories;
             setCategories(categoriesDB);
         } catch (error) {
@@ -88,7 +101,48 @@ const Category = ({ onFilterChange = () => {} }) => {
         setSelectedCategories([]);
     };
 
-    // Eliminar logs de depuración para producción
+    // Manejar error de carga de imágenes
+    const handleImageError = (categoryId) => {
+        setIconErrors(prev => ({ ...prev, [categoryId]: true }));
+    };
+
+    // Renderizar el icono apropiado (Font Awesome o imagen)
+    const renderCategoryIcon = (category) => {
+        // Si es un icono de Font Awesome
+        if (category.icon && category.icon.startsWith('fa-')) {
+            return (
+                <i 
+                    className={`fas ${category.icon}`} 
+                    style={{ fontSize: '2.5rem', color: '#666' }}
+                ></i>
+            );
+        }
+        
+        // Si la imagen tuvo un error previo, mostrar un icono por defecto
+        if (iconErrors[category.id]) {
+            // Seleccionar icono según el nombre de la categoría
+            const defaultIcons = {
+                'Cuerdas': 'fas fa-guitar',
+                'Viento': 'fas fa-wind',
+                'Percusión': 'fas fa-drum',
+                'Teclados': 'fas fa-keyboard',
+            };
+            
+            const iconClass = defaultIcons[category.name] || 'fas fa-music';
+            return <i className={iconClass} style={{ fontSize: '2.5rem', color: '#666' }}></i>;
+        }
+        
+        // De lo contrario, intentar mostrar la imagen
+        return (
+            <img 
+                src={category.icon}
+                className="w-12 h-12 object-contain"
+                alt={category.name}
+                onError={() => handleImageError(category.id)}
+            />
+        );
+    };
+
     return (
         <div className="mx-4 mb-8">
             <div className="flex flex-col mb-4">
@@ -127,11 +181,7 @@ const Category = ({ onFilterChange = () => {} }) => {
                             ${selectedCategories.some(id => Number(id) === Number(category.id))
                                 ? 'bg-(--color-primary-light) border-2 border-(--color-primary)' 
                                 : 'bg-(--color-grey)'}`}>
-                            <img 
-                                src={category.icon}
-                                className="w-12 h-12 object-contain"
-                                alt={category.name}
-                            />
+                            {renderCategoryIcon(category)}
                         </div>
                         <p className={`text-sm text-center font-semibold mt-2
                             ${selectedCategories.some(id => Number(id) === Number(category.id))
