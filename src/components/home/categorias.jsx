@@ -128,6 +128,28 @@ const Category = ({ onFilterChange = () => { } }) => {
             return <i className={iconClass} style={{ fontSize: '2.5rem', color: '#666' }}></i>;
         }
 
+        return (
+            <img
+                src={category.icon}
+                className="w-12 h-12 object-contain"
+                alt={category.name}
+                onError={() => handleImageError(category.id)}
+            />
+        );
+    };
+
+    const scrollSlider = (direction) => {
+        if (sliderRef.current) {
+            const scrollAmount = direction === 'left'
+                ? -sliderRef.current.offsetWidth
+                : sliderRef.current.offsetWidth;
+            sliderRef.current.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     return (
         <div className="mx-4 mb-8 relative max-w-6xl mx-auto">
             <div className="flex flex-col mb-4">

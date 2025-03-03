@@ -222,7 +222,7 @@ const Instruments = () => {
                     </thead>
                     <tbody>
                         {instruments.map(instrument => {
-                            const status = instrument.stock > 0 ? 'Disponible' : 'No disponible';
+                            const status = (instrument.stock > 0 || instrument.status =='Disponible') ? 'Disponible' : 'No disponible';
                             return (
                             <tr key={instrument.id}>
                                 <td>{instrument.id}</td>
