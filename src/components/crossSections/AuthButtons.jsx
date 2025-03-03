@@ -41,18 +41,18 @@ const AuthButtons = () => {
     if (user) {
         return (
             <div className="flex items-center ">
-                <div className="flex items-center" onClick={handleClick}>
+                <div className="flex items-center min-w-32" onClick={handleClick}>
                     <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-(--color-primary) rounded-full ">
                         <span className="text-xl text-white">{user.username[0].toUpperCase()}</span>
                     </div>
                     <span className="text-(--color-secundary) font-medium pl-2">
-                        {user.username}
+                        {user.username.split(" ")[0]}
                     </span>
                 </div>
 
                 {isOpen && (
                     <div className="absolute z-10 mt-35 bg-white sm:border sm:border-gray-200 rounded-lg sm:shadow-lg sm:max-h-60 overflow-y-auto text-sm mx-1 p-2 font-normal text-(--color-secondary) w-full md:w-auto">
-                        <a className='relative block rounded-lg p-2 px-4 ' href="/profile">Mi Perfil</a>
+                        <a className='relative block rounded-lg p-2 px-4' href="/profile">Mi Perfil</a>
                         <button
                             onClick={handleLogout}
                             className="p-2 px-4 text-red-800">
