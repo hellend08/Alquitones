@@ -5,8 +5,6 @@ import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
 import Footer from '../crossSections/Footer';
 
-
-
 // Dashboard component
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
@@ -28,7 +26,6 @@ const Instruments = () => {
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-
 
     useEffect(() => {
         loadInstruments();
@@ -169,7 +166,6 @@ const Instruments = () => {
             (modalMode === 'create' || instrument.id !== currentInstrument?.id)
         );
     };
-
 
     return (
         <div className={styles.instrumentsSection}>

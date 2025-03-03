@@ -171,7 +171,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                 {/* Category Slider */}
                 <div
                     ref={sliderRef}
-                    className="flex overflow-x-auto scroll-smooth no-scrollbar px-3 mx-6"
+                    className="flex overflow-x-auto scroll-smooth no-scrollbar px-3 mx-6 overflow-hidden"
                     style={{
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -185,21 +185,22 @@ const Category = ({ onFilterChange = () => { } }) => {
                             className={`flex-1 flex flex-col items-center cursor-pointer transition-all duration-200 
                                 group relative p-2 min-w-[80px] max-w-[120px]
                                 ${selectedCategories.some(id => Number(id) === Number(category.id))
-                                    ? 'scale-110 opacity-100'
+                                    ? 'opacity-100'
                                     : 'opacity-80 hover:opacity-100'}`}
                             onClick={() => toggleCategorySelection(category.id)}
                         >
                             <div className={`w-20 h-20 sm:w-24 sm:h-24 flex justify-center items-center rounded-full relative 
-                                z-10 group-hover:scale-95 transition-transform duration-200
+                                z-10 
                                 ${selectedCategories.some(id => Number(id) === Number(category.id))
                                     ? 'bg-(--color-primary-light) border-2 border-(--color-primary)'
                                     : 'bg-(--color-grey)'}`}>
                                 {renderCategoryIcon(category)}
+                                {/* group-hover:scale-95 transition-transform duration-200 */}
 
                                 {/* Added hover effect layer */}
-                                <div className="absolute inset-0 rounded-full border-2 border-transparent 
+                                {/* <div className="absolute inset-0 rounded-full border-2 border-transparent 
                                     group-hover:border-(--color-primary) transition-all duration-200 
-                                    group-hover:scale-110 origin-center"></div>
+                                    group-hover:scale-110 origin-center"></div> */}
                             </div>
                             <div className="flex flex-col items-center">
                                 <p className={`text-sm text-center font-semibold mt-2
