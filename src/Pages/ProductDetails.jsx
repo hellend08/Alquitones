@@ -1,31 +1,44 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { localDB } from '../../database/LocalDB';
-import Characteristics from './Characteristics';
+import { localDB } from '../database/LocalDB';
+import Characteristics from '../components/characteristics/Characteristics';
 
-function CardDetails() {
+function ProductDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [categories, setCategories] = useState("");
+    const [specifications, setSpecifications] = useState([]);
     const [showGallery, setShowGallery] = useState(false);
 
     useEffect(() => {
         const product = localDB.getProductById(parseInt(id));
         if (product) {
             setInstrument(product);
-            loadSuggestions(parseInt(id));
+            getSuggestions(parseInt(id));
             getCategories();
+            getSpecifications();
+            // getSpec(6)
             window.scrollTo(0, 0);
         }
     }, [id]);
 
-    const loadSuggestions = (currentId) => {
+    const getSuggestions = (currentId) => {
         let allProducts = localDB.getAllProducts().filter(p => p.id !== currentId);
         allProducts = allProducts.sort(() => Math.random() - 0.5);
         setSuggestions(allProducts.slice(0, 2));
     };
+
+    const getSpecifications = (product) => {
+        try {
+            const allSpacifications = localDB.getAllSpecifications();
+            setSpecifications(allSpacifications);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
 
     const getCategories = () => {
         try {
@@ -77,12 +90,15 @@ function CardDetails() {
                     </div>
                 </div>
             </div>
-
+            
             <div className="mt-6 p-6 bg-white rounded-lg shadow flex justify-between items-start">
                 <section className="w-[70%]">
                     <h2 className="text-xl font-bold text-(--color-secondary)">Características</h2>
                     <div className="grid grid-cols-3 gap-5">
-                        <Characteristics/>
+                        {specifications.map((spec) => (
+                            <Characteristics key={spec.id} specification={spec} />
+                            ))
+                        }
                     </div>
                     <div >
                         {/* className="flex flex-col lg:flex-row justify-between items-center mb-2.5" */}
@@ -99,17 +115,6 @@ function CardDetails() {
                     <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
                 </div>
             </div>
-            
-            {/* <div className="mt-6 p-6 bg-white rounded-lg shadow">
-                <div className="flex flex-col lg:flex-row justify-between items-center mb-2.5">
-                    <h2 className="text-xl font-bold text-(--color-secondary)">Descripción</h2>
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
-                        <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
-                    </div>
-                </div>
-                <p className="text-gray-600 text-lg">{instrument.description}</p>
-            </div> */}
 
             <h2 className="mt-10 text-xl font-bold text-(--color-secondary)">Sugerencias</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
@@ -160,4 +165,4 @@ function CardDetails() {
     )
 }
 
-export default CardDetails
+export default ProductDetails
