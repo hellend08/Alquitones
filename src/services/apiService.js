@@ -2,8 +2,14 @@ import axios from "axios";
 import { localDB } from "../database/LocalDB";
 // URL del backend, obtenida desde variables de entorno
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const CHECK_BACKEND = import.meta.env.VITE_CHECK_BACKEND === "true"; // Por defecto es `true`
+
 // Función para verificar si el backend está disponible
 const checkBackendStatus = async () => {
+    if (!CHECK_BACKEND) {
+        console.warn("🔧 Chequeo de backend deshabilitado. Usando solo datos locales.");
+        return false;
+    }
     try {
         await axios.get(`${API_BASE_URL}/health/ping`);
         return true;
