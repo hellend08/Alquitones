@@ -1706,32 +1706,32 @@ const Admin = () => {
                     <nav className={styles.sidebarNav}>
                         <ul>
                             <li>
-                                <Link to="/admin/dashboard">
+                            <Link to="/administracion/dashboard">
                                     <i className="fas fa-home"></i> Dashboard
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/instruments">
+                                <Link to="/administracion/instruments">
                                     <i className="fas fa-guitar"></i> Lista Productos
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/specifications">
+                                <Link to="/administracion/specifications">
                                     <i className="fas fa-list-ul"></i> Características
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/rentals">
+                                <Link to="/administracion/rentals">
                                     <i className="fas fa-calendar-alt"></i> Alquileres
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/categories">
+                                <Link to="/administracion/categories">
                                     <i className="fas fa-tags"></i> Categorías
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/users">
+                                <Link to="/administracion/users">
                                     <i className="fas fa-users"></i> Usuarios
                                 </Link>
                             </li>
