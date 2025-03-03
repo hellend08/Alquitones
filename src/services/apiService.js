@@ -17,15 +17,15 @@ const fetchData = async (endpoint, localFallback) => {
     console.log(`Backend disponible: ${backendAvailable}`);
     
     if (backendAvailable) {
-        console.log(`Fetching ${endpoint} from backend.`);
+        console.log(`>>> Obteniendo datos de ${endpoint} desde el backend...`);
         
         try {
             const response = await axios.get(`${API_BASE_URL}${endpoint}`);
-            console.log(`Data fetched from backend:`, response.data);
+            console.log(`Datos obtenidos de ${endpoint}: `, response.data);
             
             return response.data;
         } catch (error) {
-            console.error(`Error fetching ${endpoint} from backend:`, error);
+            console.error(`Error al obtener datos de ${endpoint}: `, error);
         }
     }
     
@@ -37,20 +37,18 @@ export const apiService = {
     getInstruments: async() => {
         let instruments = await fetchData("/instruments/random/40", localDB.getAllProducts().sort(() => Math.random() - 0.5))
         //instruments es un objeto de que contiene varios instrument quiero chequear si un instrument.category es un objeto, en ese caso quiero convertirlo en un numero que sea el id de category y que se llame categoryId (o sea, instrument.categoryId)
-        instruments = instruments.map(instrument => {
-            if (typeof instrument.category === "object") {
+        if (typeof instruments[0].category === "object") {
+            instruments = instruments.map(instrument => {
                 instrument.categoryId = instrument.category.id;
-            }
-            return instrument;
+                return instrument;
+            });
         }
-        );
         return instruments;
     },
     getCategories: () => fetchData("/categories", () => localDB.getAllCategories()),
     getInstrumentsPagined: async (page, size, searchQuery, paginated) => {
-        console.log(`Fetching page ${page} of size ${size} with search query "${searchQuery}" and paginated ${paginated}`);
         
-        let instrumentsPaginated = await fetchData(`/instruments/page?page=${page}&size=${size}&search=${searchQuery}&paginated=${paginated}`, localDB.getProductsPaginated(page, size, searchQuery, paginated));
+        let instrumentsPaginated = await fetchData(`/instruments/results?page=${page}&size=${size}&search=${searchQuery}&paginated=${paginated}`, localDB.getProductsPaginated(page, size, searchQuery, paginated));
         instrumentsPaginated.products = instrumentsPaginated.products.map(instrument => {
             if (typeof instrument.category === "object") {
                 instrument.categoryId = instrument.category.id;
@@ -59,5 +57,43 @@ export const apiService = {
         }
         );
         return  instrumentsPaginated;
+    },
+    addInstrument: async (instrumentData, imagesAdj) => {
+        const backendAvailable = await checkBackendStatus();
+    console.log(`Backend disponible: ${backendAvailable}`);
+    if (!backendAvailable) {
+        return localDB.createProduct(instrumentData);
     }
+
+        const formData = new FormData();
+        
+        instrumentData.category = { id: instrumentData.categoryId };
+        delete instrumentData.categoryId;
+        instrumentData.stock = 5;
+        delete instrumentData.status;
+        instrumentData.createdAt = new Date();
+        delete instrumentData.images;
+        instrumentData.mainImage = "url";
+        // Convertir el objeto a JSON string
+        const instrumentJson = JSON.stringify(instrumentData);
+        console.log("instrumentJson", instrumentJson);
+        formData.append("instrument", instrumentJson);
+        console.log("formData", formData);
+        // Agregar imágenes al FormData
+        if (imagesAdj.length > 0) {
+            for (let i = 0; i < imagesAdj.length; i++) {
+                formData.append("images", imagesAdj[i]);
+            }
+        }
+        // Mostrar los valores de FormData manualmente
+for (let pair of formData.entries()) {
+    console.log(`${pair[0]}: ${pair[1]}`);
+}
+        return axios.post(`${API_BASE_URL}/instruments/add`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+    },
+    
 };

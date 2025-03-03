@@ -40,7 +40,7 @@ const Instruments = () => {
             // Obtener todos los productos sin paginación
             const result = await apiService.getInstrumentsPagined(
                 1,
-                5, // Tamaño infinito para obtener todos
+                40, // Tamaño infinito para obtener todos
                 searchTerm,
                 false // Desactivar paginación
             );
@@ -80,6 +80,7 @@ const Instruments = () => {
         const form = e.target;
         const fileInput = document.getElementById('instrument-images');
         const images = Array.from(fileInput.files);
+        const imagesAdj = fileInput.files;
 
         // Validación de imágenes SOLO para creación
         if (modalMode === 'create' && (images.length < 1 || images.length > 5)) {
@@ -124,7 +125,7 @@ const Instruments = () => {
             };
 
             if (modalMode === 'create') {
-                await localDB.createProduct(instrumentData);
+                await apiService.addInstrument(instrumentData, imagesAdj);
                 alert('Instrumento creado con éxito');
             } else {
                 await localDB.updateProduct(currentInstrument.id, instrumentData);
@@ -425,9 +426,9 @@ const Categories = () => {
         loadCategories();
     }, [searchTerm, currentPage]);
 
-    const loadCategories = () => {
+    const loadCategories = async () => {
         try {
-            const allCategories = localDB.getAllCategories();
+            const allCategories = await apiService.getCategories();
             let filteredCategories = allCategories;
 
             if (searchTerm) {
