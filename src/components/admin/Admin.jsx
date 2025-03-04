@@ -170,7 +170,7 @@ const Instruments = () => {
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Instrumentos</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Instrumentos</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
@@ -256,9 +256,18 @@ const Instruments = () => {
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h3>{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
-                            <button
+                        <button
+                            onClick={() => {
+                                setModalOpen(false);
+                                setPreviews([]);
+                            }}
+                            className={styles.modalClose}
+                        >
+                            &times;
+                        </button>
+                        {/* <div className=" mb-3"> */}
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
+                            {/* <button
                                 onClick={() => {
                                     setModalOpen(false);
                                     setPreviews([]);
@@ -266,46 +275,52 @@ const Instruments = () => {
                                 className={styles.modalClose}
                             >
                                 &times;
-                            </button>
-                        </div>
-                        <form onSubmit={handleModalSubmit} className={styles.modalForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-name">Nombre del Instrumento</label>
+                            </button> */}
+                        {/* </div> */}
+                        <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-name">Nombre del Instrumento:</label>
                                 <input
                                     type="text"
                                     id="instrument-name"
                                     defaultValue={currentInstrument?.name || ''}
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
 
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-category">Categoría</label>
-                                <select
-                                    id="instrument-category"
-                                    defaultValue={currentInstrument?.categoryId || ''}
-
-                                >
-                                    <option value="">Seleccionar categoría</option>
-                                    {localDB.data.categories.map(category => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-price">Precio por día</label>
-                                <input
-                                    type="number"
-                                    id="instrument-price"
-                                    min="0"
-                                    step="0.01"
-                                    defaultValue={currentInstrument?.pricePerDay || ''}
-
-                                />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-images">Imágenes del Instrumento</label>
+                            <section className="flex flex-row justify-between">
+                                <div className="flex flex-col gap-2">
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">Categoría</label>
+                                    <select
+                                        id="instrument-category"
+                                        defaultValue={currentInstrument?.categoryId || ''}
+                                        className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    >
+                                        <option value="">Seleccionar categoría</option>
+                                        {localDB.data.categories.map(category => (
+                                            <option className="text-gray-900" key={category.id} value={category.id}>
+                                                {category.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-price">Precio por día</label>
+                                    <input
+                                        type="number"
+                                        id="instrument-price"
+                                        min="0"
+                                        step="0.01"
+                                        defaultValue={currentInstrument?.pricePerDay || ''}
+                                        className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                        placeholder="Ingresa un precio"
+                                    />
+                                </div>
+                            </section>
+                            
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-images">Imágenes del Instrumento</label>
                                 <input
                                     type="file"
                                     id="instrument-images"
@@ -317,6 +332,8 @@ const Instruments = () => {
                                         const previews = Array.from(files).map(file => URL.createObjectURL(file));
                                         setPreviews(previews);
                                     }}
+                                    className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
+                                    
                                 />
                                 {previews.length > 0 && (
                                     <div className={styles.imagePreviewContainer}>
@@ -331,12 +348,12 @@ const Instruments = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Características</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" >Características</label>
                                 <div className={styles.specificationsContainer}>
                                     {localDB.getAllSpecifications().map(spec => (
-                                        <div key={spec.id} className={styles.specificationItem}>
-                                            <label htmlFor={`spec-${spec.id}`}>{spec.name}</label>
+                                        <div key={spec.id} className="flex flex-col gap-1 bg-(--color-light) p-2 rounded-md">
+                                            <label className="font-semibold text-sm text-(--color-secondary)" htmlFor={`spec-${spec.id}`}>{spec.name}</label>
                                             <input
                                                 type="text"
                                                 id={`spec-${spec.id}`}
@@ -347,46 +364,49 @@ const Instruments = () => {
                                                         s => s.specification.id === spec.id
                                                     )?.spValue || ''
                                                 }
+                                                className=" rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                             />
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-description">Descripción</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-description">Descripción:</label>
                                 <textarea
                                     id="instrument-description"
                                     rows="4"
                                     defaultValue={currentInstrument?.description || ''}
+                                    className=" rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Escribe la descripción del producto"
 
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-status">Estado</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-status">Estado</label>
                                 <select
                                     id="instrument-status"
                                     defaultValue={currentInstrument?.status || 'Disponible'}
-
+                                    className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                 >
-                                    <option value="Disponible">Disponible</option>
-                                    <option value="Reservado">Reservado</option>
-                                    <option value="Mantenimiento">Mantenimiento</option>
+                                    <option className="text-gray-900" value="Disponible">Disponible</option>
+                                    <option className="text-gray-900" value="Reservado">Reservado</option>
+                                    <option className="text-gray-900" value="Mantenimiento">Mantenimiento</option>
                                 </select>
                             </div>
-                            <div className={styles.formActions}>
+                            <div className="flex justify-end gap-4 mt-6 mb-4">
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setModalOpen(false);
                                         setPreviews([]);
                                     }}
-                                    className={styles.modalBtnSecondary}
+                                    className="border-2 border-(--color-secondary) w-[95px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className={styles.modalBtnPrimary}
+                                    className="bg-(--color-primary) hover:bg-(--color-secondary) w-[95px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200"
                                 >
                                     {modalMode === 'create' ? 'Crear' : 'Actualizar'}
                                 </button>
@@ -627,7 +647,7 @@ const Categories = () => {
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Categorías</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Categorías</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
@@ -1077,7 +1097,7 @@ const Specifications = () => {
     return (
         <div className={styles.specificationsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Características</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Características</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
@@ -1126,7 +1146,7 @@ const Specifications = () => {
                                 <td>{specification.id}</td>
                                 <td>
                                     {specification.icon?.startsWith('fa-') ? (
-                                        <i className={`fas ${specification.icon} fa-2x`} style={{ color: '#9C6615' }}></i>
+                                        <i className={`fas ${specification.icon} fa-2x`} style={{ color: '#001F3F' }}></i>
                                     ) : (
                                         <img
                                             src={specification.icon}
@@ -1479,7 +1499,7 @@ const Users = () => {
     return (
         <div className={styles.usersSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Usuarios</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Usuarios</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
