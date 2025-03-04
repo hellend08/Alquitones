@@ -407,8 +407,7 @@ const Instruments = () => {
     );
 };
 
-// Categories component
-// Categories component with icon selection
+// Categories component - Solo con iconos predefinidos (sin imagen personalizada)
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
@@ -426,28 +425,11 @@ const Categories = () => {
         loadCategories();
     }, [searchTerm, currentPage]);
 
-    // Efecto para manejar la interacción con los iconos
+    // Mantener el efecto original para manejar la selección de iconos
     useEffect(() => {
-        // Añadir lógica de toggle para mostrar/ocultar selectores basado en radio button
         if (modalOpen) {
-            const radioFontAwesome = document.querySelector('input[name="icon-type"][value="font-awesome"]');
-            const radioImage = document.querySelector('input[name="icon-type"][value="image"]');
-            const fontAwesomeSelector = document.getElementById('font-awesome-selector');
-            const imageSelector = document.getElementById('image-selector');
             const iconClassSelect = document.getElementById('icon-class');
             const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
-
-            if (!radioFontAwesome || !radioImage) return;
-
-            const updateVisibility = () => {
-                if (radioFontAwesome.checked) {
-                    if (fontAwesomeSelector) fontAwesomeSelector.style.display = 'flex';
-                    if (imageSelector) imageSelector.style.display = 'none';
-                } else {
-                    if (fontAwesomeSelector) fontAwesomeSelector.style.display = 'none';
-                    if (imageSelector) imageSelector.style.display = 'flex';
-                }
-            };
 
             const updateIconPreview = () => {
                 if (!iconClassSelect || !iconPreviewContainer) return;
@@ -471,19 +453,14 @@ const Categories = () => {
             };
 
             // Actualizar visibilidad inicial
-            updateVisibility();
             updateIconPreview();
 
             // Añadir event listeners
-            radioFontAwesome.addEventListener('change', updateVisibility);
-            radioImage.addEventListener('change', updateVisibility);
             if (iconClassSelect) iconClassSelect.addEventListener('change', updateIconPreview);
             if (iconPreviewContainer) iconPreviewContainer.addEventListener('click', handleIconSelection);
 
             // Cleanup
             return () => {
-                radioFontAwesome?.removeEventListener('change', updateVisibility);
-                radioImage?.removeEventListener('change', updateVisibility);
                 iconClassSelect?.removeEventListener('change', updateIconPreview);
                 iconPreviewContainer?.removeEventListener('click', handleIconSelection);
             };
@@ -522,12 +499,14 @@ const Categories = () => {
     const handleAddCategory = () => {
         setModalMode('create');
         setCurrentCategory(null);
+        setPreviews([]);
         setModalOpen(true);
     };
 
     const handleEditCategory = (category) => {
         setModalMode('edit');
         setCurrentCategory(category);
+        setPreviews([]);
         setModalOpen(true);
     };
 
@@ -535,24 +514,15 @@ const Categories = () => {
         e.preventDefault();
         const form = e.target;
         
-        // Determinar el icono en función del tipo seleccionado
-        let icon;
-        if (form['icon-type'].value === 'font-awesome') {
-            icon = form['icon-class'].value; // Usar el valor del select para Font Awesome
-        } else {
-            // Usar la imagen subida o una por defecto si no hay
-            const iconInput = document.getElementById('category-icon');
-            icon = iconInput.files.length > 0
-                ? URL.createObjectURL(iconInput.files[0])
-                : (currentCategory?.icon || '/src/assets/icons/default-category.png');
-        }
-
+        // Obtener SOLO el icono de Font Awesome, eliminar cualquier otra opción
+        const icon = form['icon-class'].value;
+    
         const categoryData = {
             name: form['category-name'].value,
             description: form['category-description'].value,
-            icon: icon
+            icon: icon // Siempre usar el valor del select, sin considerar imágenes personalizadas
         };
-
+    
         try {
             if (modalMode === 'create') {
                 await localDB.createCategory(categoryData);
@@ -561,7 +531,7 @@ const Categories = () => {
                 await localDB.updateCategory(currentCategory.id, categoryData);
                 alert('Categoría actualizada con éxito');
             }
-
+    
             loadCategories();
             setModalOpen(false);
             setPreviews([]);
@@ -724,22 +694,23 @@ const Categories = () => {
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                            <button
-                                onClick={() => {
-                                    setModalOpen(false);
-                                    setPreviews([]);
-                                }}
-                                className={styles.modalClose}
-                            >
-                                &times;
-                            </button>
-                        {/* <div className={styles.modalHeader}> */}
-                            <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">{modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}</h3>
-                            
-                        {/* </div> */}
+                        <button
+                            onClick={() => {
+                                setModalOpen(false);
+                                setPreviews([]);
+                            }}
+                            className={styles.modalClose}
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            {modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}
+                        </h3>
                         <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-name">Nombre de la Categoría</label>
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-name">
+                                    Nombre de la Categoría
+                                </label>
                                 <input
                                     type="text"
                                     id="category-name"
@@ -750,47 +721,23 @@ const Categories = () => {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-description">Descripción</label>
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-description">
+                                    Descripción
+                                </label>
                                 <textarea
                                     id="category-description"
                                     rows="4"
                                     defaultValue={currentCategory?.description || ''}
                                     required
                                     className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
-                                    placeholder="Ingresa un nombre"
+                                    placeholder="Ingresa una descripción"
                                 />
                             </div>
 
-                            {/* Selector de tipo de icono */}
-                            <div className={styles.formGroup}>
-                                <label className="font-semibold text-sm text-(--color-secondary)">Tipo de Icono</label>
-                                <div className="flex justify-around gap-4 my-2">
-                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
-                                        <input
-                                            type="radio"
-                                            name="icon-type"
-                                            value="font-awesome"
-                                            defaultChecked={currentCategory?.icon?.startsWith('fa-') || !currentCategory}
-                                            className="accent-(--color-secondary)"
-                                        />
-                                        Icono predefinido
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
-                                        <input
-                                            type="radio"
-                                            name="icon-type"
-                                            value="image"
-                                            defaultChecked={currentCategory?.icon && !currentCategory.icon.startsWith('fa-')}
-                                            className="accent-(--color-secondary)"
-                                        />
-                                        Imagen personalizada
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Selector de iconos de Font Awesome */}
-                            <div className="flex flex-col gap-2" style={{display: 'flex !important' }} id="font-awesome-selector">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">Seleccionar Icono</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">
+                                    Seleccionar Icono
+                                </label>
                                 <select
                                     id="icon-class"
                                     name="icon-class"
@@ -812,7 +759,6 @@ const Categories = () => {
                                                 className={`fas ${icon.value} fa-2x`}
                                                 title={icon.label}
                                                 style={{
-                                                    // display: 'inline-block',
                                                     margin: '5px',
                                                     cursor: 'pointer',
                                                     color: '#001F3F'
@@ -821,34 +767,6 @@ const Categories = () => {
                                         ))}
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Selector de imagen personalizada */}
-                            <div className="flex flex-col gap-2" id="image-selector">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-icon">Imagen Personalizada</label>
-                                <input
-                                    type="file"
-                                    id="category-icon"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const files = e.target.files;
-                                        const previews = Array.from(files).map(file => URL.createObjectURL(file));
-                                        setPreviews(previews);
-                                    }}
-                                    className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
-                                />
-                                {previews.length > 0 && (
-                                    <div className={styles.imagePreviewContainer}>
-                                        {previews.map((preview, index) => (
-                                            <img
-                                                key={index}
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
-                                                className={styles.imagePreview}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
                             </div>
 
                             <div className={styles.formActions}>
@@ -877,8 +795,7 @@ const Categories = () => {
     );
 };
 
-// Nuevo componente Specifications para Admin.jsx
-// Nuevo componente Specifications actualizado con iconos
+// Specifications component - Solo eliminando imagen personalizada pero manteniendo la funcionalidad original
 const Specifications = () => {
     const [specifications, setSpecifications] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
@@ -896,27 +813,15 @@ const Specifications = () => {
         loadSpecifications();
     }, [searchTerm, currentPage]);
 
+    // Mantener el efecto original para manejar la selección de iconos
     useEffect(() => {
-        // Añadir lógica de toggle para mostrar/ocultar selectores basado en radio button
         if (modalOpen) {
-            const radioFontAwesome = document.querySelector('input[name="icon-type"][value="font-awesome"]');
-            const radioImage = document.querySelector('input[name="icon-type"][value="image"]');
-            const fontAwesomeSelector = document.getElementById('font-awesome-selector');
-            const imageSelector = document.getElementById('image-selector');
             const iconClassSelect = document.getElementById('icon-class');
             const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
 
-            const updateVisibility = () => {
-                if (radioFontAwesome.checked) {
-                    fontAwesomeSelector.style.display = 'flex';
-                    imageSelector.style.display = 'none';
-                } else {
-                    fontAwesomeSelector.style.display = 'none';
-                    imageSelector.style.display = 'flex';
-                }
-            };
-
             const updateIconPreview = () => {
+                if (!iconClassSelect || !iconPreviewContainer) return;
+                
                 const selectedIcon = iconClassSelect.value;
                 iconPreviewContainer.querySelectorAll('i').forEach(icon => {
                     icon.classList.remove(styles.selectedIcon);
@@ -927,6 +832,8 @@ const Specifications = () => {
             };
 
             const handleIconSelection = (e) => {
+                if (!iconClassSelect) return;
+                
                 if (e.target.classList.contains('fas')) {
                     iconClassSelect.value = e.target.classList[1];
                     updateIconPreview();
@@ -934,19 +841,14 @@ const Specifications = () => {
             };
 
             // Actualizar visibilidad inicial
-            updateVisibility();
             updateIconPreview();
 
             // Añadir event listeners
-            radioFontAwesome.addEventListener('change', updateVisibility);
-            radioImage.addEventListener('change', updateVisibility);
-            iconClassSelect.addEventListener('change', updateIconPreview);
-            iconPreviewContainer.addEventListener('click', handleIconSelection);
+            if (iconClassSelect) iconClassSelect.addEventListener('change', updateIconPreview);
+            if (iconPreviewContainer) iconPreviewContainer.addEventListener('click', handleIconSelection);
 
             // Cleanup
             return () => {
-                radioFontAwesome?.removeEventListener('change', updateVisibility);
-                radioImage?.removeEventListener('change', updateVisibility);
                 iconClassSelect?.removeEventListener('change', updateIconPreview);
                 iconPreviewContainer?.removeEventListener('click', handleIconSelection);
             };
@@ -964,6 +866,12 @@ const Specifications = () => {
                 return;
             }
             let filteredSpecifications = allSpecifications;
+
+            if (searchTerm) {
+                filteredSpecifications = allSpecifications.filter(spec =>
+                    spec.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
 
             // Calcular paginación manualmente
             const startIndex = (currentPage - 1) * itemsPerPage;
@@ -1000,17 +908,9 @@ const Specifications = () => {
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        const iconInput = document.getElementById('specification-icon');
-
-        // Obtener el icono (ya sea una imagen subida o seleccionado del dropdown)
-        let icon;
-        if (form['icon-type'].value === 'font-awesome') {
-            icon = form['icon-class'].value;
-        } else {
-            icon = iconInput.files.length > 0
-                ? URL.createObjectURL(iconInput.files[0])
-                : (currentSpecification?.icon || 'fa-tag');
-        }
+        
+        // Obtener el icono de Font Awesome
+        const icon = form['icon-class'].value;
 
         const specificationData = {
             name: form['specification-name'].value,
@@ -1211,13 +1111,14 @@ const Specifications = () => {
                         >
                             &times;
                         </button>
-                        {/* <div className={styles.modalHeader}> */}
-                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">{modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}</h3>
-                    
-                        {/* </div> */}
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            {modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}
+                        </h3>
                         <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-name">Nombre de la Característica</label>
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-name">
+                                    Nombre de la Característica
+                                </label>
                                 <input
                                     type="text"
                                     id="specification-name"
@@ -1228,43 +1129,23 @@ const Specifications = () => {
                                 />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-description">Descripción</label>
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-description">
+                                    Descripción
+                                </label>
                                 <textarea
                                     id="specification-description"
                                     rows="4"
                                     defaultValue={currentSpecification?.description || ''}
                                     required
                                     className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
-                                    placeholder="Ingresa un nombre"
+                                    placeholder="Ingresa una descripción"
                                 />
                             </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="font-semibold text-sm text-(--color-secondary)">Tipo de Icono</label>
-                                <div className="flex justify-around gap-4 my-2">
-                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
-                                        <input
-                                            type="radio"
-                                            name="icon-type"
-                                            value="font-awesome"
-                                            defaultChecked={currentSpecification?.icon?.startsWith('fa-') || !currentSpecification}
-                                            className="accent-(--color-secondary)" 
-                                        />
-                                        Icono Font Awesome
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
-                                        <input
-                                            type="radio"
-                                            name="icon-type"
-                                            value="image"
-                                            defaultChecked={currentSpecification?.icon && !currentSpecification.icon.startsWith('fa-')}
-                                            className="accent-(--color-secondary)"
-                                        />
-                                        Imagen personalizada
-                                    </label>
-                                </div>
-                            </div>
+                            
                             <div className="flex flex-col gap-2" id="font-awesome-selector">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">Seleccionar Icono</label>
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">
+                                    Seleccionar Icono
+                                </label>
                                 <select
                                     id="icon-class"
                                     name="icon-class"
@@ -1286,7 +1167,6 @@ const Specifications = () => {
                                                 className={`fas ${icon.value} fa-2x`}
                                                 title={icon.label}
                                                 style={{
-                                                    // display: 'inline-block',
                                                     margin: '5px',
                                                     cursor: 'pointer',
                                                     color: '#001F3F'
@@ -1296,32 +1176,7 @@ const Specifications = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-2" id="image-selector">
-                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-icon">Imagen Personalizada</label>
-                                <input
-                                    type="file"
-                                    id="specification-icon"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const files = e.target.files;
-                                        const previews = Array.from(files).map(file => URL.createObjectURL(file));
-                                        setPreviews(previews);
-                                    }}
-                                    className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
-                                />
-                                {previews.length > 0 && (
-                                    <div className={styles.imagePreviewContainer}>
-                                        {previews.map((preview, index) => (
-                                            <img
-                                                key={index}
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
-                                                className={styles.imagePreview}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+
                             <div className={styles.formActions}>
                                 <button
                                     type="button"
