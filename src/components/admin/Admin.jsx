@@ -265,18 +265,7 @@ const Instruments = () => {
                         >
                             &times;
                         </button>
-                        {/* <div className=" mb-3"> */}
                         <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
-                            {/* <button
-                                onClick={() => {
-                                    setModalOpen(false);
-                                    setPreviews([]);
-                                }}
-                                className={styles.modalClose}
-                            >
-                                &times;
-                            </button> */}
-                        {/* </div> */}
                         <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
                                 <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-name">Nombre del Instrumento:</label>
@@ -286,7 +275,6 @@ const Instruments = () => {
                                     defaultValue={currentInstrument?.name || ''}
                                     className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     placeholder="Ingresa un nombre"
-
                                 />
                             </div>
                             <section className="flex flex-row justify-between">
@@ -453,11 +441,11 @@ const Categories = () => {
 
             const updateVisibility = () => {
                 if (radioFontAwesome.checked) {
-                    if (fontAwesomeSelector) fontAwesomeSelector.style.display = 'block';
+                    if (fontAwesomeSelector) fontAwesomeSelector.style.display = 'flex';
                     if (imageSelector) imageSelector.style.display = 'none';
                 } else {
                     if (fontAwesomeSelector) fontAwesomeSelector.style.display = 'none';
-                    if (imageSelector) imageSelector.style.display = 'block';
+                    if (imageSelector) imageSelector.style.display = 'flex';
                 }
             };
 
@@ -736,8 +724,6 @@ const Categories = () => {
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h3>{modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}</h3>
                             <button
                                 onClick={() => {
                                     setModalOpen(false);
@@ -747,46 +733,55 @@ const Categories = () => {
                             >
                                 &times;
                             </button>
-                        </div>
-                        <form onSubmit={handleModalSubmit} className={styles.modalForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="category-name">Nombre de la Categoría</label>
+                        {/* <div className={styles.modalHeader}> */}
+                            <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">{modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}</h3>
+                            
+                        {/* </div> */}
+                        <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-name">Nombre de la Categoría</label>
                                 <input
                                     type="text"
                                     id="category-name"
                                     defaultValue={currentCategory?.name || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="category-description">Descripción</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-description">Descripción</label>
                                 <textarea
                                     id="category-description"
                                     rows="4"
                                     defaultValue={currentCategory?.description || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
                                 />
                             </div>
 
                             {/* Selector de tipo de icono */}
                             <div className={styles.formGroup}>
-                                <label>Tipo de Icono</label>
-                                <div className={styles.iconTypeSelector}>
-                                    <label>
+                                <label className="font-semibold text-sm text-(--color-secondary)">Tipo de Icono</label>
+                                <div className="flex justify-around gap-4 my-2">
+                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
                                         <input
                                             type="radio"
                                             name="icon-type"
                                             value="font-awesome"
                                             defaultChecked={currentCategory?.icon?.startsWith('fa-') || !currentCategory}
+                                            className="accent-(--color-secondary)"
                                         />
                                         Icono predefinido
                                     </label>
-                                    <label>
+                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
                                         <input
                                             type="radio"
                                             name="icon-type"
                                             value="image"
                                             defaultChecked={currentCategory?.icon && !currentCategory.icon.startsWith('fa-')}
+                                            className="accent-(--color-secondary)"
                                         />
                                         Imagen personalizada
                                     </label>
@@ -794,21 +789,22 @@ const Categories = () => {
                             </div>
 
                             {/* Selector de iconos de Font Awesome */}
-                            <div className={styles.formGroup} id="font-awesome-selector">
-                                <label htmlFor="icon-class">Seleccionar Icono</label>
+                            <div className="flex flex-col gap-2" style={{display: 'flex !important' }} id="font-awesome-selector">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">Seleccionar Icono</label>
                                 <select
                                     id="icon-class"
                                     name="icon-class"
                                     defaultValue={currentCategory?.icon?.startsWith('fa-') ? currentCategory.icon : 'fa-music'}
+                                    className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                 >
                                     {categoryIcons.map((icon, index) => (
-                                        <option key={index} value={icon.value}>
+                                        <option className="text-gray-900" key={index} value={icon.value}>
                                             {icon.label}
                                         </option>
                                     ))}
                                 </select>
                                 <div className={styles.iconPreview}>
-                                    <p>Vista previa:</p>
+                                    <p className="font-semibold text-sm text-(--color-secondary)">Vista previa:</p>
                                     <div className={styles.iconPreviewBox}>
                                         {categoryIcons.map((icon, index) => (
                                             <i
@@ -816,10 +812,10 @@ const Categories = () => {
                                                 className={`fas ${icon.value} fa-2x`}
                                                 title={icon.label}
                                                 style={{
-                                                    display: 'inline-block',
+                                                    // display: 'inline-block',
                                                     margin: '5px',
                                                     cursor: 'pointer',
-                                                    color: '#9C6615'
+                                                    color: '#001F3F'
                                                 }}
                                             ></i>
                                         ))}
@@ -828,8 +824,8 @@ const Categories = () => {
                             </div>
 
                             {/* Selector de imagen personalizada */}
-                            <div className={styles.formGroup} id="image-selector">
-                                <label htmlFor="category-icon">Imagen Personalizada</label>
+                            <div className="flex flex-col gap-2" id="image-selector">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-icon">Imagen Personalizada</label>
                                 <input
                                     type="file"
                                     id="category-icon"
@@ -839,6 +835,7 @@ const Categories = () => {
                                         const previews = Array.from(files).map(file => URL.createObjectURL(file));
                                         setPreviews(previews);
                                     }}
+                                    className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
                                 />
                                 {previews.length > 0 && (
                                     <div className={styles.imagePreviewContainer}>
@@ -861,13 +858,13 @@ const Categories = () => {
                                         setModalOpen(false);
                                         setPreviews([]);
                                     }}
-                                    className={styles.modalBtnSecondary}
+                                    className="border-2 border-(--color-secondary) w-[95px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className={styles.modalBtnPrimary}
+                                    className="bg-(--color-primary) hover:bg-(--color-secondary) w-[95px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200"
                                 >
                                     {modalMode === 'create' ? 'Crear' : 'Actualizar'}
                                 </button>
@@ -911,11 +908,11 @@ const Specifications = () => {
 
             const updateVisibility = () => {
                 if (radioFontAwesome.checked) {
-                    fontAwesomeSelector.style.display = 'block';
+                    fontAwesomeSelector.style.display = 'flex';
                     imageSelector.style.display = 'none';
                 } else {
                     fontAwesomeSelector.style.display = 'none';
-                    imageSelector.style.display = 'block';
+                    imageSelector.style.display = 'flex';
                 }
             };
 
@@ -1205,75 +1202,83 @@ const Specifications = () => {
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h3>{modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}</h3>
-                            <button
-                                onClick={() => {
-                                    setModalOpen(false);
-                                    setPreviews([]);
-                                }}
-                                className={styles.modalClose}
-                            >
-                                &times;
-                            </button>
-                        </div>
-                        <form onSubmit={handleModalSubmit} className={styles.modalForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="specification-name">Nombre de la Característica</label>
+                        <button
+                            onClick={() => {
+                                setModalOpen(false);
+                                setPreviews([]);
+                            }}
+                            className={styles.modalClose}
+                        >
+                            &times;
+                        </button>
+                        {/* <div className={styles.modalHeader}> */}
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">{modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}</h3>
+                    
+                        {/* </div> */}
+                        <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-name">Nombre de la Característica</label>
                                 <input
                                     type="text"
                                     id="specification-name"
                                     defaultValue={currentSpecification?.name || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="specification-description">Descripción</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-description">Descripción</label>
                                 <textarea
                                     id="specification-description"
                                     rows="4"
                                     defaultValue={currentSpecification?.description || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Tipo de Icono</label>
-                                <div className={styles.iconTypeSelector}>
-                                    <label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)">Tipo de Icono</label>
+                                <div className="flex justify-around gap-4 my-2">
+                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
                                         <input
                                             type="radio"
                                             name="icon-type"
                                             value="font-awesome"
                                             defaultChecked={currentSpecification?.icon?.startsWith('fa-') || !currentSpecification}
+                                            className="accent-(--color-secondary)" 
                                         />
                                         Icono Font Awesome
                                     </label>
-                                    <label>
+                                    <label className="flex items-center gap-2 cursor-pointer text-(--color-secondary) text-sm">
                                         <input
                                             type="radio"
                                             name="icon-type"
                                             value="image"
                                             defaultChecked={currentSpecification?.icon && !currentSpecification.icon.startsWith('fa-')}
+                                            className="accent-(--color-secondary)"
                                         />
                                         Imagen personalizada
                                     </label>
                                 </div>
                             </div>
-                            <div className={styles.formGroup} id="font-awesome-selector">
-                                <label htmlFor="icon-class">Seleccionar Icono</label>
+                            <div className="flex flex-col gap-2" id="font-awesome-selector">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">Seleccionar Icono</label>
                                 <select
                                     id="icon-class"
                                     name="icon-class"
                                     defaultValue={currentSpecification?.icon?.startsWith('fa-') ? currentSpecification.icon : 'fa-tag'}
+                                    className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                 >
                                     {fontAwesomeIcons.map((icon, index) => (
-                                        <option key={index} value={icon.value}>
+                                        <option className="text-gray-900" key={index} value={icon.value}>
                                             {icon.label}
                                         </option>
                                     ))}
                                 </select>
                                 <div className={styles.iconPreview}>
-                                    <p>Vista previa:</p>
+                                    <p className="font-semibold text-sm text-(--color-secondary)">Vista previa:</p>
                                     <div className={styles.iconPreviewBox}>
                                         {fontAwesomeIcons.map((icon, index) => (
                                             <i
@@ -1281,18 +1286,18 @@ const Specifications = () => {
                                                 className={`fas ${icon.value} fa-2x`}
                                                 title={icon.label}
                                                 style={{
-                                                    display: 'inline-block',
+                                                    // display: 'inline-block',
                                                     margin: '5px',
                                                     cursor: 'pointer',
-                                                    color: '#9C6615'
+                                                    color: '#001F3F'
                                                 }}
                                             ></i>
                                         ))}
                                     </div>
                                 </div>
                             </div>
-                            <div className={styles.formGroup} id="image-selector">
-                                <label htmlFor="specification-icon">Imagen Personalizada</label>
+                            <div className="flex flex-col gap-2" id="image-selector">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-icon">Imagen Personalizada</label>
                                 <input
                                     type="file"
                                     id="specification-icon"
@@ -1302,6 +1307,7 @@ const Specifications = () => {
                                         const previews = Array.from(files).map(file => URL.createObjectURL(file));
                                         setPreviews(previews);
                                     }}
+                                    className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
                                 />
                                 {previews.length > 0 && (
                                     <div className={styles.imagePreviewContainer}>
@@ -1323,13 +1329,13 @@ const Specifications = () => {
                                         setModalOpen(false);
                                         setPreviews([]);
                                     }}
-                                    className={styles.modalBtnSecondary}
+                                    className="border-2 border-(--color-secondary) w-[95px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className={styles.modalBtnPrimary}
+                                    className="bg-(--color-primary) hover:bg-(--color-secondary) w-[95px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200"
                                 >
                                     {modalMode === 'create' ? 'Crear' : 'Actualizar'}
                                 </button>

@@ -244,8 +244,8 @@
 } */
 
 .addButton {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--color-golden);
+    padding: 0.5rem 1.5rem;
+    background-color: var(--color-primary);
     color: var(--color-white);
     border: none;
     border-radius: 4px;
@@ -254,7 +254,7 @@
 }
 
 .addButton:hover {
-    background-color: var(--color-golden-light);
+    background-color: var(--color-secondary);
 }
 
 /* Tabla */
@@ -435,9 +435,9 @@
     color: var(--color-dark-brown);
 }
 
-.formGroup {
-    margin-bottom: 0.75rem;  /* Reducido de 1rem */
-}
+/* .formGroup {
+    margin-bottom: 0.75rem;  Reducido de 1rem
+} */
 
 /* .formGroup label {
     display: block;
@@ -447,11 +447,11 @@
     font-size: 0.9rem;     Texto más pequeño
 } */
 
-.formGroup input,
+
 .formGroup select,
 .formGroup textarea {
     width: 100%;
-    padding: 0.4rem;       /* Reducido de 0.5rem */
+    padding: 0.4rem;       /* Reducido de 0.5rem .formGroup input,*/
     border: 1px solid var(--color-gray);
     border-radius: 4px;
     font-size: 0.9rem;     /* Texto más pequeño */
@@ -531,7 +531,7 @@
 
 .searchInput {
     width: 100%;
-    padding: 0.625rem 1rem;
+    padding: 0.5rem 1rem;
     border: 1px solid var(--color-gray);
     border-radius: 4px;
     font-size: 0.875rem;
@@ -540,8 +540,8 @@
 
 .searchInput:focus {
     outline: none;
-    border-color: var(--color-golden);
-    box-shadow: 0 0 0 2px rgba(156, 102, 21, 0.1);
+    border-color: var(--color-primary);
+    /* box-shadow: 0 0 0 2px rgba(156, 102, 21, 0.1); */
 }
 
 .searchContainer {
@@ -651,18 +651,18 @@
     border-radius: 4px;
 } */
 
-.iconTypeSelector {
+/* .iconTypeSelector {
     display: flex;
     gap: 1rem;
     margin: 0.5rem 0;
-}
+} */
 
-.iconTypeSelector label {
+/* .iconTypeSelector label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-}
+} */
 
 .iconPreview {
     margin-top: 0.5rem;
@@ -683,21 +683,21 @@
 .iconPreviewBox i {
     transition: all 0.3s ease;
     cursor: pointer;
-    opacity: 0.6;
+    /* opacity: 0.6; */
 }
 
-.iconPreviewBox i:hover {
+/* .iconPreviewBox i:hover {
     opacity: 0.8;
     transform: scale(1.1);
-}
+} */
 
 .iconPreviewBox i.selectedIcon {
-    opacity: 1;
+    /* opacity: 1; */
     color: #007bff !important;
-    transform: scale(1.2);
-    border: 2px solid #007bff;
-    border-radius: 50%;
-    padding: 5px;
+    /* transform: scale(1.2); */
+    /* border: 2px solid #007bff; */
+    /* border-radius: 50%; */
+    /* padding: 5px; */
 }
 
 .roleSelector {
