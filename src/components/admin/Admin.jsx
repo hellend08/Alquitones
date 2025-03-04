@@ -5,8 +5,6 @@ import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
 import Footer from '../crossSections/Footer';
 
-
-
 // Dashboard component
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
@@ -28,7 +26,6 @@ const Instruments = () => {
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-
 
     useEffect(() => {
         loadInstruments();
@@ -170,11 +167,10 @@ const Instruments = () => {
         );
     };
 
-
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Instrumentos</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Instrumentos</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
@@ -260,56 +256,59 @@ const Instruments = () => {
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h3>{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
-                            <button
-                                onClick={() => {
-                                    setModalOpen(false);
-                                    setPreviews([]);
-                                }}
-                                className={styles.modalClose}
-                            >
-                                &times;
-                            </button>
-                        </div>
-                        <form onSubmit={handleModalSubmit} className={styles.modalForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-name">Nombre del Instrumento</label>
+                        <button
+                            onClick={() => {
+                                setModalOpen(false);
+                                setPreviews([]);
+                            }}
+                            className={styles.modalClose}
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">{modalMode === 'create' ? 'Agregar Instrumento' : 'Editar Instrumento'}</h3>
+                        <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-name">Nombre del Instrumento:</label>
                                 <input
                                     type="text"
                                     id="instrument-name"
                                     defaultValue={currentInstrument?.name || ''}
-
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-category">Categoría</label>
-                                <select
-                                    id="instrument-category"
-                                    defaultValue={currentInstrument?.categoryId || ''}
-
-                                >
-                                    <option value="">Seleccionar categoría</option>
-                                    {localDB.data.categories.map(category => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-price">Precio por día</label>
-                                <input
-                                    type="number"
-                                    id="instrument-price"
-                                    min="0"
-                                    step="0.01"
-                                    defaultValue={currentInstrument?.pricePerDay || ''}
-
-                                />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-images">Imágenes del Instrumento</label>
+                            <section className="flex flex-row justify-between">
+                                <div className="flex flex-col gap-2">
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">Categoría</label>
+                                    <select
+                                        id="instrument-category"
+                                        defaultValue={currentInstrument?.categoryId || ''}
+                                        className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    >
+                                        <option value="">Seleccionar categoría</option>
+                                        {localDB.data.categories.map(category => (
+                                            <option className="text-gray-900" key={category.id} value={category.id}>
+                                                {category.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-price">Precio por día</label>
+                                    <input
+                                        type="number"
+                                        id="instrument-price"
+                                        min="0"
+                                        step="0.01"
+                                        defaultValue={currentInstrument?.pricePerDay || ''}
+                                        className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                        placeholder="Ingresa un precio"
+                                    />
+                                </div>
+                            </section>
+                            
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-images">Imágenes del Instrumento</label>
                                 <input
                                     type="file"
                                     id="instrument-images"
@@ -321,6 +320,8 @@ const Instruments = () => {
                                         const previews = Array.from(files).map(file => URL.createObjectURL(file));
                                         setPreviews(previews);
                                     }}
+                                    className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
+                                    
                                 />
                                 {previews.length > 0 && (
                                     <div className={styles.imagePreviewContainer}>
@@ -335,12 +336,12 @@ const Instruments = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Características</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" >Características</label>
                                 <div className={styles.specificationsContainer}>
                                     {localDB.getAllSpecifications().map(spec => (
-                                        <div key={spec.id} className={styles.specificationItem}>
-                                            <label htmlFor={`spec-${spec.id}`}>{spec.name}</label>
+                                        <div key={spec.id} className="flex flex-col gap-1 bg-(--color-light) p-2 rounded-md">
+                                            <label className="font-semibold text-sm text-(--color-secondary)" htmlFor={`spec-${spec.id}`}>{spec.name}</label>
                                             <input
                                                 type="text"
                                                 id={`spec-${spec.id}`}
@@ -351,46 +352,49 @@ const Instruments = () => {
                                                         s => s.specification.id === spec.id
                                                     )?.spValue || ''
                                                 }
+                                                className=" rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                             />
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-description">Descripción</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-description">Descripción:</label>
                                 <textarea
                                     id="instrument-description"
                                     rows="4"
                                     defaultValue={currentInstrument?.description || ''}
+                                    className=" rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Escribe la descripción del producto"
 
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="instrument-status">Estado</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-status">Estado</label>
                                 <select
                                     id="instrument-status"
                                     defaultValue={currentInstrument?.status || 'Disponible'}
-
+                                    className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                 >
-                                    <option value="Disponible">Disponible</option>
-                                    <option value="Reservado">Reservado</option>
-                                    <option value="Mantenimiento">Mantenimiento</option>
+                                    <option className="text-gray-900" value="Disponible">Disponible</option>
+                                    <option className="text-gray-900" value="Reservado">Reservado</option>
+                                    <option className="text-gray-900" value="Mantenimiento">Mantenimiento</option>
                                 </select>
                             </div>
-                            <div className={styles.formActions}>
+                            <div className="flex justify-end gap-4 mt-6 mb-4">
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setModalOpen(false);
                                         setPreviews([]);
                                     }}
-                                    className={styles.modalBtnSecondary}
+                                    className="border-2 border-(--color-secondary) w-[95px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className={styles.modalBtnPrimary}
+                                    className="bg-(--color-primary) hover:bg-(--color-secondary) w-[95px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200"
                                 >
                                     {modalMode === 'create' ? 'Crear' : 'Actualizar'}
                                 </button>
@@ -403,7 +407,7 @@ const Instruments = () => {
     );
 };
 
-// Categories component
+// Categories component - Solo con iconos predefinidos (sin imagen personalizada)
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
@@ -420,6 +424,48 @@ const Categories = () => {
     useEffect(() => {
         loadCategories();
     }, [searchTerm, currentPage]);
+
+    // Mantener el efecto original para manejar la selección de iconos
+    useEffect(() => {
+        if (modalOpen) {
+            const iconClassSelect = document.getElementById('icon-class');
+            const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
+
+            const updateIconPreview = () => {
+                if (!iconClassSelect || !iconPreviewContainer) return;
+                
+                const selectedIcon = iconClassSelect.value;
+                iconPreviewContainer.querySelectorAll('i').forEach(icon => {
+                    icon.classList.remove(styles.selectedIcon);
+                    if (icon.classList.contains(selectedIcon)) {
+                        icon.classList.add(styles.selectedIcon);
+                    }
+                });
+            };
+
+            const handleIconSelection = (e) => {
+                if (!iconClassSelect) return;
+                
+                if (e.target.classList.contains('fas')) {
+                    iconClassSelect.value = e.target.classList[1];
+                    updateIconPreview();
+                }
+            };
+
+            // Actualizar visibilidad inicial
+            updateIconPreview();
+
+            // Añadir event listeners
+            if (iconClassSelect) iconClassSelect.addEventListener('change', updateIconPreview);
+            if (iconPreviewContainer) iconPreviewContainer.addEventListener('click', handleIconSelection);
+
+            // Cleanup
+            return () => {
+                iconClassSelect?.removeEventListener('change', updateIconPreview);
+                iconPreviewContainer?.removeEventListener('click', handleIconSelection);
+            };
+        }
+    }, [modalOpen]);
 
     const loadCategories = () => {
         try {
@@ -453,29 +499,30 @@ const Categories = () => {
     const handleAddCategory = () => {
         setModalMode('create');
         setCurrentCategory(null);
+        setPreviews([]);
         setModalOpen(true);
     };
 
     const handleEditCategory = (category) => {
         setModalMode('edit');
         setCurrentCategory(category);
+        setPreviews([]);
         setModalOpen(true);
     };
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        const iconInput = document.getElementById('category-icon');
-        const icon = iconInput.files.length > 0
-            ? URL.createObjectURL(iconInput.files[0])
-            : (currentCategory?.icon || '/src/assets/icons/default-category.png');
-
+        
+        // Obtener SOLO el icono de Font Awesome, eliminar cualquier otra opción
+        const icon = form['icon-class'].value;
+    
         const categoryData = {
             name: form['category-name'].value,
             description: form['category-description'].value,
-            icon: icon
+            icon: icon // Siempre usar el valor del select, sin considerar imágenes personalizadas
         };
-
+    
         try {
             if (modalMode === 'create') {
                 await localDB.createCategory(categoryData);
@@ -484,7 +531,7 @@ const Categories = () => {
                 await localDB.updateCategory(currentCategory.id, categoryData);
                 alert('Categoría actualizada con éxito');
             }
-
+    
             loadCategories();
             setModalOpen(false);
             setPreviews([]);
@@ -522,10 +569,43 @@ const Categories = () => {
         }
     };
 
+    // Iconos específicos para categorías de instrumentos musicales
+    const categoryIcons = [
+        // Instrumentos de cuerda
+        { value: 'fa-guitar', label: 'Guitarra' },
+        { value: 'fa-violin', label: 'Violín' },
+        { value: 'fa-mandolin', label: 'Mandolina' },
+        
+        // Instrumentos de viento
+        { value: 'fa-saxophone', label: 'Saxofón' },
+        { value: 'fa-trumpet', label: 'Trompeta' },
+        { value: 'fa-flute', label: 'Flauta' },
+        { value: 'fa-wind', label: 'Viento' },
+        
+        // Instrumentos de percusión
+        { value: 'fa-drum', label: 'Batería' },
+        { value: 'fa-drum-steelpan', label: 'Percusión' },
+        { value: 'fa-bells', label: 'Campanas' },
+        
+        // Instrumentos de teclado
+        { value: 'fa-piano-keyboard', label: 'Piano' },
+        { value: 'fa-keyboard', label: 'Teclado' },
+        
+        // Otros instrumentos y categorías generales
+        { value: 'fa-music', label: 'Nota musical' },
+        { value: 'fa-microphone', label: 'Micrófono' },
+        { value: 'fa-record-vinyl', label: 'Vinilo' },
+        { value: 'fa-headphones', label: 'Auriculares' },
+        { value: 'fa-volume-up', label: 'Amplificación' },
+        { value: 'fa-sliders-h', label: 'Controles' },
+        { value: 'fa-compact-disc', label: 'Disco' },
+        { value: 'fa-tags', label: 'Categorías' }
+    ];
+
     return (
         <div className={styles.instrumentsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Categorías</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Categorías</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
@@ -573,11 +653,20 @@ const Categories = () => {
                             <tr key={category.id}>
                                 <td>{category.id}</td>
                                 <td>
-                                    <img
-                                        src={category.icon}
-                                        alt={category.name}
-                                        className={styles.productImage}
-                                    />
+                                    {category.icon?.startsWith('fa-') ? (
+                                        <i className={`fas ${category.icon} fa-2x`} style={{ color: '#9C6615' }}></i>
+                                    ) : (
+                                        <img
+                                            src={category.icon}
+                                            alt={category.name}
+                                            className={styles.productImage}
+                                            onError={(e) => {
+                                                console.error(`Error loading image: ${category.icon}`);
+                                                e.target.onerror = null;
+                                                e.target.src = '/src/assets/icons/default-category.png';
+                                            }}
+                                        />
+                                    )}
                                 </td>
                                 <td>{category.name}</td>
                                 <td>{category.description}</td>
@@ -605,62 +694,81 @@ const Categories = () => {
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h3>{modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}</h3>
-                            <button
-                                onClick={() => {
-                                    setModalOpen(false);
-                                    setPreviews([]);
-                                }}
-                                className={styles.modalClose}
-                            >
-                                &times;
-                            </button>
-                        </div>
-                        <form onSubmit={handleModalSubmit} className={styles.modalForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="category-name">Nombre de la Categoría</label>
+                        <button
+                            onClick={() => {
+                                setModalOpen(false);
+                                setPreviews([]);
+                            }}
+                            className={styles.modalClose}
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            {modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}
+                        </h3>
+                        <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-name">
+                                    Nombre de la Categoría
+                                </label>
                                 <input
                                     type="text"
                                     id="category-name"
                                     defaultValue={currentCategory?.name || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="category-description">Descripción</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-description">
+                                    Descripción
+                                </label>
                                 <textarea
                                     id="category-description"
                                     rows="4"
                                     defaultValue={currentCategory?.description || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa una descripción"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="category-icon">Ícono de Categoría</label>
-                                <input
-                                    type="file"
-                                    id="category-icon"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const files = e.target.files;
-                                        const previews = Array.from(files).map(file => URL.createObjectURL(file));
-                                        setPreviews(previews);
-                                    }}
-                                />
-                                {previews.length > 0 && (
-                                    <div className={styles.imagePreviewContainer}>
-                                        {previews.map((preview, index) => (
-                                            <img
+
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">
+                                    Seleccionar Icono
+                                </label>
+                                <select
+                                    id="icon-class"
+                                    name="icon-class"
+                                    defaultValue={currentCategory?.icon?.startsWith('fa-') ? currentCategory.icon : 'fa-music'}
+                                    className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                >
+                                    {categoryIcons.map((icon, index) => (
+                                        <option className="text-gray-900" key={index} value={icon.value}>
+                                            {icon.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className={styles.iconPreview}>
+                                    <p className="font-semibold text-sm text-(--color-secondary)">Vista previa:</p>
+                                    <div className={styles.iconPreviewBox}>
+                                        {categoryIcons.map((icon, index) => (
+                                            <i
                                                 key={index}
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
-                                                className={styles.imagePreview}
-                                            />
+                                                className={`fas ${icon.value} fa-2x`}
+                                                title={icon.label}
+                                                style={{
+                                                    margin: '5px',
+                                                    cursor: 'pointer',
+                                                    color: '#001F3F'
+                                                }}
+                                            ></i>
                                         ))}
                                     </div>
-                                )}
+                                </div>
                             </div>
+
                             <div className={styles.formActions}>
                                 <button
                                     type="button"
@@ -668,13 +776,13 @@ const Categories = () => {
                                         setModalOpen(false);
                                         setPreviews([]);
                                     }}
-                                    className={styles.modalBtnSecondary}
+                                    className="border-2 border-(--color-secondary) w-[95px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className={styles.modalBtnPrimary}
+                                    className="bg-(--color-primary) hover:bg-(--color-secondary) w-[95px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200"
                                 >
                                     {modalMode === 'create' ? 'Crear' : 'Actualizar'}
                                 </button>
@@ -687,8 +795,7 @@ const Categories = () => {
     );
 };
 
-// Nuevo componente Specifications para Admin.jsx
-// Nuevo componente Specifications actualizado con iconos
+// Specifications component - Solo eliminando imagen personalizada pero manteniendo la funcionalidad original
 const Specifications = () => {
     const [specifications, setSpecifications] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
@@ -706,27 +813,15 @@ const Specifications = () => {
         loadSpecifications();
     }, [searchTerm, currentPage]);
 
+    // Mantener el efecto original para manejar la selección de iconos
     useEffect(() => {
-        // Añadir lógica de toggle para mostrar/ocultar selectores basado en radio button
         if (modalOpen) {
-            const radioFontAwesome = document.querySelector('input[name="icon-type"][value="font-awesome"]');
-            const radioImage = document.querySelector('input[name="icon-type"][value="image"]');
-            const fontAwesomeSelector = document.getElementById('font-awesome-selector');
-            const imageSelector = document.getElementById('image-selector');
             const iconClassSelect = document.getElementById('icon-class');
             const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
 
-            const updateVisibility = () => {
-                if (radioFontAwesome.checked) {
-                    fontAwesomeSelector.style.display = 'block';
-                    imageSelector.style.display = 'none';
-                } else {
-                    fontAwesomeSelector.style.display = 'none';
-                    imageSelector.style.display = 'block';
-                }
-            };
-
             const updateIconPreview = () => {
+                if (!iconClassSelect || !iconPreviewContainer) return;
+                
                 const selectedIcon = iconClassSelect.value;
                 iconPreviewContainer.querySelectorAll('i').forEach(icon => {
                     icon.classList.remove(styles.selectedIcon);
@@ -737,6 +832,8 @@ const Specifications = () => {
             };
 
             const handleIconSelection = (e) => {
+                if (!iconClassSelect) return;
+                
                 if (e.target.classList.contains('fas')) {
                     iconClassSelect.value = e.target.classList[1];
                     updateIconPreview();
@@ -744,19 +841,14 @@ const Specifications = () => {
             };
 
             // Actualizar visibilidad inicial
-            updateVisibility();
             updateIconPreview();
 
             // Añadir event listeners
-            radioFontAwesome.addEventListener('change', updateVisibility);
-            radioImage.addEventListener('change', updateVisibility);
-            iconClassSelect.addEventListener('change', updateIconPreview);
-            iconPreviewContainer.addEventListener('click', handleIconSelection);
+            if (iconClassSelect) iconClassSelect.addEventListener('change', updateIconPreview);
+            if (iconPreviewContainer) iconPreviewContainer.addEventListener('click', handleIconSelection);
 
             // Cleanup
             return () => {
-                radioFontAwesome?.removeEventListener('change', updateVisibility);
-                radioImage?.removeEventListener('change', updateVisibility);
                 iconClassSelect?.removeEventListener('change', updateIconPreview);
                 iconPreviewContainer?.removeEventListener('click', handleIconSelection);
             };
@@ -774,6 +866,12 @@ const Specifications = () => {
                 return;
             }
             let filteredSpecifications = allSpecifications;
+
+            if (searchTerm) {
+                filteredSpecifications = allSpecifications.filter(spec =>
+                    spec.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
 
             // Calcular paginación manualmente
             const startIndex = (currentPage - 1) * itemsPerPage;
@@ -810,17 +908,9 @@ const Specifications = () => {
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        const iconInput = document.getElementById('specification-icon');
-
-        // Obtener el icono (ya sea una imagen subida o seleccionado del dropdown)
-        let icon;
-        if (form['icon-type'].value === 'font-awesome') {
-            icon = form['icon-class'].value;
-        } else {
-            icon = iconInput.files.length > 0
-                ? URL.createObjectURL(iconInput.files[0])
-                : (currentSpecification?.icon || 'fa-tag');
-        }
+        
+        // Obtener el icono de Font Awesome
+        const icon = form['icon-class'].value;
 
         const specificationData = {
             name: form['specification-name'].value,
@@ -904,7 +994,7 @@ const Specifications = () => {
     return (
         <div className={styles.specificationsSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Características</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Características</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
@@ -953,7 +1043,7 @@ const Specifications = () => {
                                 <td>{specification.id}</td>
                                 <td>
                                     {specification.icon?.startsWith('fa-') ? (
-                                        <i className={`fas ${specification.icon} fa-2x`} style={{ color: '#9C6615' }}></i>
+                                        <i className={`fas ${specification.icon} fa-2x`} style={{ color: '#001F3F' }}></i>
                                     ) : (
                                         <img
                                             src={specification.icon}
@@ -1012,75 +1102,64 @@ const Specifications = () => {
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <div className={styles.modalHeader}>
-                            <h3>{modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}</h3>
-                            <button
-                                onClick={() => {
-                                    setModalOpen(false);
-                                    setPreviews([]);
-                                }}
-                                className={styles.modalClose}
-                            >
-                                &times;
-                            </button>
-                        </div>
-                        <form onSubmit={handleModalSubmit} className={styles.modalForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="specification-name">Nombre de la Característica</label>
+                        <button
+                            onClick={() => {
+                                setModalOpen(false);
+                                setPreviews([]);
+                            }}
+                            className={styles.modalClose}
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            {modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}
+                        </h3>
+                        <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-name">
+                                    Nombre de la Característica
+                                </label>
                                 <input
                                     type="text"
                                     id="specification-name"
                                     defaultValue={currentSpecification?.name || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa un nombre"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="specification-description">Descripción</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="specification-description">
+                                    Descripción
+                                </label>
                                 <textarea
                                     id="specification-description"
                                     rows="4"
                                     defaultValue={currentSpecification?.description || ''}
                                     required
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Ingresa una descripción"
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Tipo de Icono</label>
-                                <div className={styles.iconTypeSelector}>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="icon-type"
-                                            value="font-awesome"
-                                            defaultChecked={currentSpecification?.icon?.startsWith('fa-') || !currentSpecification}
-                                        />
-                                        Icono Font Awesome
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="icon-type"
-                                            value="image"
-                                            defaultChecked={currentSpecification?.icon && !currentSpecification.icon.startsWith('fa-')}
-                                        />
-                                        Imagen personalizada
-                                    </label>
-                                </div>
-                            </div>
-                            <div className={styles.formGroup} id="font-awesome-selector">
-                                <label htmlFor="icon-class">Seleccionar Icono</label>
+                            
+                            <div className="flex flex-col gap-2" id="font-awesome-selector">
+                                <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">
+                                    Seleccionar Icono
+                                </label>
                                 <select
                                     id="icon-class"
                                     name="icon-class"
                                     defaultValue={currentSpecification?.icon?.startsWith('fa-') ? currentSpecification.icon : 'fa-tag'}
+                                    className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                 >
                                     {fontAwesomeIcons.map((icon, index) => (
-                                        <option key={index} value={icon.value}>
+                                        <option className="text-gray-900" key={index} value={icon.value}>
                                             {icon.label}
                                         </option>
                                     ))}
                                 </select>
                                 <div className={styles.iconPreview}>
-                                    <p>Vista previa:</p>
+                                    <p className="font-semibold text-sm text-(--color-secondary)">Vista previa:</p>
                                     <div className={styles.iconPreviewBox}>
                                         {fontAwesomeIcons.map((icon, index) => (
                                             <i
@@ -1088,41 +1167,16 @@ const Specifications = () => {
                                                 className={`fas ${icon.value} fa-2x`}
                                                 title={icon.label}
                                                 style={{
-                                                    display: 'inline-block',
                                                     margin: '5px',
                                                     cursor: 'pointer',
-                                                    color: '#9C6615'
+                                                    color: '#001F3F'
                                                 }}
                                             ></i>
                                         ))}
                                     </div>
                                 </div>
                             </div>
-                            <div className={styles.formGroup} id="image-selector">
-                                <label htmlFor="specification-icon">Imagen Personalizada</label>
-                                <input
-                                    type="file"
-                                    id="specification-icon"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const files = e.target.files;
-                                        const previews = Array.from(files).map(file => URL.createObjectURL(file));
-                                        setPreviews(previews);
-                                    }}
-                                />
-                                {previews.length > 0 && (
-                                    <div className={styles.imagePreviewContainer}>
-                                        {previews.map((preview, index) => (
-                                            <img
-                                                key={index}
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
-                                                className={styles.imagePreview}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+
                             <div className={styles.formActions}>
                                 <button
                                     type="button"
@@ -1130,13 +1184,13 @@ const Specifications = () => {
                                         setModalOpen(false);
                                         setPreviews([]);
                                     }}
-                                    className={styles.modalBtnSecondary}
+                                    className="border-2 border-(--color-secondary) w-[95px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className={styles.modalBtnPrimary}
+                                    className="bg-(--color-primary) hover:bg-(--color-secondary) w-[95px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200"
                                 >
                                     {modalMode === 'create' ? 'Crear' : 'Actualizar'}
                                 </button>
@@ -1306,7 +1360,7 @@ const Users = () => {
     return (
         <div className={styles.usersSection}>
             <div className={styles.sectionHeader}>
-                <h2>Gestión de Usuarios</h2>
+                <h2 className="text-(--color-secondary) text-2xl font-bold">Gestión de Usuarios</h2>
                 <div className={styles.headerActions}>
                     <div className={styles.searchContainer}>
                         <span className="material-symbols-outlined" style={{
@@ -1533,32 +1587,32 @@ const Admin = () => {
                     <nav className={styles.sidebarNav}>
                         <ul>
                             <li>
-                                <Link to="/admin/dashboard">
+                            <Link to="/administracion/dashboard">
                                     <i className="fas fa-home"></i> Dashboard
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/instruments">
+                                <Link to="/administracion/instruments">
                                     <i className="fas fa-guitar"></i> Lista Productos
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/specifications">
+                                <Link to="/administracion/specifications">
                                     <i className="fas fa-list-ul"></i> Características
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/rentals">
+                                <Link to="/administracion/rentals">
                                     <i className="fas fa-calendar-alt"></i> Alquileres
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/categories">
+                                <Link to="/administracion/categories">
                                     <i className="fas fa-tags"></i> Categorías
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/admin/users">
+                                <Link to="/administracion/users">
                                     <i className="fas fa-users"></i> Usuarios
                                 </Link>
                             </li>

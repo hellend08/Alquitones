@@ -1,134 +1,173 @@
-
+import React, { useState, useEffect } from "react";
+import { localDB } from "../../database/LocalDB";
+import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
-    // Función para renderizar el perfil de usuario
-    const renderizarPerfil = () => {
-        // Información del usuario
-        const usuario = {
-            nombre: "Juan Perez",
-            email: "juan.perez@email.com",
-            descripcion: "jojo",
-            fotoPerfil: "https://www.w3schools.com/w3images/avatar2.png",
-            arriendos: [
-                { id: 1, articulo: "Bicicleta", fecha: "2025-02-20", duracion: "3 días" },
-                { id: 2, articulo: "Carpa", fecha: "2025-02-18", duracion: "1 semana" },
-                { id: 3, articulo: "Proyector", fecha: "2025-02-10", duracion: "2 días" },
-                { id: 4, articulo: "Sillas", fecha: "2025-02-05", duracion: "5 días" },
-                { id: 5, articulo: "Cámara", fecha: "2025-01-30", duracion: "4 días" }
-            ]
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    // Datos de ejemplo para arriendos (en una aplicación real, estos vendrían de una API o base de datos)
+    const arriendosEjemplo = [
+        {
+            "ID": 1,
+            "Imagen": "https://example.com/images/guitar.jpg",
+            "Nombre": "Guitarra Eléctrica",
+            "Categoria": "Cuerda",
+            "Estado": "Disponible",
+            "Duracion": "7 días"
+        },
+        {
+            "ID": 2,
+            "Imagen": "https://example.com/images/piano.jpg",
+            "Nombre": "Piano Acústico",
+            "Categoria": "Teclado",
+            "Estado": "En uso",
+            "Duracion": "10 días"
+        },
+        {
+            "ID": 3,
+            "Imagen": "https://example.com/images/drum.jpg",
+            "Nombre": "Batería",
+            "Categoria": "Percusión",
+            "Estado": "Disponible",
+            "Duracion": "5 días"
+        },
+        {
+            "ID": 4,
+            "Imagen": "https://example.com/images/violin.jpg",
+            "Nombre": "Violín",
+            "Categoria": "Cuerda",
+            "Estado": "En reparación",
+            "Duracion": "3 días"
+        },
+        {
+            "ID": 5,
+            "Imagen": "https://example.com/images/trumpet.jpg",
+            "Nombre": "Trompeta",
+            "Categoria": "Viento",
+            "Estado": "Disponible",
+            "Duracion": "7 dias"
+        }
+    ];
+
+    useEffect(() => {
+        const checkUser = () => {
+            const currentUser = localDB.getCurrentUser();
+            if (currentUser) {
+                setUser(currentUser);
+            }
+            setLoading(false);
         };
 
-        // Mostrar datos de bienvenida
-        document.getElementById("bienvenida").textContent = `Hola ${usuario.nombre.split(" ")[0]}, ¡buenas tardes!`;
-        document.getElementById("nombre").textContent = usuario.nombre;
-        document.getElementById("email").textContent = usuario.email;
-        document.getElementById("descripcion").textContent = usuario.descripcion;
-        document.getElementById("fotoPerfil").src = usuario.fotoPerfil;
+        // Verificar estado inicial
+        checkUser();
+    }, []);
 
-        // Mostrar tabla de arriendos
-        const tablaArriendos = document.getElementById("tablaArriendos");
-        usuario.arriendos.forEach((arriendo, index) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-            <td class="px-4 py-2 border-b">${index + 1}</td>
-            <td class="px-4 py-2 border-b">${arriendo.articulo}</td>
-            <td class="px-4 py-2 border-b">${arriendo.fecha}</td>
-            <td class="px-4 py-2 border-b">${arriendo.duracion}</td>
-          `;
-            tablaArriendos.appendChild(row);
-        });
-
-        // Funcionalidad de botones
-        document.getElementById("agendarArriendo").addEventListener("click", () => {
-            alert("Funcionalidad para agendar un arriendo");
-        });
-
-        document.getElementById("verCatalogo").addEventListener("click", () => {
-            alert("Funcionalidad para ver el catálogo de cosas para arrendar");
-        });
+    const handleLogout = () => {
+        localDB.logout();
+        navigate('/login');
     };
 
-    // Llamar a la función para renderizar el perfil cuando el DOM esté listo
-    window.onload = renderizarPerfil;
+    const handleNavigation = (path) => {
+        navigate(path);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <p className="text-xl">Cargando...</p>
+            </div>
+        );
+    }
+
+    if (!user) {
+        navigate('/login');
+        return null;
+    }
+
+    // Obtener el primer nombre para el saludo
+    const firstName = user.username ? user.username.split(" ")[0] : "";
 
     return (
         <>
             <div className="bg-(--color-primary) text-white text-center py-15">
-                <h1 id="bienvenida" className="text-4xl font-bold">Cargando...</h1>
+                <h1 className="text-4xl font-bold">Hola {firstName}, ¡buenas tardes!</h1>
                 <p className="text-lg mt-2">¡Te damos la bienvenida a tu perfil!</p>
             </div>
-
-           
-  
-      
-
-      
-            <table className="mt-8 container mx-auto px-6 py-8">
+            <table className="mt-8 container md:w-2/3 mx-auto px-6 py-8">
                 <thead>
                     <tr>
                         <th className="px-4 py-2 text-left font-bold text-2xl">Información Personal</th>
                     </tr>
+                </thead>
                 <tbody>
                     <tr>
                         <td className="px-4 py-2 font-semibold">Nombre:</td>
-                        <td id="nombre" className="px-4 py-2">Cargando...</td>
+                        <td className="px-4 py-2">{user.username || "No disponible"}</td>
                     </tr>
                     <tr>
                         <td className="px-4 py-2 font-semibold">Email:</td>
-                        <td id="email" className="px-4 py-2">Cargando...</td>
+                        <td className="px-4 py-2">{user.email || "No disponible"}</td>
                     </tr>
                     <tr>
-                        <td className="px-4 py-2 font-semibold">Descripción:</td>
-                        <td id="descripcion" className="px-4 py-2">Cargando...</td>
+                        <td className="px-4 py-2 font-semibold">Rol:</td>
+                        <td className="px-4 py-2">{user.role || "No disponible"}</td>
+                    </tr>
+                    <tr>
+                        <td className="px-4 py-2 font-semibold">Te uniste el: </td>
+                        <td className="px-4 py-2">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "No disponible"}</td>
                     </tr>
                 </tbody>
-                </thead>
             </table>
-          
 
-
-            <div className="mt-8 flex justify-around">
-                <button id="agendarArriendo" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+            <div className="mt-8 flex justify-around container md:w-2/3 mx-auto">
+                <button 
+                    onClick={() => handleNavigation('/')} 
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-(--color-primary)"
+                >
                     Agendar Arriendo
                 </button>
-                <button id="verCatalogo" className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                <button 
+                    onClick={() => handleNavigation('/')} 
+                    className="bg-(--color-secondary) text-white px-6 py-2 rounded-lg hover:bg-(--color-primary) flex items-center"
+                >
                     Ver Catálogo
+                    <span className="material-symbols-outlined pl-4">arrow_forward</span>
                 </button>
             </div>
 
-
-
-
-            <div className="container mx-auto px-6 py-8">
+            <div className="container mx-auto py-8 md:w-2/3">
                 <h3 className="text-xl font-semibold text-gray-800 text-center">Últimos 5 Arriendos</h3>
                 <div className="overflow-x-auto mt-4">
                     <table className="min-w-full bg-white border border-gray-300">
                         <thead>
                             <tr className="bg-gray-200">
-                            <th className="px-4 py-2 text-left">ID</th>
-                            <th className="px-4 py-2 text-left">Imagen</th>
-                            <th className="px-4 py-2 text-left">Nombre</th>
-                            <th className="px-4 py-2 text-left">Categoría</th>
-                            <th className="px-4 py-2 text-left">Estado</th>
-                            <th className="px-4 py-2 text-left">Precio/Día</th>
+                                <th className="px-4 py-2 text-left">ID</th>
+                                <th className="px-4 py-2 text-left">Imagen</th>
+                                <th className="px-4 py-2 text-left">Nombre</th>
+                                <th className="px-4 py-2 text-left">Categoria</th>
+                                <th className="px-4 py-2 text-left">Estado</th>
+                                <th className="px-4 py-2 text-left">Duracion</th>
                             </tr>
                         </thead>
-                        <tbody id="tablaArriendos">
-                            <tr>
-                                <td colSpan="6" className="text-center py-4">Cargando...</td>
-                            </tr>
+                        <tbody>
+                            {arriendosEjemplo.map((arriendo, index) => (
+                                <tr key={arriendo.ID || index}>
+                                    <td className="px-4 py-2 border-b">{index + 1}</td>
+                                    <td className="px-4 py-2 border-b">{arriendo.Imagen}</td>
+                                    <td className="px-4 py-2 border-b">{arriendo.Nombre}</td>
+                                    <td className="px-4 py-2 border-b">{arriendo.Categoria}</td>
+                                    <td className="px-4 py-2 border-b">{arriendo.Estado}</td>
+                                    <td className="px-4 py-2 border-b">{arriendo.Duracion}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
             </div>
         </>
-
-
     );
-
-
 };
 
 export default UserProfile;
-
-

@@ -5,7 +5,6 @@ body {
   background-color: var(--color-light);
 }
 
-
 :root {
   --color-primary: #9F7933;
   --color-secondary: #001F3F;
@@ -15,4 +14,12 @@ body {
   --color-grey: #e1e1e1;
   --color-light: #f4f4f4;
   --color-dark: #222;
+}
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }
