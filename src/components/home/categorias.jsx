@@ -151,19 +151,29 @@ const Category = ({ onFilterChange = () => { } }) => {
     };
 
     return (
-        <div className="mx-4 mb-8 relative max-w-6xl mx-auto">
-            <div className="flex flex-col mb-4">
-                <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-semibold text-(--color-primary)">Categorías</h2>
-                        <span className="text-sm text-gray-500">
-                            {selectedCategories.length > 0
-                                ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
-                                : `Total: ${totalProducts} productos`}
-                        </span>
-                    </div>
-                </div>
-            </div>
+        <div className="mb-12 py-4 relative max-w-6xl mx-3 lg:mx-auto">
+            <section className="flex items-center mb-6 gap-2 justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+            <h2 className="text-sm md:text-lg font-semibold text-(--color-primary)">Categorías</h2>
+            <span className="text-sm md:text-base text-gray-500">
+                {selectedCategories.length > 0
+                    ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
+                    : `Total: ${totalProducts} productos`}
+            </span>
+        </div>
+        
+        {/* Botón de borrar filtros - solo visible cuando hay categorías seleccionadas */}
+        {selectedCategories.length > 0 && (
+            <button 
+                onClick={clearFilters}
+                className="text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full flex items-center transition-all duration-200 hover:shadow-sm"
+            >
+                <i className="fas fa-times-circle mr-1"></i>
+                <span className="hidden sm:inline">Borrar Filtros</span>
+                <span className="sm:hidden">Borrar</span>
+            </button>
+        )}
+    </section>
 
             <div className="relative">
                 {/* Left Navigation Arrow */}
@@ -177,7 +187,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                 {/* Category Slider */}
                 <div
                     ref={sliderRef}
-                    className="flex overflow-x-auto scroll-smooth no-scrollbar"
+                    className="flex overflow-x-auto scroll-smooth no-scrollbar px-3 mx-6 overflow-hidden"
                     style={{
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -191,21 +201,22 @@ const Category = ({ onFilterChange = () => { } }) => {
                             className={`flex-1 flex flex-col items-center cursor-pointer transition-all duration-200 
                                 group relative p-2 min-w-[80px] max-w-[120px]
                                 ${selectedCategories.some(id => Number(id) === Number(category.id))
-                                    ? 'scale-110 opacity-100'
+                                    ? 'opacity-100'
                                     : 'opacity-80 hover:opacity-100'}`}
                             onClick={() => toggleCategorySelection(category.id)}
                         >
                             <div className={`w-20 h-20 sm:w-24 sm:h-24 flex justify-center items-center rounded-full relative 
-                                z-10 group-hover:scale-95 transition-transform duration-200
+                                z-10 
                                 ${selectedCategories.some(id => Number(id) === Number(category.id))
-                                    ? 'bg-(--color-primary-light) border-2 border-(--color-primary)'
+                                    ? 'bg-(--color-primary) opacity-80 border-2 border-(--color-primary)'
                                     : 'bg-(--color-grey)'}`}>
                                 {renderCategoryIcon(category)}
+                                {/* group-hover:scale-95 transition-transform duration-200 */}
 
                                 {/* Added hover effect layer */}
-                                <div className="absolute inset-0 rounded-full border-2 border-transparent 
+                                {/* <div className="absolute inset-0 rounded-full border-2 border-transparent 
                                     group-hover:border-(--color-primary) transition-all duration-200 
-                                    group-hover:scale-110 origin-center"></div>
+                                    group-hover:scale-110 origin-center"></div> */}
                             </div>
                             <div className="flex flex-col items-center">
                                 <p className={`text-sm text-center font-semibold mt-2

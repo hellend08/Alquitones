@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { localDB } from '../../database/LocalDB';
+import Characteristics from './Characteristics';
 
 function CardDetails() {
     const { id } = useParams();
@@ -76,18 +77,23 @@ function CardDetails() {
                     </div>
                 </div>
             </div>
-            
-            <div className="mt-6 p-6 bg-white rounded-lg shadow">
-                <div className="flex flex-col lg:flex-row justify-between items-center mb-2.5">
-                    <h2 className="text-xl font-bold text-(--color-secondary)">Descripción</h2>
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
-                        <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
-                    </div>
-                </div>
-                <p className="text-gray-600 text-lg">{instrument.description}</p>
-            </div>
 
+            <div className="mt-6 p-6 bg-white rounded-lg shadow md:flex justify-between items-start md:gap-3">
+                <section className="md:w-[70%]">
+                    <h2 className="text-xl font-bold text-(--color-secondary)">Características</h2>
+                    <div className="mb-6 mt-3">
+                        <Characteristics specifications={instrument.specifications}/>
+                    </div>
+                    <div >
+                        <h2 className="text-xl font-bold text-(--color-secondary)">Descripción</h2>
+                        <li className="text-(--color-secondary) text-base m-3 list-disc">{instrument.description}.</li>
+                    </div>
+                </section>
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
+                    <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
+                </div>
+            </div>
             <h2 className="mt-10 text-xl font-bold text-(--color-secondary)">Sugerencias</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 {suggestions.map((product) => (

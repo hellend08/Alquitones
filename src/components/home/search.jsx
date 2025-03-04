@@ -66,8 +66,8 @@ const SearchBar = ({ onSearch }) => {
 
     return (
         <div className="max-w-lg mx-auto relative">
-            <form onSubmit={handleSubmit} className="flex">
-                <div className="w-full flex">
+            <form onSubmit={handleSubmit} className="flex mx-4 lg:mx-0">
+                {/* <div className="w-full flex"> */}
                     <input 
                         type="search" 
                         id="search-dropdown" 
@@ -83,7 +83,7 @@ const SearchBar = ({ onSearch }) => {
                         <span className="material-symbols-outlined text-gray-600">search</span>
                         <span className="sr-only">Search</span>
                     </button>
-                </div>
+                {/* </div> */}
             </form>
             <SearchResults 
                 results={searchResults} 
