@@ -36,6 +36,8 @@ const AuthButtons = () => {
         window.location.href = `/${type}`;
     };
 
+  const avatarName = user ? user.username.split(" ")[0][0] + user.username.split(" ")[1][0]: '';
+
 
 
     if (user) {
@@ -43,7 +45,7 @@ const AuthButtons = () => {
             <div className="flex items-center ">
                 <div className="flex items-center min-w-32" onClick={handleClick}>
                     <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-(--color-primary) rounded-full ">
-                        <span className="text-xl text-white">{user.username[0].toUpperCase()}</span>
+                        <span className="text-xl text-white">{avatarName.toUpperCase()}</span>
                     </div>
                     <span className="text-(--color-secundary) font-medium pl-2">
                         {user.username.split(" ")[0]}
