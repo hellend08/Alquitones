@@ -4,10 +4,10 @@ class LocalDB {
         this.data = {
             // En LocalDB.jsx, actualiza categories:
             categories: [
-                { id: 1, name: 'Cuerdas', icon: '/src/assets/icons/guitar.png', description: 'Instrumentos de cuerda' },
-                { id: 2, name: 'Viento', icon: '/src/assets/icons/flute.png', description: 'Instrumentos de viento' },
-                { id: 3, name: 'Percusión', icon: '/src/assets/icons/drums.png', description: 'Instrumentos de percusión' },
-                { id: 4, name: 'Teclados', icon: '/src/assets/icons/piano.png', description: 'Instrumentos de teclado' }
+                { id: 1, name: 'Cuerdas', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/banjo.png', description: 'Instrumentos de cuerda' },
+                { id: 2, name: 'Viento', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/french-horn.png', description: 'Instrumentos de viento' },
+                { id: 3, name: 'Percusión', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/drum.png', description: 'Instrumentos de percusión' },
+                { id: 4, name: 'Teclados', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/piano-keys.png', description: 'Instrumentos de teclado' }
             ],
             users: [
                 {
