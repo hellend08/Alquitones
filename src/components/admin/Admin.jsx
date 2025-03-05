@@ -3,14 +3,14 @@ import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
-import Footer from '../crossSections/Footer';
+import Footer from '../crossSections/footer';
 
 // Dashboard component
 const Dashboard = () => (
     <div className={styles.dashboardContent}>
         <div className={styles.placeholderContainer}>
             <img
-                src="/src/assets/no-disponible.jpg"
+                src="https://alquitones.s3.us-east-2.amazonaws.com/no-disponible.jpg"
                 alt="No disponible"
                 className={styles.placeholderImage}
             />
@@ -667,7 +667,7 @@ const categoryIcons = [
                                             onError={(e) => {
                                                 console.error(`Error loading image: ${category.icon}`);
                                                 e.target.onerror = null;
-                                                e.target.src = '/src/assets/icons/default-category.png';
+                                                e.target.src = 'https://alquitones.s3.us-east-2.amazonaws.com/yunluo.png';
                                             }}
                                         />
                                     )}
@@ -1226,7 +1226,7 @@ const Rentals = () => (
     <div className={styles.rentalsContent}>
         <div className={styles.placeholderContainer}>
             <img
-                src="/src/assets/no-disponible.jpg"
+                src="https://alquitones.s3.us-east-2.amazonaws.com/no-disponible.jpg"
                 alt="No disponible"
                 className={styles.placeholderImage}
             />
