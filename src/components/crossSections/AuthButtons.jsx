@@ -36,7 +36,12 @@ const AuthButtons = () => {
         window.location.href = `/${type}`;
     };
 
-  const avatarName = user ? user.username.split(" ")[0][0] + user.username.split(" ")[1][0]: '';
+    const avatarName = () => {
+        const name = user.username.split(" ");
+        const firstName = name[0] ? name[0][0].toUpperCase() : "";
+        const lastName = name[1] ? name[1][0].toUpperCase() : "";
+        return `${firstName}${lastName ? lastName : ""}`;
+    }
 
 
 
@@ -45,7 +50,7 @@ const AuthButtons = () => {
             <div className="flex items-center ">
                 <div className="flex items-center min-w-32" onClick={handleClick}>
                     <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-(--color-primary) rounded-full ">
-                        <span className="text-xl text-white">{avatarName.toUpperCase()}</span>
+                        <span className="text-xl text-white">{avatarName()}</span>
                     </div>
                     <span className="text-(--color-secundary) font-medium pl-2">
                         {user.username.split(" ")[0]}
