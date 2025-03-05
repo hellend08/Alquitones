@@ -50,7 +50,7 @@ const ProductCards = ({ products: propProducts }) => {
                         <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
                             <img 
                                 className="h-48 w-96 mx-auto object-contain rounded-t-lg" 
-                                src={product.images?.[0] || product.mainImage} 
+                                src={product.mainImage || product.images?.[0]} 
                                 alt={product.name} 
                                 onError={(e) => {
                                     console.log("Error cargando imagen:", e.target.src);
