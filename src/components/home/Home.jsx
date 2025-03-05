@@ -35,20 +35,38 @@ const Home = () => {
                 <div className="bg-(--color-primary) py-4 mb-4">
                     <SearchBar onSearch={handleSearch} />
                 </div>
-                {/* <div className="py-4 mb-4"> */}
-                    <Category onFilterChange={handleCategoryFilter} />
-                {/* </div> */}
+                <Category onFilterChange={handleCategoryFilter} />
+                
                 <div className="py-4 mb-4 flex flex-col mx-3 lg:mx-0">
                     <h1 className="text-2xl font-bold text-(--color-secondary) mb-8">
                         {filteredProducts 
                             ? (categoryFiltered ? 'Filtrado por categoría' : 'Resultados de búsqueda') 
                             : 'Recomendaciones'}
                     </h1>
-                    <ProductCards products={filteredProducts || products} />
+                    
+                    {/* Comprobación para mostrar mensaje cuando no hay productos */}
+                    {filteredProducts && filteredProducts.length === 0 && categoryFiltered ? (
+                        <div className="empty-category-message bg-gray-100 p-8 rounded-lg text-center">
+                            <div className="empty-icon text-8xl text-gray-300 mb-4">
+                                <i className="fas fa-guitar"></i>
+                            </div>
+                            <h3 className="text-xl font-semibold text-(--color-secondary) mb-2">
+                                No hay instrumentos disponibles
+                            </h3>
+                            <p className="text-gray-500">
+                                Actualmente no tenemos instrumentos disponibles en esta categoría.
+                                <br />
+                                Por favor, selecciona otra categoría o prueba con otros criterios de búsqueda.
+                            </p>
+                        </div>
+                    ) : (
+                        <ProductCards products={filteredProducts || products} />
+                    )}
                 </div>
             </main>
         </>
     );
 };
+
 
 export default Home;
