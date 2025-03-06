@@ -104,7 +104,7 @@ const Category = ({ onFilterChange = () => { } }) => {
         if (category.icon && category.icon.startsWith('fa-')) {
             return (
                 <i
-                    className={`fas ${category.icon}`}
+                    className={`fas ${category.icon} `}
                     style={{ fontSize: '2.5rem', color: '#666' }}
                 ></i>
             );
@@ -147,33 +147,33 @@ const Category = ({ onFilterChange = () => { } }) => {
     return (
         <div className="mb-12 py-4 relative max-w-6xl mx-3 lg:mx-auto">
             <section className="flex items-center mb-6 gap-2 justify-between">
-        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
-            <h2 className="text-sm md:text-lg font-semibold text-(--color-primary)">Categorías</h2>
-            <span className="text-sm md:text-base text-gray-500">
-                {selectedCategories.length > 0
-                    ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
-                    : `Total: ${totalProducts} productos`}
-            </span>
-        </div>
-        
-        {/* Botón de borrar filtros - solo visible cuando hay categorías seleccionadas */}
-        {selectedCategories.length > 0 && (
-            <button 
-                onClick={clearFilters}
-                className="text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full flex items-center transition-all duration-200 hover:shadow-sm"
-            >
-                <i className="fas fa-times-circle mr-1"></i>
-                <span className="hidden sm:inline">Borrar Filtros</span>
-                <span className="sm:hidden">Borrar</span>
-            </button>
-        )}
-    </section>
+                <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                    <h2 className="text-sm md:text-lg font-semibold text-(--color-primary)">Categorías</h2>
+                    <span className="text-sm md:text-base text-gray-500">
+                        {selectedCategories.length > 0
+                            ? `Mostrando ${filteredProducts.length} de ${totalProducts} productos`
+                            : `Total: ${totalProducts} productos`}
+                    </span>
+                </div>
+
+                {/* Botón de borrar filtros - solo visible cuando hay categorías seleccionadas */}
+                {selectedCategories.length > 0 && (
+                    <button
+                        onClick={clearFilters}
+                        className="text-sm py-1 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full flex items-center transition-all duration-200 hover:shadow-sm"
+                    >
+                        <i className="fas fa-times-circle mr-1 text-red-600"></i>
+                        <span className="hidden sm:inline">Borrar Filtros</span>
+                        <span className="sm:hidden">Borrar</span>
+                    </button>
+                )}
+            </section>
 
             <div className="relative">
                 {/* Left Navigation Arrow */}
                 <button
                     onClick={() => scrollSlider('left')}
-                    className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-transparent hover:bg-transparent text-gray-500 hover:text-gray-700"
+                    className={`absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-transparent hover:bg-transparent text-gray-500 hover:text-gray-700 ${categories.length <= 4 ? 'hidden' : ''}`}
                 >
                     <i className="fas fa-chevron-left text-2xl"></i>
                 </button>
@@ -181,7 +181,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                 {/* Category Slider */}
                 <div
                     ref={sliderRef}
-                    className="flex overflow-x-auto scroll-smooth no-scrollbar px-3 mx-6 overflow-hidden"
+                    className="flex overflow-x-auto scroll-smooth no-scrollbar px-3 mx-6 overflow-hidden grid-cols-4 gap-8 "
                     style={{
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -193,7 +193,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                         <div
                             key={category.id}
                             className={`flex-1 flex flex-col items-center cursor-pointer transition-all duration-200 
-                                group relative p-2 min-w-[80px] max-w-[120px]
+                                group relative p-2 min-w-48
                                 ${selectedCategories.some(id => Number(id) === Number(category.id))
                                     ? 'opacity-100'
                                     : 'opacity-80 hover:opacity-100'}`}
@@ -202,15 +202,9 @@ const Category = ({ onFilterChange = () => { } }) => {
                             <div className={`w-20 h-20 sm:w-24 sm:h-24 flex justify-center items-center rounded-full relative 
                                 z-10 
                                 ${selectedCategories.some(id => Number(id) === Number(category.id))
-                                    ? 'bg-(--color-primary) opacity-80 border-2 border-(--color-primary)'
+                                    ? 'bg-(--color-quinary) opacity-80 border-2 border-(--color-primary)'
                                     : 'bg-(--color-grey)'}`}>
                                 {renderCategoryIcon(category)}
-                                {/* group-hover:scale-95 transition-transform duration-200 */}
-
-                                {/* Added hover effect layer */}
-                                {/* <div className="absolute inset-0 rounded-full border-2 border-transparent 
-                                    group-hover:border-(--color-primary) transition-all duration-200 
-                                    group-hover:scale-110 origin-center"></div> */}
                             </div>
                             <div className="flex flex-col items-center">
                                 <p className={`text-sm text-center font-semibold mt-2
@@ -231,7 +225,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                 {/* Right Navigation Arrow */}
                 <button
                     onClick={() => scrollSlider('right')}
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-transparent hover:bg-transparent text-gray-500 hover:text-gray-700"
+                    className= {`absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-transparent hover:bg-transparent text-gray-500 hover:text-gray-700 ${categories.length <= 4 ? 'hidden' : ''}`}
                 >
                     <i className="fas fa-chevron-right text-2xl"></i>
                 </button>
