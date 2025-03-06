@@ -1038,7 +1038,7 @@ const Specifications = () => {
                         onClick={handleAddSpecification}
                         className={styles.addButton}
                     >
-                        <i className="fas fa-plus"></i> Agregar Característica
+                        <i className="fas fa-plus"></i> Agregar Nueva
                     </button>
                 </div>
             </div>
@@ -1130,7 +1130,7 @@ const Specifications = () => {
                             &times;
                         </button>
                         <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                            {modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}
+                            {modalMode === 'create' ? 'Agregar Nueva' : 'Editar Característica'}
                         </h3>
                         <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
