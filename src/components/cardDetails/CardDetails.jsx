@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { localDB } from '../../database/LocalDB';
 import Characteristics from './Characteristics';
+import AuthButtons from '../crossSections/AuthButtons';
 
 function CardDetails() {
     const { id } = useParams();
@@ -10,6 +11,7 @@ function CardDetails() {
     const [suggestions, setSuggestions] = useState([]);
     const [categories, setCategories] = useState("");
     const [showGallery, setShowGallery] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
         const product = localDB.getProductById(parseInt(id));
@@ -19,6 +21,10 @@ function CardDetails() {
             getCategories();
             window.scrollTo(0, 0);
         }
+        
+        // Verificar si el usuario está autenticado
+        const currentUser = localDB.getCurrentUser();
+        setIsAuthenticated(!!currentUser);
     }, [id]);
 
     const loadSuggestions = (currentId) => {
@@ -89,11 +95,35 @@ function CardDetails() {
                         <li className="text-(--color-secondary) text-base m-3 list-disc">{instrument.description}.</li>
                     </div>
                 </section>
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                
+                <div className="flex flex-col gap-4">
                     <p className="text-lg font-semibold">Precio: <span className="text-green-600">${instrument.pricePerDay.toFixed(2)}</span></p>
-                    <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
+                
+                    {isAuthenticated ? (
+                        <button className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) cursor-pointer transition">Reserva Ahora</button>
+                    ) : (
+                        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-100">
+                            <div className="flex flex-col items-center text-center">
+                                <span className="material-symbols-outlined text-3xl text-(--color-secondary) mb-2">lock</span>
+                                <h3 className="text-lg font-semibold text-(--color-secondary) mb-2">Accede a tu cuenta para hacer tu reserva</h3>
+                                
+                                {/* Usar solo el botón de iniciar sesión */}
+                                <button
+                                    onClick={() => window.location.href = '/login'}
+                                    className="bg-(--color-secondary) hover:bg-(--color-primary) text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors duration-200 mb-3"
+                                >
+                                    Iniciar sesión
+                                </button>
+                                
+                                <p className="text-sm">
+                                    ¿No tienes cuenta? <a href="/register" className="text-(--color-secondary) underline">Crea una aquí</a>
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
+            
             <h2 className="mt-10 text-xl font-bold text-(--color-secondary)">Sugerencias</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 {suggestions.map((product) => (
@@ -132,7 +162,6 @@ function CardDetails() {
                                     src={img} 
                                     alt={`Imagen ${index + 1}`} 
                                     className="w-full md:col-span-2 h-47 object-cover rounded-lg"
-                                    // className={`w-full ${index === 0 ? 'md:col-span-2 h-60' : 'col-span-2 h-47'} object-cover rounded-lg`}
                                 />
                             ))}
                         </div>
