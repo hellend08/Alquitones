@@ -194,7 +194,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/02.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/03.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/05.webp',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/06.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
