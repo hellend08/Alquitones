@@ -78,7 +78,7 @@ const Instruments = () => {
         const images = Array.from(fileInput.files);
 
         // Validación de imágenes SOLO para creación
-        if (modalMode === 'create' && (images.length < 1 || images.length > 5)) {
+        if (modalMode === 'create' && (images.length < 1 || images.length > 6)) {
             alert('Debes seleccionar entre 1 y 5 imágenes');
             return;
         }

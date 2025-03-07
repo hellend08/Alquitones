@@ -771,8 +771,8 @@ class LocalDB {
 
     createProduct(productData) {
         // Modificar validación para permitir 1-5 imágenes
-        if (!productData.images || productData.images.length < 1 || productData.images.length > 5) {
-          throw new Error('El producto debe tener al menos 1 imagen');
+        if (!productData.images || productData.images.length < 1 || productData.images.length > 6) {
+          throw new Error('El producto debe tener entre 1 y 6 imágenes');
         }
       
         const newProduct = {
