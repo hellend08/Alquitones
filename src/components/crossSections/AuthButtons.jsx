@@ -36,6 +36,13 @@ const AuthButtons = () => {
         window.location.href = `/${type}`;
     };
 
+    const avatarName = () => {
+        const name = user.username.split(" ");
+        const firstName = name[0] ? name[0][0].toUpperCase() : "";
+        const lastName = name[1] ? name[1][0].toUpperCase() : "";
+        return `${firstName}${lastName ? lastName : ""}`;
+    }
+
 
 
     if (user) {
@@ -43,7 +50,7 @@ const AuthButtons = () => {
             <div className="flex items-center ">
                 <div className="flex items-center min-w-32" onClick={handleClick}>
                     <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-(--color-primary) rounded-full ">
-                        <span className="text-xl text-white">{user.username[0].toUpperCase()}</span>
+                        <span className="text-xl text-white">{avatarName()}</span>
                     </div>
                     <span className="text-(--color-secundary) font-medium pl-2">
                         {user.username.split(" ")[0]}
@@ -51,7 +58,10 @@ const AuthButtons = () => {
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-10 mt-35 bg-white sm:border sm:border-gray-200 rounded-lg sm:shadow-lg sm:max-h-60 overflow-y-auto text-sm mx-1 p-2 font-normal text-(--color-secondary) w-full md:w-auto">
+                    <div className={`absolute z-10 bg-white sm:border sm:border-gray-200 rounded-lg sm:shadow-lg sm:max-h-60 overflow-y-auto text-sm mx-1 p-2 font-normal text-(--color-secondary) w-full md:w-auto ${user.role === 'admin' ? 'mt-45' : 'mt-35'}`}>
+                        {user.role === 'admin' && (
+                            <a className='relative block rounded-lg p-2 px-4' href="/administracion/dashboard">Dashboard</a>
+                        )}
                         <a className='relative block rounded-lg p-2 px-4' href="/profile">Mi Perfil</a>
                         <button
                             onClick={handleLogout}

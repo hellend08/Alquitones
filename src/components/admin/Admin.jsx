@@ -11,7 +11,7 @@ const Dashboard = () => (
     <div className={styles.dashboardContent}>
         <div className={styles.placeholderContainer}>
             <img
-                src="/src/assets/no-disponible.jpg"
+                src="https://alquitones.s3.us-east-2.amazonaws.com/no-disponible.jpg"
                 alt="No disponible"
                 className={styles.placeholderImage}
             />
@@ -80,7 +80,7 @@ const Instruments = () => {
         const imagesAdj = fileInput.files;
 
         // Validación de imágenes SOLO para creación
-        if (modalMode === 'create' && (images.length < 1 || images.length > 5)) {
+        if (modalMode === 'create' && (images.length < 1 || images.length > 6)) {
             alert('Debes seleccionar entre 1 y 5 imágenes');
             return;
         }
@@ -575,37 +575,41 @@ const Categories = () => {
     };
 
     // Iconos específicos para categorías de instrumentos musicales
-    const categoryIcons = [
-        // Instrumentos de cuerda
-        { value: 'fa-guitar', label: 'Guitarra' },
-        { value: 'fa-violin', label: 'Violín' },
-        { value: 'fa-mandolin', label: 'Mandolina' },
-        
-        // Instrumentos de viento
-        { value: 'fa-saxophone', label: 'Saxofón' },
-        { value: 'fa-trumpet', label: 'Trompeta' },
-        { value: 'fa-flute', label: 'Flauta' },
-        { value: 'fa-wind', label: 'Viento' },
-        
-        // Instrumentos de percusión
-        { value: 'fa-drum', label: 'Batería' },
-        { value: 'fa-drum-steelpan', label: 'Percusión' },
-        { value: 'fa-bells', label: 'Campanas' },
-        
-        // Instrumentos de teclado
-        { value: 'fa-piano-keyboard', label: 'Piano' },
-        { value: 'fa-keyboard', label: 'Teclado' },
-        
-        // Otros instrumentos y categorías generales
-        { value: 'fa-music', label: 'Nota musical' },
-        { value: 'fa-microphone', label: 'Micrófono' },
-        { value: 'fa-record-vinyl', label: 'Vinilo' },
-        { value: 'fa-headphones', label: 'Auriculares' },
-        { value: 'fa-volume-up', label: 'Amplificación' },
-        { value: 'fa-sliders-h', label: 'Controles' },
-        { value: 'fa-compact-disc', label: 'Disco' },
-        { value: 'fa-tags', label: 'Categorías' }
-    ];
+const categoryIcons = [
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/accordion.png', label: 'Acordeón' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/bagpipes.png', label: 'Gaita' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/banjo.png', label: 'Banjo' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/bassoon.png', label: 'Fagot' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/clarinet.png', label: 'Clarinete' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/djembe.png', label: 'Djembe' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/drum.png', label: 'Tambor' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/drum-kit.png', label: 'Batería' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/flute.png', label: 'Flauta' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/french-horn.png', label: 'Trompa' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/gong.png', label: 'Gong' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/grand-piano.png', label: 'Piano de Cola' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar.png', label: 'Guitarra' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar-bass-head.png', label: 'Bajo' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar-head.png', label: 'Mástil de Guitarra' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/harp.png', label: 'Arpa' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/lyre.png', label: 'Lira' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/maracas.png', label: 'Maracas' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/musical-keyboard.png', label: 'Teclado' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/ocarina.png', label: 'Ocarina' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/otamatone.png', label: 'Otamatone' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pan-flute.png', label: 'Flauta de Pan' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pianist.png', label: 'Pianista' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/piano-keys.png', label: 'Teclas de Piano' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pipe-organ.png', label: 'Órgano' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/saxophone.png', label: 'Saxofón' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/tambourine.png', label: 'Pandereta' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/trombone.png', label: 'Trombón' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/trumpet.png', label: 'Trompeta' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/tuba.png', label: 'Tuba' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/violin.png', label: 'Violín' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/xylophone.png', label: 'Xilófono' },
+    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/yunluo.png', label: 'Yunluo' }
+];
 
     return (
         <div className={styles.instrumentsSection}>
@@ -668,7 +672,7 @@ const Categories = () => {
                                             onError={(e) => {
                                                 console.error(`Error loading image: ${category.icon}`);
                                                 e.target.onerror = null;
-                                                e.target.src = '/src/assets/icons/default-category.png';
+                                                e.target.src = 'https://alquitones.s3.us-east-2.amazonaws.com/yunluo.png';
                                             }}
                                         />
                                     )}
@@ -758,19 +762,33 @@ const Categories = () => {
                                 <div className={styles.iconPreview}>
                                     <p className="font-semibold text-sm text-(--color-secondary)">Vista previa:</p>
                                     <div className={styles.iconPreviewBox}>
-                                        {categoryIcons.map((icon, index) => (
-                                            <i
-                                                key={index}
-                                                className={`fas ${icon.value} fa-2x`}
-                                                title={icon.label}
-                                                style={{
-                                                    margin: '5px',
-                                                    cursor: 'pointer',
-                                                    color: '#001F3F'
-                                                }}
-                                            ></i>
-                                        ))}
-                                    </div>
+    {categoryIcons.map((icon, index) => (
+        <img
+            key={index}
+            src={icon.value}
+            alt={icon.label}
+            title={icon.label}
+            style={{
+                margin: '5px',
+                cursor: 'pointer',
+                width: '32px',
+                height: '32px',
+                background: 'transparent',
+                mixBlendMode: 'multiply'
+            }}
+            onClick={(e) => {
+                document.getElementById('icon-class').value = icon.value;
+                // Mantener la funcionalidad para resaltar el seleccionado
+                const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
+                iconPreviewContainer.querySelectorAll('img').forEach(img => {
+                    img.classList.remove(styles.selectedIcon);
+                });
+                e.target.classList.add(styles.selectedIcon);
+            }}
+            className={icon.value === (currentCategory?.icon || categoryIcons[0].value) ? styles.selectedIcon : ''}
+        />
+    ))}
+</div>
                                 </div>
                             </div>
 
@@ -1025,7 +1043,7 @@ const Specifications = () => {
                         onClick={handleAddSpecification}
                         className={styles.addButton}
                     >
-                        <i className="fas fa-plus"></i> Agregar Característica
+                        <i className="fas fa-plus"></i> Agregar Nueva
                     </button>
                 </div>
             </div>
@@ -1117,7 +1135,7 @@ const Specifications = () => {
                             &times;
                         </button>
                         <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                            {modalMode === 'create' ? 'Agregar Característica' : 'Editar Característica'}
+                            {modalMode === 'create' ? 'Agregar Nueva' : 'Editar Característica'}
                         </h3>
                         <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
@@ -1213,7 +1231,7 @@ const Rentals = () => (
     <div className={styles.rentalsContent}>
         <div className={styles.placeholderContainer}>
             <img
-                src="/src/assets/no-disponible.jpg"
+                src="https://alquitones.s3.us-east-2.amazonaws.com/no-disponible.jpg"
                 alt="No disponible"
                 className={styles.placeholderImage}
             />
