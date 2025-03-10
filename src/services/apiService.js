@@ -37,7 +37,17 @@ export const apiService = {
         }
         return instruments;
     },
-    getCategories: () => fetchData("/categories", localDB.getAllCategories()),
+    getCategories: async () => {
+        let categories = await fetchData("/categories", localDB.getAllCategories());
+        let instruments = await fetchData("/instruments", localDB.getAllProducts());
+        
+        categories = categories.map(category => ({
+            ...category,
+            productCount: instruments.filter(instrument => instrument.categoryId === category.id).length,
+        }));
+        
+        return categories;
+    },
     getInstrumentsPagined: async (page, size, searchQuery, paginated) => {
         let instrumentsPaginated = await fetchData(`/instruments/results?page=${page}&size=${size}&search=${searchQuery}&paginated=${paginated}`, localDB.getProductsPaginated(page, size, searchQuery, paginated));
         
