@@ -542,17 +542,29 @@ const Categories = () => {
     };
 
     const handleDeleteCategory = async (category) => {
-        const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar la categoría "${category.name}"?`);
-
+        // Verificar productos asociados
+        const associatedProducts = localDB.getProductsByCategory(category.id);
+        
+        const confirmationMessage = associatedProducts.length > 0 
+            ? `¿Estás seguro que deseas eliminar la categoría "${category.name}"? Esta acción eliminará permanentemente:\n\n• La categoría\n• ${associatedProducts.length} producto(s) asociado(s)\n\nEsta acción no se puede deshacer.`
+            : `¿Estás seguro que deseas eliminar la categoría "${category.name}"?`;
+    
+        const confirmDelete = window.confirm(confirmationMessage);
+    
         if (!confirmDelete) return;
-
+    
         try {
+            // Eliminar productos asociados primero
+            associatedProducts.forEach(async product => {
+                await localDB.deleteProduct(product.id);
+            });
+            
             await localDB.deleteCategory(category.id);
-            loadCategories(); // Recargar categorías después de eliminar
-            alert('Categoría eliminada exitosamente');
+            loadCategories();
+            alert('Categoría y productos asociados eliminados exitosamente');
         } catch (error) {
             console.error('Error al eliminar categoría:', error);
-            alert(error.message);
+            alert(`Error: ${error.message}`);
         }
     };
 
