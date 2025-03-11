@@ -27,14 +27,8 @@ const fetchData = async (endpoint, localFallback) => {
 
 export const apiService = {
     getInstruments: async() => {
-        let instruments = await fetchData("/instruments/random/40", localDB.getAllProducts().sort(() => Math.random() - 0.5));
+        const instruments = await fetchData("/instruments", localDB.getAllProducts().sort(() => Math.random() - 0.5));
         
-        if (instruments.length && typeof instruments[0].category === "object") {
-            instruments = instruments.map(instrument => ({
-                ...instrument,
-                categoryId: instrument.category.id,
-            }));
-        }
         return instruments;
     },
     getCategories: async () => {
@@ -56,6 +50,11 @@ export const apiService = {
             categoryId: typeof instrument.category === "object" ? instrument.category.id : instrument.categoryId,
         }));
         return instrumentsPaginated;
+    },
+    getInstrumentsByCategory: async (categoryId) => {
+        const instruments = await fetchData(`/instruments/filter?categoryId=${categoryId}`, localDB.getProductsByCategory(categoryId));
+        
+        return instruments;
     },
     addInstrument: async (instrumentData, imagesAdj) => {
         if (!(await checkBackendStatus())) {

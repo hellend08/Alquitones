@@ -16,14 +16,35 @@ const ProductCards = ({ products: propProducts }) => {
             console.log("ProductCards: Usando productos recibidos por props:", propProducts.length);
             setProducts(propProducts);
         } else {
-            const fetchData = async () => {
-                const data = await apiService.getInstruments();
-                setProducts(data);
-            };
             console.log("ProductCards: Cargando productos recomendados");
-            fetchData();
+            async () => await randomedProducts();
         }
     }, [propProducts]);
+
+    // Cargar productos aleatorios
+    const randomedProducts = async () => {
+        try {
+            const data = await apiService.getInstruments();
+            const randomProducts = data.sort(() => Math.random() - 0.5);
+            setProducts(randomProducts);
+        } catch (error) {
+            console.error("Error fetching random products:", error);
+        }
+    };
+
+    const getCategories = async () => {
+        try {
+            const categoriesDB = await apiService.getCategories();
+            setCategories(categoriesDB);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        getCategories();
+    }, []);
 
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
@@ -50,11 +71,11 @@ const ProductCards = ({ products: propProducts }) => {
                         <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
                             <img 
                                 className="h-48 w-96 mx-auto object-contain rounded-t-lg" 
-                                src={product.mainImage || product.images?.[0]} 
+                                src={product.images?.[0].url || product.mainImage} 
                                 alt={product.name} 
                                 onError={(e) => {
                                     console.log("Error cargando imagen:", e.target.src);
-                                    e.target.src = 'https://via.placeholder.com/300x200?text=Imagen+no+disponible';
+                                    e.target.src = 'https://dummyimage.com/300x200/000/fff&text=Imagen+no+disponible';
                                 }}
                             />
                             <div className="p-5 border-t border-gray-300">

@@ -14,9 +14,12 @@ const Category = ({ onFilterChange = () => { } }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await apiService.getCategories();
-            setCategories(data);
-            getAllProducts();
+            const categoriesData = await apiService.getCategories();
+            const instrumentsData = await apiService.getInstruments();
+            setCategories(categoriesData);
+            setTotalProducts(instrumentsData.length);
+            setFilteredProducts(instrumentsData);
+            // getAllProducts();
             loadFontAwesome();
         };
         fetchData();
@@ -35,42 +38,44 @@ const Category = ({ onFilterChange = () => { } }) => {
         }
     };
 
-    const getCategories = () => {
-        try {
-            const categoriesDB = localDB.data.categories;
-            const categoriesWithCounts = categoriesDB.map(category => ({
-                ...category,
-                productCount: localDB.getProductsByCategory(category.id).length
-            }));
-            setCategories(categoriesWithCounts);
-        } catch (error) {
-            console.error("Error loading categories:", error);
-        }
-    };
+    // const getCategories = () => {
+    //     try {
+    //         const categoriesDB = localDB.data.categories;
+    //         const categoriesWithCounts = categoriesDB.map(category => ({
+    //             ...category,
+    //             productCount: localDB.getProductsByCategory(category.id).length
+    //         }));
+    //         setCategories(categoriesWithCounts);
+    //     } catch (error) {
+    //         console.error("Error loading categories:", error);
+    //     }
+    // };
 
-    const getAllProducts = () => {
-        try {
-            const allProducts = localDB.getAllProducts();
-            setTotalProducts(allProducts.length);
-            setFilteredProducts(allProducts);
-        } catch (error) {
-            console.error("Error loading products:", error);
-        }
-    };
+    // const getAllProducts = () => {
+    //     try {
+    //         const allProducts = localDB.getAllProducts();
+    //         setTotalProducts(allProducts.length);
+    //         setFilteredProducts(allProducts);
+    //     } catch (error) {
+    //         console.error("Error loading products:", error);
+    //     }
+    // };
 
-    const filterProducts = () => {
+    const filterProducts = async () => {
         try {
             let filteredResults;
 
             if (selectedCategories.length === 0) {
-                filteredResults = localDB.getAllProducts();
+                filteredResults = await apiService.getInstruments();
             } else {
                 filteredResults = [];
 
-                selectedCategories.forEach(categoryId => {
-                    const productsInCategory = localDB.getProductsByCategory(Number(categoryId));
+                for (const categoryId of selectedCategories) {
+                    const productsInCategory = await apiService.getInstrumentsByCategory(categoryId);
+                    console.log("Productos en categoría", productsInCategory);
+                    
                     filteredResults = [...filteredResults, ...productsInCategory];
-                });
+                }
 
                 // Remove duplicates
                 filteredResults = [...new Set(filteredResults)];
