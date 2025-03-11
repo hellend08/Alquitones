@@ -424,6 +424,8 @@ const Categories = () => {
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+    // Add this with your other state variables at the top of the component
+const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
 
     useEffect(() => {
         loadCategories();
@@ -553,34 +555,34 @@ const Categories = () => {
     // Agregar esta nueva función para procesar la eliminación confirmada:
     const confirmDeleteCategory = async () => {
         if (!categoryToDelete) return;
-        
+
         try {
             // Obtener productos asociados
             const associatedProducts = localDB.getProductsByCategory(categoryToDelete.id);
-            
+
             // Eliminar productos asociados primero
             associatedProducts.forEach(async product => {
                 await localDB.deleteProduct(product.id);
             });
-            
+
             // Eliminar la categoría
             await localDB.deleteCategory(categoryToDelete.id);
-            
+
             // Actualizar la lista de categorías
             loadCategories();
-            
+
             // Cerrar el modal de eliminación
             setDeleteModalOpen(false);
-            
+
             // Mostrar mensaje de éxito
             setSuccessMessage('Categoría y productos asociados eliminados exitosamente');
             setSuccessModalOpen(true);
-            
+
             // Limpiar el estado
             setCategoryToDelete(null);
         } catch (error) {
             console.error('Error al eliminar categoría:', error);
-            
+
             // También podríamos usar un popup para errores
             alert(`Error: ${error.message}`);
         }
@@ -889,6 +891,24 @@ const Categories = () => {
                                 );
                             })()}
 
+                            {/* Nuevo campo para confirmar la eliminación */}
+                            <div className="flex flex-col gap-2 mt-2">
+                                <label className="font-semibold text-sm text-gray-700">
+                                    Para eliminar definitivamente la categoría, escribe: "eliminar categoría {categoryToDelete.name}"
+                                </label>
+                                <input
+                                    type="text"
+                                    id="delete-confirmation"
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Escribe el texto de confirmación"
+                                    onChange={(e) => {
+                                        const confirmText = `eliminar categoría ${categoryToDelete.name}`.toLowerCase();
+                                        const inputText = e.target.value.toLowerCase();
+                                        setDeleteConfirmationValid(confirmText === inputText);
+                                    }}
+                                />
+                            </div>
+
                             <div className={styles.formActions}>
                                 <button
                                     type="button"
@@ -901,9 +921,18 @@ const Categories = () => {
                                     Cancelar
                                 </button>
                                 <button
+                                    id="delete-button"
                                     type="button"
-                                    onClick={confirmDeleteCategory}
-                                    className="bg-red-600 hover:bg-red-700 w-[110px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200"
+                                    onClick={() => {
+                                        if (deleteConfirmationValid) {
+                                            confirmDeleteCategory();
+                                        }
+                                    }}
+                                    disabled={!deleteConfirmationValid}
+                                    className={`w-[110px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200 ${deleteConfirmationValid
+                                            ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                                            : 'bg-gray-400 cursor-not-allowed'
+                                        }`}
                                 >
                                     Eliminar
                                 </button>
@@ -913,31 +942,31 @@ const Categories = () => {
                 </div>
             )}
             {successModalOpen && (
-    <div className={styles.modal}>
-        <div className={`${styles.modalContent} max-w-md`}>
-            <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                Operación Exitosa
-            </h3>
-            
-            <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex justify-center items-center h-16 w-16 rounded-full bg-green-100">
-                    <i className="fas fa-check text-green-500 text-3xl"></i>
+                <div className={styles.modal}>
+                    <div className={`${styles.modalContent} max-w-md`}>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            Operación Exitosa
+                        </h3>
+
+                        <div className="flex flex-col items-center gap-4 text-center">
+                            <div className="flex justify-center items-center h-16 w-16 rounded-full bg-green-100">
+                                <i className="fas fa-check text-green-500 text-3xl"></i>
+                            </div>
+
+                            <p className="text-gray-700">
+                                {successMessage}
+                            </p>
+
+                            <button
+                                onClick={() => setSuccessModalOpen(false)}
+                                className="bg-(--color-primary) hover:bg-(--color-secondary) w-[110px] text-white font-semibold py-1 px-4 rounded shadow-sm transition-colors duration-200 mt-2"
+                            >
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                
-                <p className="text-gray-700">
-                    {successMessage}
-                </p>
-                
-                <button
-                    onClick={() => setSuccessModalOpen(false)}
-                    className="bg-(--color-primary) hover:bg-(--color-secondary) w-[110px] text-white font-semibold py-1 px-4 rounded shadow-sm transition-colors duration-200 mt-2"
-                >
-                    Aceptar
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+            )}
         </div>
     );
 };
