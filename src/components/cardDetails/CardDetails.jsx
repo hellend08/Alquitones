@@ -3,28 +3,37 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { localDB } from '../../database/LocalDB';
 import Characteristics from './Characteristics';
 import AuthButtons from '../crossSections/AuthButtons';
+import { apiService } from '../../services/apiService';
 
 function CardDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
-    const [categories, setCategories] = useState("");
+    const [categories, setCategories] = useState([]);
     const [showGallery, setShowGallery] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const product = localDB.getProductById(parseInt(id));
-        if (product) {
-            setInstrument(product);
-            loadSuggestions(parseInt(id));
-            getCategories();
-            window.scrollTo(0, 0);
-        }
-        
-        // Verificar si el usuario está autenticado
-        const currentUser = localDB.getCurrentUser();
-        setIsAuthenticated(!!currentUser);
+        const fetchData = async () => {
+            try {
+                const product = await apiService.getInstrumentById(parseInt(id));
+                if (product) {
+                    setInstrument(product);
+                    loadSuggestions(parseInt(id));
+                    getCategories();
+                    window.scrollTo(0, 0);
+                }
+                
+                // Verificar si el usuario está autenticado
+                const currentUser = localDB.getCurrentUser();
+                setIsAuthenticated(!!currentUser);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
     }, [id]);
 
     const loadSuggestions = (currentId) => {
@@ -33,9 +42,11 @@ function CardDetails() {
         setSuggestions(allProducts.slice(0, 2));
     };
 
-    const getCategories = () => {
+    const getCategories = async () => {
         try {
-            const categoriesDB = localDB.data.categories;
+            const categoriesDB = await apiService.getCategories();
+            console.log("Categorías cargadas:", categoriesDB);
+            
             setCategories(categoriesDB);
         }
         catch (error) {

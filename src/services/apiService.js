@@ -56,7 +56,18 @@ export const apiService = {
         
         return instruments;
     },
+    getInstrumentById: async (id) => {
+        const instrument = await fetchData(`/instruments/${id}`, localDB.getProductById(id));
+        const backendAvailable = await checkBackendStatus();
+
+        if (backendAvailable) {
+            instrument.images = instrument.images.map(image => image.url);
+        }
+        
+        return instrument;
+    },
     addInstrument: async (instrumentData, imagesAdj) => {
+
         if (!(await checkBackendStatus())) {
             return localDB.createProduct(instrumentData);
         }

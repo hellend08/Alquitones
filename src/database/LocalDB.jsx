@@ -766,6 +766,8 @@ class LocalDB {
     }
 
     getProductById(id) {
+        console.log(this.data.products);
+        
         return this.data.products.find(product => product.id === id);
     }
 
