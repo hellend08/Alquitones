@@ -208,7 +208,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                     }}
                 >
                     {loading ? (
-                    // 🔹 Renderizar placeholders mientras carga
+                    // Skeleton Loader
                     [...Array(4)].map((_, index) => (
                         <div key={index} className="flex flex-col items-center p-2 min-w-48 animate-pulse">
                             <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-300 rounded-full"></div>
