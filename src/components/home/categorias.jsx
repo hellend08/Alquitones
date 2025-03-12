@@ -11,16 +11,23 @@ const Category = ({ onFilterChange = () => { } }) => {
     const [totalProducts, setTotalProducts] = useState(0);
     const [iconErrors, setIconErrors] = useState({});
     const sliderRef = useRef(null);
+    const [loading, setLoading] = useState(true); // Estado de carga
+    
 
     useEffect(() => {
         const fetchData = async () => {
-            const categoriesData = await apiService.getCategories();
-            const instrumentsData = await apiService.getInstruments();
-            setCategories(categoriesData);
-            setTotalProducts(instrumentsData.length);
-            setFilteredProducts(instrumentsData);
-            // getAllProducts();
-            loadFontAwesome();
+            try {
+                setLoading(true);
+                const categoriesData = await apiService.getCategories();
+                const instrumentsData = await apiService.getInstruments();
+                setCategories(categoriesData);
+                setTotalProducts(instrumentsData.length);
+                setFilteredProducts(instrumentsData);
+            } catch (error) {
+                console.error("Error fetching categories or instruments:", error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchData();
     }, []);
@@ -200,7 +207,15 @@ const Category = ({ onFilterChange = () => { } }) => {
                         justifyContent: 'space-between'
                     }}
                 >
-                    {categories.map((category) => (
+                    {loading ? (
+                    // 🔹 Renderizar placeholders mientras carga
+                    [...Array(4)].map((_, index) => (
+                        <div key={index} className="flex flex-col items-center p-2 min-w-48 animate-pulse">
+                            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-300 rounded-full"></div>
+                            <div className="h-4 bg-gray-400 rounded w-3/4 mt-2"></div>
+                        </div>
+                    ))
+                ) : (categories.map((category) => (
                         <div
                             key={category.id}
                             className={`flex-1 flex flex-col items-center cursor-pointer transition-all duration-200 
@@ -230,7 +245,7 @@ const Category = ({ onFilterChange = () => { } }) => {
                                 </span>
                             </div>
                         </div>
-                    ))}
+                    )))}
                 </div>
 
                 {/* Right Navigation Arrow */}

@@ -12,6 +12,7 @@ const fetchData = async (endpoint, localFallback) => {
     if (backendAvailable) {
         console.log(`>>> Obteniendo datos de ${endpoint} desde el backend...`);
         try {
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate server delay
             const response = await axios.get(`${API_BASE_URL}${endpoint}`);
             console.log(`Datos obtenidos de ${endpoint}: `, response.data);
             

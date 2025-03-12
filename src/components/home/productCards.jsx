@@ -3,32 +3,34 @@ import { apiService } from "../../services/apiService";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 
-// Modificado para aceptar productos como prop
 const ProductCards = ({ products: propProducts }) => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(true); // Estado de carga
     const productsPerPage = 10;
 
-    // Cargar productos desde props o cargar recomendados si no hay props
     useEffect(() => {
         if (propProducts && propProducts.length > 0) {
             console.log("ProductCards: Usando productos recibidos por props:", propProducts.length);
             setProducts(propProducts);
+            setLoading(false);
         } else {
             console.log("ProductCards: Cargando productos recomendados");
-            async () => await randomedProducts();
+            randomedProducts();
         }
     }, [propProducts]);
 
-    // Cargar productos aleatorios
     const randomedProducts = async () => {
         try {
+            setLoading(true);
             const data = await apiService.getInstruments();
             const randomProducts = data.sort(() => Math.random() - 0.5);
             setProducts(randomProducts);
         } catch (error) {
             console.error("Error fetching random products:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -36,11 +38,10 @@ const ProductCards = ({ products: propProducts }) => {
         try {
             const categoriesDB = await apiService.getCategories();
             setCategories(categoriesDB);
-        }
-        catch (error) {
+        } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     useEffect(() => {
         getCategories();
@@ -49,9 +50,8 @@ const ProductCards = ({ products: propProducts }) => {
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
         return category?.name || "Sin categoría";
-    }
+    };
 
-    // Lógica de paginación
     const totalPages = Math.ceil(products.length / productsPerPage);
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -64,14 +64,26 @@ const ProductCards = ({ products: propProducts }) => {
 
     return (
         <div className="flex flex-col gap-6">
-            {/* Grid de productos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {currentProducts.length > 0 ? (
+                {loading ? (
+                    // 🔹 Renderiza placeholders mientras carga
+                    [...Array(6)].map((_, index) => (
+                        <div key={index} className="bg-gray-200 animate-pulse border border-gray-300 rounded-lg shadow-sm">
+                            <div className="h-48 w-96 mx-auto bg-gray-300 rounded-t-lg"></div>
+                            <div className="p-5 border-t border-gray-300">
+                                <div className="h-6 bg-gray-400 rounded w-3/4 mb-2"></div>
+                                <div className="h-4 bg-gray-300 rounded w-1/2 mb-3"></div>
+                                <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                                <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                            </div>
+                        </div>
+                    ))
+                ) : currentProducts.length > 0 ? (
                     currentProducts.map((product) => (
                         <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
                             <img 
                                 className="h-48 w-96 mx-auto object-contain rounded-t-lg" 
-                                src={product.images?.[0].url || product.mainImage} 
+                                src={product.images?.[0]?.url || product.mainImage} 
                                 alt={product.name} 
                                 onError={(e) => {
                                     console.log("Error cargando imagen:", e.target.src);
@@ -119,7 +131,7 @@ const ProductCards = ({ products: propProducts }) => {
                 )}
             </div>
 
-            {/* Controles de paginación (solo mostrar si hay productos) */}
+            {/* Controles de paginación */}
             {currentProducts.length > 0 && (
                 <div className="flex justify-center items-center gap-2 mt-4 mb-8">
                     <button
@@ -160,7 +172,6 @@ const ProductCards = ({ products: propProducts }) => {
     );
 };
 
-// Añadir propTypes para validar las props
 ProductCards.propTypes = {
     products: PropTypes.array
 };
