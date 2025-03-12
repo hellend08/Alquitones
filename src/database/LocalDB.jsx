@@ -4,10 +4,10 @@ class LocalDB {
         this.data = {
             // En LocalDB.jsx, actualiza categories:
             categories: [
-                { id: 1, name: 'Cuerdas', icon: '/src/assets/icons/guitar.png', description: 'Instrumentos de cuerda' },
-                { id: 2, name: 'Viento', icon: '/src/assets/icons/flute.png', description: 'Instrumentos de viento' },
-                { id: 3, name: 'Percusión', icon: '/src/assets/icons/drums.png', description: 'Instrumentos de percusión' },
-                { id: 4, name: 'Teclados', icon: '/src/assets/icons/piano.png', description: 'Instrumentos de teclado' }
+                { id: 1, name: 'Cuerdas', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/banjo.png', description: 'Instrumentos de cuerda' },
+                { id: 2, name: 'Viento', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/french-horn.png', description: 'Instrumentos de viento' },
+                { id: 3, name: 'Percusión', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/drum.png', description: 'Instrumentos de percusión' },
+                { id: 4, name: 'Teclados', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/piano-keys.png', description: 'Instrumentos de teclado' }
             ],
             users: [
                 {
@@ -194,7 +194,7 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/02.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/03.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/05.webp',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/06.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
@@ -771,8 +771,8 @@ class LocalDB {
 
     createProduct(productData) {
         // Modificar validación para permitir 1-5 imágenes
-        if (!productData.images || productData.images.length < 1 || productData.images.length > 5) {
-          throw new Error('El producto debe tener al menos 1 imagen');
+        if (!productData.images || productData.images.length < 1 || productData.images.length > 6) {
+          throw new Error('El producto debe tener entre 1 y 6 imágenes');
         }
       
         const newProduct = {
