@@ -198,7 +198,13 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/06.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 2 },
+                        { date: "2025-03-22", availableQuantity: 3 },
+                        { date: "2025-03-23", availableQuantity: 1 },
+                        { date: "2025-03-24", availableQuantity: 0 }
+                      ]
                 },
                 {
                     id: 2,
@@ -228,7 +234,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/3.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 1 },
+                        { date: "2025-03-22", availableQuantity: 0 },
+                        { date: "2025-03-23", availableQuantity: 0 },
+                        { date: "2025-03-24", availableQuantity: 2 }
+                      ]
                 },
                 {
                     id: 3,
@@ -258,7 +270,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/11.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-22", availableQuantity: 4 },
+                        { date: "2025-03-23", availableQuantity: 3 },
+                        { date: "2025-03-24", availableQuantity: 3 },
+                        { date: "2025-03-25", availableQuantity: 1 }
+                      ]
                 },
 
                 // VIENTO (ID: 2)
@@ -290,7 +308,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 0 },
+                        { date: "2025-03-22", availableQuantity: 0 },
+                        { date: "2025-03-23", availableQuantity: 2 },
+                        { date: "2025-03-24", availableQuantity: 3 }
+                      ]
                 },
                 {
                     id: 5,
@@ -320,7 +344,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/32.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 1 },
+                        { date: "2025-03-23", availableQuantity: 1 },
+                        { date: "2025-03-25", availableQuantity: 1 },
+                        { date: "2025-03-27", availableQuantity: 3 }
+                      ]
                 },
                 {
                     id: 6,
@@ -350,7 +380,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/41.webp',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-22", availableQuantity: 2 },
+                        { date: "2025-03-23", availableQuantity: 2 },
+                        { date: "2025-03-24", availableQuantity: 2 },
+                        { date: "2025-03-25", availableQuantity: 2 }
+                      ]
                 },
 
                 // PERCUSIÓN (ID: 3)
@@ -383,7 +419,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/50.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 3 },
+                        { date: "2025-03-22", availableQuantity: 3 },
+                        { date: "2025-03-26", availableQuantity: 3 },
+                        { date: "2025-03-27", availableQuantity: 3 }
+                      ]
                 },
                 {
                     id: 8,
@@ -414,7 +456,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/61.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-23", availableQuantity: 1 },
+                        { date: "2025-03-24", availableQuantity: 0 },
+                        { date: "2025-03-25", availableQuantity: 0 },
+                        { date: "2025-03-26", availableQuantity: 1 }
+                      ]
                 },
                 {
                     id: 9,
@@ -444,7 +492,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 2 },
+                        { date: "2025-03-22", availableQuantity: 2 },
+                        { date: "2025-03-23", availableQuantity: 2 },
+                        { date: "2025-03-24", availableQuantity: 2 }
+                      ]
                 },
 
                 // TECLADOS (ID: 4)
@@ -477,7 +531,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/81.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 1 },
+                        { date: "2025-03-22", availableQuantity: 1 },
+                        { date: "2025-03-23", availableQuantity: 0 },
+                        { date: "2025-03-28", availableQuantity: 1 }
+                      ]
                 },
                 {
                     id: 11,
@@ -508,7 +568,13 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-24", availableQuantity: 2 },
+                        { date: "2025-03-25", availableQuantity: 2 },
+                        { date: "2025-03-26", availableQuantity: 0 },
+                        { date: "2025-03-27", availableQuantity: 2 }
+                      ]
                 },
                 {
                     id: 12,
@@ -533,7 +599,13 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/115.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-21", availableQuantity: 3 },
+                        { date: "2025-03-25", availableQuantity: 3 },
+                        { date: "2025-03-28", availableQuantity: 0 },
+                        { date: "2025-03-29", availableQuantity: 3 }
+                      ]
                 }
             ]
         };
