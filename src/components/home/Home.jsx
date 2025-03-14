@@ -48,12 +48,18 @@ const Home = () => {
         if (dateRange && (dateRange.startDate || dateRange.endDate)) {
             const formatDate = (dateStr) => {
                 if (!dateStr) return null;
-                const date = new Date(dateStr);
-                return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                const [year, month, day] = dateStr.split('-').map(Number);
+                const localDate = new Date(year, month - 1, day);
+                return localDate.toLocaleDateString('es-UY', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    timeZone: 'America/Montevideo'
+                });
             };
             
             const start = dateRange.startDate ? formatDate(dateRange.startDate) : '';
-            const end = dateRange.endDate ? formatDate(dateRange.endDate) : '';
+            const end = dateRange.endDate ? formatDate(dateRange.endDate) : start;
             
             if (start && end) {
                 return `Disponibles entre ${start} y ${end}`;

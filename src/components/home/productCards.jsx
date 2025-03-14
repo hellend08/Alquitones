@@ -56,11 +56,13 @@ const ProductCards = ({ products: propProducts }) => {
 
     // Formatear fecha para mostrar
     const formatDate = (dateStr) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('es-ES', {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const localDate = new Date(year, month - 1, day);
+        return localDate.toLocaleDateString('es-UY', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric'
+            year: 'numeric',
+            timeZone: 'America/Montevideo'
         });
     };
 

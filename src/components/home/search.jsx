@@ -22,10 +22,20 @@ const SearchBar = ({ onSearch }) => {
         currentDate.setHours(0, 0, 0, 0);
         end.setHours(0, 0, 0, 0);
         
-        // Modificado para incluir la fecha final
-        while (currentDate <= end) {
-            dates.push(currentDate.toISOString().split('T')[0]);
-            currentDate.setDate(currentDate.getDate() + 1);
+        // Asegurar que las fechas de inicio y fin estén siempre incluidas
+        dates.push(startDate);
+        
+        // Si hay fecha final diferente a la inicial, incluirla
+        if (endDate && endDate !== startDate) {
+            // Añadir fechas intermedias
+            while (currentDate < end) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                const dateStr = currentDate.toISOString().split('T')[0];
+                dates.push(dateStr);
+            }
+            
+            // Asegurar que la fecha final esté incluida
+            dates.push(endDate);
         }
         
         return dates;
