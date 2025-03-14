@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
+import { apiService } from "../../services/apiService";
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
@@ -31,12 +32,12 @@ const Instruments = () => {
         loadInstruments();
     }, [searchTerm]);
 
-    const loadInstruments = () => {
+    const loadInstruments = async () => {
         try {
             // Obtener todos los productos sin paginación
-            const result = localDB.getProductsPaginated(
+            const result = await apiService.getInstrumentsPagined(
                 1,
-                Infinity, // Tamaño infinito para obtener todos
+                40, // Tamaño infinito para obtener todos
                 searchTerm,
                 false // Desactivar paginación
             );
@@ -76,6 +77,7 @@ const Instruments = () => {
         const form = e.target;
         const fileInput = document.getElementById('instrument-images');
         const images = Array.from(fileInput.files);
+        const imagesAdj = fileInput.files;
 
         // Validación de imágenes SOLO para creación
         if (modalMode === 'create' && (images.length < 1 || images.length > 6)) {
@@ -120,7 +122,7 @@ const Instruments = () => {
             };
 
             if (modalMode === 'create') {
-                await localDB.createProduct(instrumentData);
+                await apiService.addInstrument(instrumentData, imagesAdj);
                 alert('Instrumento creado con éxito');
             } else {
                 await localDB.updateProduct(currentInstrument.id, instrumentData);
@@ -215,7 +217,9 @@ const Instruments = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {instruments.map(instrument => (
+                        {instruments.map(instrument => {
+                            const status = (instrument.stock > 0 || instrument.status =='Disponible') ? 'Disponible' : 'No disponible';
+                            return (
                             <tr key={instrument.id}>
                                 <td>{instrument.id}</td>
                                 <td>
@@ -228,8 +232,8 @@ const Instruments = () => {
                                 <td>{instrument.name}</td>
                                 <td>{getProductCategory(instrument.categoryId)}</td>
                                 <td>
-                                    <span className={`${styles.statusBadge} ${styles[instrument.status.toLowerCase()]}`}>
-                                        {instrument.status}
+                                    <span className={`${styles.statusBadge} ${styles[status.toLowerCase()]}`}>
+                                        {status}
                                     </span>
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
@@ -248,7 +252,8 @@ const Instruments = () => {
                                     </button>
                                 </td>
                             </tr>
-                        ))}
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>
@@ -467,9 +472,9 @@ const Categories = () => {
         }
     }, [modalOpen]);
 
-    const loadCategories = () => {
+    const loadCategories = async () => {
         try {
-            const allCategories = localDB.getAllCategories();
+            const allCategories = await apiService.getCategories();
             let filteredCategories = allCategories;
 
             if (searchTerm) {

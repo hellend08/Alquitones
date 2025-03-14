@@ -1,13 +1,25 @@
 // search.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { localDB } from '../../database/LocalDB';
+import { apiService } from "../../services/apiService";
+
 import SearchResults from './SearchResults';
 
 const SearchBar = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showResults, setShowResults] = useState(false);
     const [searchResults, setSearchResults] = useState(null);
+    const [products, setProducts] = useState([]);
+
+      useEffect(() => {
+            const fetchData = async () => {
+                const data = await apiService.getInstruments();
+                setProducts(data);
+            };
+    
+            fetchData();
+        }, []);
+
 
     const handleSearch = (e) => {
         const newSearchTerm = e.target.value;
@@ -20,12 +32,8 @@ const SearchBar = ({ onSearch }) => {
         }
     
         try {
-            // Verificar y obtener productos con valor por defecto
-            const dbProducts = localDB.getAllProducts() || {instruments: []};
-            // Dentro de handleSearch, cambiar esta línea:
-            const allProducts = localDB.getAllProducts(); // Eliminar .instruments
-            
-            const results = allProducts.filter(product => 
+            // 
+            const results = products.filter(product => 
                 product.name.toLowerCase().includes(newSearchTerm.toLowerCase())
             );
             
