@@ -62,18 +62,37 @@ function CardDetails() {
         setSelectedDates(dates);
     };
 
-    // Calcular el precio total basado en las fechas seleccionadas
+  // Calcular el precio total basado en las fechas seleccionadas
+    // Utilizando un enfoque más preciso para el cálculo de días
     const calculateTotalPrice = () => {
         if (!selectedDates || !selectedDates.startDate || !instrument) return 0;
         
-        const start = new Date(selectedDates.startDate);
-        const end = selectedDates.endDate ? new Date(selectedDates.endDate) : start;
+        // Parsear las fechas correctamente
+        // Formato esperado: "2025-03-21"
+        const [startYear, startMonth, startDay] = selectedDates.startDate.split('-').map(Number);
         
-        // Calcular la diferencia en días
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Inclusivo
+        // Si hay fecha de fin, usarla; de lo contrario usar la fecha de inicio
+        let endYear, endMonth, endDay;
+        if (selectedDates.endDate) {
+            [endYear, endMonth, endDay] = selectedDates.endDate.split('-').map(Number);
+        } else {
+            [endYear, endMonth, endDay] = [startYear, startMonth, startDay];
+        }
         
-        return (instrument.pricePerDay * diffDays).toFixed(2);
+        // Crear objetos Date con los valores exactos (mes -1 porque en JS los meses van de 0-11)
+        const start = new Date(startYear, startMonth - 1, startDay);
+        const end = new Date(endYear, endMonth - 1, endDay);
+        
+        // Calcular días totales considerando fechas inclusivas
+        const oneDay = 24 * 60 * 60 * 1000; // milisegundos en un día
+        const diffDays = Math.round(Math.abs((end - start) / oneDay)) + 1; // +1 para incluir ambos días
+        
+        // El precio es directamente días * precio por día para el ejemplo de Uruguay
+        // Como asumimos que todas las fechas seleccionadas son válidas (el calendario no permite 
+        // seleccionar fechas no disponibles), el total es simplemente:
+        const totalPrice = instrument.pricePerDay * diffDays;
+        
+        return totalPrice.toFixed(2);
     };
 
     // Manejar el error de carga

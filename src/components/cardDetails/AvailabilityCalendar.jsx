@@ -64,36 +64,65 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
         return date >= today;
     };
 
-    // Manejar la selección de fechas
-    const handleDateClick = (date) => {
-        setCalendarError(null);
-        
-        if (!isDateSelectable(date)) {
-            return; // No permitir seleccionar fechas pasadas
-        }
-        
-        if (!isDateAvailable(date)) {
-            setCalendarError("Esta fecha no está disponible para reserva");
-            return;
-        }
-        
-        // Lógica para seleccionar rango
-        if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-            // Si no hay fecha inicial o ambas fechas ya están seleccionadas, iniciar nueva selección
-            setSelectedStartDate(date);
-            setSelectedEndDate(null);
-        } else {
-            // Si ya hay fecha inicial pero no final
-            if (date < selectedStartDate) {
-                // Si la nueva fecha es anterior a la fecha de inicio, intercambiar
-                setSelectedEndDate(selectedStartDate);
-                setSelectedStartDate(date);
-            } else {
-                setSelectedEndDate(date);
-            }
-        }
-    };
 
+// Verificar si todas las fechas en un rango están disponibles
+const isRangeAvailable = (startDate, endDate) => {
+    if (!startDate || !endDate) return true;
+    
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+        if (!isDateAvailable(currentDate)) {
+            return false;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return true;
+};
+
+// Manejar la selección de fechas
+const handleDateClick = (date) => {
+    setCalendarError(null);
+    
+    if (!isDateSelectable(date)) {
+        return; // No permitir seleccionar fechas pasadas
+    }
+    
+    if (!isDateAvailable(date)) {
+        setCalendarError("Esta fecha no está disponible para reserva");
+        return;
+    }
+    
+    // Lógica para seleccionar rango
+    if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+        // Si no hay fecha inicial o ambas fechas ya están seleccionadas, iniciar nueva selección
+        setSelectedStartDate(date);
+        setSelectedEndDate(null);
+    } else {
+        // Si ya hay fecha inicial pero no final
+        if (date < selectedStartDate) {
+            // Si la nueva fecha es anterior a la fecha de inicio, intercambiar
+            const newStart = date;
+            const newEnd = selectedStartDate;
+            
+            // Verificar si todo el rango está disponible
+            if (!isRangeAvailable(newStart, newEnd)) {
+                setCalendarError("El rango seleccionado contiene fechas no disponibles");
+                return;
+            }
+            
+            setSelectedStartDate(newStart);
+            setSelectedEndDate(newEnd);
+        } else {
+            // Verificar si todo el rango está disponible
+            if (!isRangeAvailable(selectedStartDate, date)) {
+                setCalendarError("El rango seleccionado contiene fechas no disponibles");
+                return;
+            }
+            
+            setSelectedEndDate(date);
+        }
+    }
+};
     // Efecto para notificar cuando cambia la selección
     useEffect(() => {
         if (onSelect && (selectedStartDate || selectedEndDate)) {
