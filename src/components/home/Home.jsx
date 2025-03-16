@@ -10,7 +10,7 @@ const Home = () => {
     const { instruments, loading, error } = useInstrumentState();
     const [filteredProducts, setFilteredProducts] = useState(null);
     const [categoryFiltered, setCategoryFiltered] = useState(false);
-
+    
     const handleSearch = (results) => {
         setFilteredProducts(results);
         setCategoryFiltered(false);

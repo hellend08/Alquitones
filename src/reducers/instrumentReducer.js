@@ -1,7 +1,9 @@
 export const instrumentReducer = (state, action) => {
     switch (action.type) {
         case 'GET_INSTRUMENTS':
-            return { ...state, instruments: action.payload, loading: false };
+            return { ...state, instruments: action.payload , loading: false };
+        case 'GET_INSTRUMENTS_RANDOMED':
+            return { ...state, instruments: action.payload.sort(() => Math.random() - 0.5) , loading: false };
         case 'ADD_INSTRUMENT':
             return { ...state, instruments: [...state.instruments, action.payload] };
         case 'UPDATE_INSTRUMENT':

@@ -19,7 +19,7 @@ export const InstrumentProvider = ({ children }) => {
             dispatch({ type: "SET_LOADING" });
             try {
                 const data = await apiService.getInstruments();
-                dispatch({ type: "GET_INSTRUMENTS", payload: data });
+                dispatch({ type: "GET_INSTRUMENTS_RANDOMED", payload: data });
             } catch (error) {
                 dispatch({ type: "SET_ERROR", payload: "Error al obtener instrumentos" });
             }
