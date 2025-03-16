@@ -33,13 +33,13 @@ export const apiService = {
         return instruments;
     },
     getCategories: async () => {
-        let categories = await fetchData("/categories", localDB.getAllCategories());
-        let instruments = await fetchData("/instruments", localDB.getAllProducts());
+        const categories = await fetchData("/categories", localDB.getAllCategories());
+        // let instruments = await fetchData("/instruments", localDB.getAllProducts());
         
-        categories = categories.map(category => ({
-            ...category,
-            productCount: instruments.filter(instrument => instrument.categoryId === category.id).length,
-        }));
+        // categories = categories.map(category => ({
+        //     ...category,
+        //     productCount: instruments.filter(instrument => instrument.categoryId === category.id).length,
+        // }));
         
         return categories;
     },

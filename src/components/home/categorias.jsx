@@ -1,11 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
-import { useCategoryState } from "../../context/CategoryContext";
 
-const Category = ({ onFilterChange = () => {}, products: propProducts }) => {
-    const { categories, loading: loadingCategories } = useCategoryState();
+const Category = ({ onFilterChange = () => {}, products: instruments, categories: categories, loadingCategories }) => {
     // const { instruments } = useInstrumentState();
-    const instruments = propProducts;
 
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -18,7 +15,6 @@ const Category = ({ onFilterChange = () => {}, products: propProducts }) => {
 
 const filterProducts = () => {
     if (selectedCategories.length === 0) {
-        // 🔥 Solución: Evita establecer un array vacío cuando no hay filtros activos
         setFilteredProducts(instruments.length > 0 ? instruments : null);
         onFilterChange(instruments.length > 0 ? instruments : null);
     } else {

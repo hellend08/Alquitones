@@ -1,20 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
-import { useCategoryState } from "../../context/CategoryContext";
 
-const ProductCards = ({ products: propProducts, isLoading }) => {
-    const { categories } = useCategoryState();
-    const [products, setProducts] = useState([]);
+const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 10;
-
-    useEffect(() => {
-        if (propProducts && propProducts.length > 0) {
-            console.log("ProductCards: Usando productos recibidos por props:", propProducts.length);
-            setProducts(propProducts);
-        }
-    }, [propProducts]);
 
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
