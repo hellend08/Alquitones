@@ -1,51 +1,10 @@
 import { useState, useEffect } from "react";
-import { apiService } from "../../services/apiService";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 
-const ProductCards = ({ products: propProducts }) => {
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
+const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [loading, setLoading] = useState(true); // Estado de carga
     const productsPerPage = 10;
-
-    useEffect(() => {
-        if (propProducts && propProducts.length > 0) {
-            console.log("ProductCards: Usando productos recibidos por props:", propProducts.length);
-            setProducts(propProducts);
-            setLoading(false);
-        } else {
-            console.log("ProductCards: Cargando productos recomendados");
-            randomedProducts();
-        }
-    }, [propProducts]);
-
-    const randomedProducts = async () => {
-        try {
-            setLoading(true);
-            const data = await apiService.getInstruments();
-            const randomProducts = data.sort(() => Math.random() - 0.5);
-            setProducts(randomProducts);
-        } catch (error) {
-            console.error("Error fetching random products:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const getCategories = async () => {
-        try {
-            const categoriesDB = await apiService.getCategories();
-            setCategories(categoriesDB);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    useEffect(() => {
-        getCategories();
-    }, []);
 
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
@@ -65,8 +24,8 @@ const ProductCards = ({ products: propProducts }) => {
     return (
         <div className="flex flex-col gap-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {loading ? (
-                    // 🔹 Renderiza placeholders mientras carga
+                {isLoading ? (
+                    // 🔹 Renderiza el Skeleton mientras carga
                     [...Array(6)].map((_, index) => (
                         <div key={index} className="bg-gray-200 animate-pulse border border-gray-300 rounded-lg shadow-sm">
                             <div className="h-48 w-96 mx-auto bg-gray-300 rounded-t-lg"></div>
@@ -141,11 +100,11 @@ const ProductCards = ({ products: propProducts }) => {
                         <span className="material-symbols-outlined text-sm">home</span>
                     </button>
                     <button
-                        onClick={() => paginate(1)}
+                        onClick={() => paginate(currentPage - 1)}
                         disabled={currentPage === 1}
                         className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                     >
-                        <span className="material-symbols-outlined text-sm">first_page</span>
+                        <span className="material-symbols-outlined text-sm">chevron_left</span>
                     </button>
                     
                     <span className="px-4 py-1 text-sm font-medium text-gray-700">
@@ -157,7 +116,7 @@ const ProductCards = ({ products: propProducts }) => {
                         disabled={currentPage === totalPages}
                         className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                     >
-                        <span className="material-symbols-outlined text-sm">navigate_next</span>
+                        <span className="material-symbols-outlined text-sm">chevron_right</span>
                     </button>
                     <button
                         onClick={() => paginate(totalPages)}
@@ -173,7 +132,8 @@ const ProductCards = ({ products: propProducts }) => {
 };
 
 ProductCards.propTypes = {
-    products: PropTypes.array
+    products: PropTypes.array.isRequired,
+    isLoading: PropTypes.bool.isRequired,
 };
 
 export default ProductCards;

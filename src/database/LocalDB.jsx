@@ -167,12 +167,12 @@ class LocalDB {
 
             // En el constructor de LocalDB, actualiza el array specifications:
             specifications: [
-                { id: 1, name: 'Marca', description: 'Marca del instrumento', icon: 'fa-trademark' },
-                { id: 2, name: 'Modelo', description: 'Modelo específico del instrumento', icon: 'fa-cube' },
-                { id: 3, name: 'Material', description: 'Material principal del instrumento', icon: 'fa-tree' },
-                { id: 4, name: 'Tipo', description: 'Tipo o clasificación del instrumento', icon: 'fa-shapes' },
-                { id: 5, name: 'Características técnicas', description: 'Detalles técnicos específicos', icon: 'fa-cogs' },
-                { id: 6, name: 'Accesorios', description: 'Elementos incluidos con el instrumento', icon: 'fa-plug' }
+                { id: 1, label: 'Marca', description: 'Marca del instrumento', icon: 'fa-trademark' },
+                { id: 2, label: 'Modelo', description: 'Modelo específico del instrumento', icon: 'fa-cube' },
+                { id: 3, label: 'Material', description: 'Material principal del instrumento', icon: 'fa-tree' },
+                { id: 4, label: 'Tipo', description: 'Tipo o clasificación del instrumento', icon: 'fa-shapes' },
+                { id: 5, label: 'Características técnicas', description: 'Detalles técnicos específicos', icon: 'fa-cogs' },
+                { id: 6, label: 'Accesorios', description: 'Elementos incluidos con el instrumento', icon: 'fa-plug' }
             ],
             products: [
                 // CUERDAS (ID: 1)

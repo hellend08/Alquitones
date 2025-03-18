@@ -1,24 +1,15 @@
 // search.jsx
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { apiService } from "../../services/apiService";
 
 import SearchResults from './SearchResults';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, products: products }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showResults, setShowResults] = useState(false);
     const [searchResults, setSearchResults] = useState(null);
-    const [products, setProducts] = useState([]);
 
-      useEffect(() => {
-            const fetchData = async () => {
-                const data = await apiService.getInstruments();
-                setProducts(data);
-            };
-    
-            fetchData();
-        }, []);
+
 
 
     const handleSearch = (e) => {
