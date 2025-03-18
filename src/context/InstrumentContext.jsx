@@ -8,7 +8,8 @@ const InstrumentDispatchContext = createContext();
 const initialState = { 
     instruments: [],
     loading: true, 
-    error: null 
+    error: null,
+    specifications: []
 };
 
 export const InstrumentProvider = ({ children }) => {
@@ -18,8 +19,12 @@ export const InstrumentProvider = ({ children }) => {
         const fetchInstruments = async () => {
             dispatch({ type: "SET_LOADING" });
             try {
-                const data = await apiService.getInstruments();
-                dispatch({ type: "GET_INSTRUMENTS_RANDOMED", payload: data });
+                const [instrumentsData, specificationsData] = await Promise.all([
+                    apiService.getInstruments(),
+                    apiService.getSpecifications()
+                ]);
+                dispatch({ type: "GET_INSTRUMENTS_RANDOMED", payload: instrumentsData });
+                dispatch({ type: "SET_SPECIFICATIONS", payload: specificationsData });
             } catch (error) {
                 dispatch({ type: "SET_ERROR", payload: "Error al obtener instrumentos" });
             }
@@ -27,8 +32,19 @@ export const InstrumentProvider = ({ children }) => {
         fetchInstruments();
     }, []);
 
+    const addInstrument = async (instrumentData, imagesAdj) => {
+        try {
+            const response = await apiService.addInstrument(instrumentData, imagesAdj);
+            dispatch({ type: "ADD_INSTRUMENT", payload: response.data });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al agregar instrumento" });
+            throw error;
+        }
+    };
+
     return (
-        <InstrumentStateContext.Provider value={state}>
+        <InstrumentStateContext.Provider value={{ ...state, addInstrument }}>
             <InstrumentDispatchContext.Provider value={dispatch}>
                 {children}
             </InstrumentDispatchContext.Provider>

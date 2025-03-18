@@ -22,6 +22,8 @@ export const instrumentReducer = (state, action) => {
             return { ...state, loading: true };
         case 'SET_ERROR':
             return { ...state, error: action.payload, loading: false };
+        case 'SET_SPECIFICATIONS':
+            return { ...state, specifications: action.payload };
         default:
             return state;
     }
