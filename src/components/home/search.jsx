@@ -1,13 +1,16 @@
 // search.jsx
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { localDB } from '../../database/LocalDB';
+
 import SearchResults from './SearchResults';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, products: products }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showResults, setShowResults] = useState(false);
     const [searchResults, setSearchResults] = useState(null);
+
+
+
 
     const handleSearch = (e) => {
         const newSearchTerm = e.target.value;
@@ -20,12 +23,8 @@ const SearchBar = ({ onSearch }) => {
         }
     
         try {
-            // Verificar y obtener productos con valor por defecto
-            const dbProducts = localDB.getAllProducts() || {instruments: []};
-            // Dentro de handleSearch, cambiar esta línea:
-            const allProducts = localDB.getAllProducts(); // Eliminar .instruments
-            
-            const results = allProducts.filter(product => 
+            // 
+            const results = products.filter(product => 
                 product.name.toLowerCase().includes(newSearchTerm.toLowerCase())
             );
             

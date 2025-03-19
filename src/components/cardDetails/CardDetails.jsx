@@ -3,45 +3,57 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { localDB } from '../../database/LocalDB';
 import Characteristics from './Characteristics';
 import AuthButtons from '../crossSections/AuthButtons';
+import { apiService } from '../../services/apiService';
+import { useInstrumentState } from "../../context/InstrumentContext";
+import { useCategoryState } from "../../context/CategoryContext";
 
 function CardDetails() {
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+
+        return () => {
+            document.head.removeChild(link);
+        };
+    }, []);
+    
     const { id } = useParams();
     const navigate = useNavigate();
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
-    const [categories, setCategories] = useState("");
     const [showGallery, setShowGallery] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { categories } = useCategoryState();
+    const { instruments } = useInstrumentState();
 
     useEffect(() => {
-        const product = localDB.getProductById(parseInt(id));
-        if (product) {
-            setInstrument(product);
-            loadSuggestions(parseInt(id));
-            getCategories();
-            window.scrollTo(0, 0);
-        }
-        
-        // Verificar si el usuario está autenticado
-        const currentUser = localDB.getCurrentUser();
-        setIsAuthenticated(!!currentUser);
+        const fetchData = async () => {
+            try {
+                const product = await apiService.getInstrumentById(parseInt(id));
+                if (product) {
+                    setInstrument(product);
+                    loadSuggestions(parseInt(id));
+                    window.scrollTo(0, 0);
+                }
+                
+                // Verificar si el usuario está autenticado
+                const currentUser = localDB.getCurrentUser();
+                setIsAuthenticated(!!currentUser);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
     }, [id]);
 
     const loadSuggestions = (currentId) => {
-        let allProducts = localDB.getAllProducts().filter(p => p.id !== currentId);
+        let allProducts = instruments.filter(p => p.id !== currentId);
         allProducts = allProducts.sort(() => Math.random() - 0.5);
         setSuggestions(allProducts.slice(0, 2));
     };
-
-    const getCategories = () => {
-        try {
-            const categoriesDB = localDB.data.categories;
-            setCategories(categoriesDB);
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
 
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
@@ -49,7 +61,30 @@ function CardDetails() {
     }
 
     if (!instrument) {
-        return <div className="text-center py-10">Cargando...</div>;
+        return (
+            <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
+                <div className="flex justify-between items-center mb-6 animate-pulse">
+                    <div className="h-8 bg-gray-300 rounded w-3/4"></div>
+                    <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="w-full h-96 bg-gray-300 rounded-lg"></div>
+                    <div className="grid grid-cols-2 gap-2 md:col-span-2">
+                        {[...Array(4)].map((_, index) => (
+                            <div key={index} className="w-full h-47 bg-gray-300 rounded-lg"></div>
+                        ))}
+                    </div>
+                </div>
+                <div className="mt-6 p-6 bg-white rounded-lg shadow md:flex justify-between items-start md:gap-3 animate-pulse">
+                    <div className="md:w-[70%]">
+                        <div className="h-6 bg-gray-300 rounded w-1/2 mb-4"></div>
+                        <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                        <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                    </div>
+                    <div className="h-10 bg-gray-300 rounded w-32"></div>
+                </div>
+            </div>
+        );
     }
 
     // Obtener solo las primeras 5 imágenes para la vista principal

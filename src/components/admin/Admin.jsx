@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
+import { apiService } from "../../services/apiService";
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
 import Footer from '../crossSections/footer';
+import { useInstrumentState, useInstrumentDispatch } from "../../context/InstrumentContext";
+import { useCategoryState, useCategoryDispatch } from "../../context/CategoryContext";
 
 // Dashboard component
 const Dashboard = () => (
@@ -20,39 +23,24 @@ const Dashboard = () => (
 
 // Instruments component (moved from main Admin component)
 const Instruments = () => {
-    const [instruments, setInstruments] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
+    const { instruments, loading: instrumentsLoading, addInstrument } = useInstrumentState();
+    const dispatch = useInstrumentDispatch();
 
     useEffect(() => {
-        loadInstruments();
-    }, [searchTerm]);
-
-    const loadInstruments = () => {
-        try {
-            // Obtener todos los productos sin paginación
-            const result = localDB.getProductsPaginated(
-                1,
-                Infinity, // Tamaño infinito para obtener todos
-                searchTerm,
-                false // Desactivar paginación
+        if (searchTerm) {
+            const filteredInstruments = instruments.filter(instrument =>
+                instrument.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
-
-            setInstruments(result.products);
-        } catch (error) {
-            console.error('Error al cargar instrumentos:', error);
-            alert('Error al cargar los instrumentos');
+            dispatch({ type: "SET_INSTRUMENTS", payload: filteredInstruments });
+        } else {
+            dispatch({ type: "SET_INSTRUMENTS", payload: instruments });
         }
-    };
-
-    const getProductCategory = (categoryId) => {
-        const categories = localDB.data.categories;
-        const category = categories.find(cat => cat.id === categoryId);
-        return category ? category.name : 'Sin categoría';
-    };
+    }, [searchTerm, instruments]);
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -76,6 +64,7 @@ const Instruments = () => {
         const form = e.target;
         const fileInput = document.getElementById('instrument-images');
         const images = Array.from(fileInput.files);
+        const imagesAdj = fileInput.files;
 
         // Validación de imágenes SOLO para creación
         if (modalMode === 'create' && (images.length < 1 || images.length > 6)) {
@@ -120,14 +109,14 @@ const Instruments = () => {
             };
 
             if (modalMode === 'create') {
-                await localDB.createProduct(instrumentData);
+                await addInstrument(instrumentData, imagesAdj);
                 alert('Instrumento creado con éxito');
             } else {
-                await localDB.updateProduct(currentInstrument.id, instrumentData);
+                await apiService.updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
+                dispatch({ type: "UPDATE_INSTRUMENT", payload: { id: currentInstrument.id, ...instrumentData } });
                 alert('Instrumento actualizado con éxito');
             }
 
-            loadInstruments();
             setModalOpen(false);
             setPreviews([]);
         } catch (error) {
@@ -145,10 +134,7 @@ const Instruments = () => {
 
         try {
             await localDB.deleteProduct(instrument.id);
-            // Update the local state immediately by filtering out the deleted instrument
-            setInstruments(prevInstruments =>
-                prevInstruments.filter(item => item.id !== instrument.id)
-            );
+            dispatch({ type: "DELETE_INSTRUMENT", payload: instrument.id });
             alert('Instrumento eliminado exitosamente');
         } catch (error) {
             console.error('Error al eliminar instrumento:', error);
@@ -156,15 +142,10 @@ const Instruments = () => {
         }
     };
 
-    const checkDuplicateName = (name) => {
-        const normalizedName = name.trim().toLowerCase();
-        // Permitir campo vacío en edición
-        if (modalMode === 'edit' && !normalizedName) return false;
-
-        return instruments.some(instrument =>
-            instrument.name.trim().toLowerCase() === normalizedName &&
-            (modalMode === 'create' || instrument.id !== currentInstrument?.id)
-        );
+    const getProductCategory = (categoryId) => {
+        const categories = localDB.data.categories;
+        const category = categories.find(cat => cat.id === categoryId);
+        return category ? category.name : 'Sin categoría';
     };
 
     return (
@@ -215,7 +196,9 @@ const Instruments = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {instruments.map(instrument => (
+                        {instruments.map(instrument => {
+                            const status = (instrument.stock > 0 || instrument.status =='Disponible') ? 'Disponible' : 'No disponible';
+                            return (
                             <tr key={instrument.id}>
                                 <td>{instrument.id}</td>
                                 <td>
@@ -228,8 +211,8 @@ const Instruments = () => {
                                 <td>{instrument.name}</td>
                                 <td>{getProductCategory(instrument.categoryId)}</td>
                                 <td>
-                                    <span className={`${styles.statusBadge} ${styles[instrument.status.toLowerCase()]}`}>
-                                        {instrument.status}
+                                    <span className={`${styles.statusBadge} ${styles[status.toLowerCase()]}`}>
+                                        {status}
                                     </span>
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
@@ -248,7 +231,8 @@ const Instruments = () => {
                                     </button>
                                 </td>
                             </tr>
-                        ))}
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>
@@ -409,87 +393,24 @@ const Instruments = () => {
 
 // Categories component - Solo con iconos predefinidos (sin imagen personalizada)
 const Categories = () => {
-    const [categories, setCategories] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentCategory, setCurrentCategory] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-
-    // Estados para paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 10;
+    const { categories, loading: categoriesLoading } = useCategoryState();
+    const dispatch = useCategoryDispatch();
 
     useEffect(() => {
-        loadCategories();
-    }, [searchTerm, currentPage]);
-
-    // Mantener el efecto original para manejar la selección de iconos
-    useEffect(() => {
-        if (modalOpen) {
-            const iconClassSelect = document.getElementById('icon-class');
-            const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
-
-            const updateIconPreview = () => {
-                if (!iconClassSelect || !iconPreviewContainer) return;
-                
-                const selectedIcon = iconClassSelect.value;
-                iconPreviewContainer.querySelectorAll('i').forEach(icon => {
-                    icon.classList.remove(styles.selectedIcon);
-                    if (icon.classList.contains(selectedIcon)) {
-                        icon.classList.add(styles.selectedIcon);
-                    }
-                });
-            };
-
-            const handleIconSelection = (e) => {
-                if (!iconClassSelect) return;
-                
-                if (e.target.classList.contains('fas')) {
-                    iconClassSelect.value = e.target.classList[1];
-                    updateIconPreview();
-                }
-            };
-
-            // Actualizar visibilidad inicial
-            updateIconPreview();
-
-            // Añadir event listeners
-            if (iconClassSelect) iconClassSelect.addEventListener('change', updateIconPreview);
-            if (iconPreviewContainer) iconPreviewContainer.addEventListener('click', handleIconSelection);
-
-            // Cleanup
-            return () => {
-                iconClassSelect?.removeEventListener('change', updateIconPreview);
-                iconPreviewContainer?.removeEventListener('click', handleIconSelection);
-            };
+        if (searchTerm) {
+            const filteredCategories = categories.filter(category =>
+                category.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            dispatch({ type: "SET_CATEGORIES", payload: filteredCategories });
+        } else {
+            dispatch({ type: "SET_CATEGORIES", payload: categories });
         }
-    }, [modalOpen]);
-
-    const loadCategories = () => {
-        try {
-            const allCategories = localDB.getAllCategories();
-            let filteredCategories = allCategories;
-
-            if (searchTerm) {
-                filteredCategories = allCategories.filter(category =>
-                    category.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
-
-            // Calcular paginación manualmente
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedCategories = filteredCategories.slice(startIndex, endIndex);
-
-            setCategories(paginatedCategories);
-            setTotalPages(Math.ceil(filteredCategories.length / itemsPerPage));
-        } catch (error) {
-            console.error('Error al cargar categorías:', error);
-            alert('Error al cargar las categorías');
-        }
-    };
+    }, [searchTerm, categories]);
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -526,13 +447,14 @@ const Categories = () => {
         try {
             if (modalMode === 'create') {
                 await localDB.createCategory(categoryData);
+                dispatch({ type: "ADD_CATEGORY", payload: categoryData });
                 alert('Categoría creada con éxito');
             } else {
                 await localDB.updateCategory(currentCategory.id, categoryData);
+                dispatch({ type: "UPDATE_CATEGORY", payload: { id: currentCategory.id, ...categoryData } });
                 alert('Categoría actualizada con éxito');
             }
     
-            loadCategories();
             setModalOpen(false);
             setPreviews([]);
         } catch (error) {
@@ -548,24 +470,11 @@ const Categories = () => {
 
         try {
             await localDB.deleteCategory(category.id);
-            loadCategories(); // Recargar categorías después de eliminar
+            dispatch({ type: "DELETE_CATEGORY", payload: category.id });
             alert('Categoría eliminada exitosamente');
         } catch (error) {
             console.error('Error al eliminar categoría:', error);
             alert(error.message);
-        }
-    };
-
-    // Manejadores de paginación
-    const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
         }
     };
 
