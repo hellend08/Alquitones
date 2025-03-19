@@ -10,6 +10,8 @@ const ProductCards = ({ products: propProducts }) => {
     const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [likedProducts, setLikedProducts] = useState({});
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const productsPerPage = 10;
 
     // Cargar productos desde props o cargar recomendados si no hay props
@@ -68,6 +70,39 @@ const ProductCards = ({ products: propProducts }) => {
         });
     };
 
+    useEffect(() => {
+        const savedLikes = JSON.parse(localStorage.getItem("likedProducts")) || [];
+        setLikedProducts(Array.isArray(savedLikes) ? savedLikes : []);
+
+        const currentUser = localDB.getCurrentUser();
+        setIsAuthenticated(!!currentUser);
+    }, []);
+
+    const toggleLike = (product) => {
+        setLikedProducts((prev) => {
+            const prevArray = Array.isArray(prev) ? prev : [];
+            let updatedLikes;
+    
+            // Verificar si ya está en la lista
+            const isLiked = prevArray.some((p) => p.id === product.id);
+    
+            if (isLiked) {
+                // eliminamos
+                updatedLikes = prevArray.filter((p) => p.id !== product.id);
+            } else {
+                // agregamos
+                updatedLikes = [...prevArray, product];
+            }
+    
+            localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+            return updatedLikes;
+        });
+    };
+
+    const disableLike = () => {
+        alert("Inicia Sesión para interactuar.")
+    }
+
     // Lógica de paginación
     const totalPages = Math.ceil(products.length / productsPerPage);
     const indexOfLastProduct = currentPage * productsPerPage;
@@ -90,8 +125,21 @@ const ProductCards = ({ products: propProducts }) => {
                         
                         return (
                             <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-                                <section className="p-3 border-b border-gray-300 flex justify-end">
-                                    <i className="fas fa-share cursor-pointer" onClick={() => setSelectedProduct(product)} ></i>
+                                <section className="p-3 border-b border-gray-300 flex justify-start gap-5">
+                                    {isAuthenticated ? ( 
+                                        <button 
+                                            className={`transition cursor-pointer ${likedProducts.some((p) => p.id === product.id) ? "text-red-500" : "text-(--color-secondary)"}`}
+                                            onClick={() => toggleLike(product)} 
+                                        >
+                                            <i className={`fa${likedProducts.some((p) => p.id === product.id) ? 's' : 'r'} fa-heart`}></i>
+                                        </button> ) : (
+                                        <button className="cursor-pointer" onClick={() => disableLike()}>
+                                            <i className="far fa-heart disabled:text-gray-100" ></i>
+                                        </button>
+                                    )}
+                                    <button className="cursor-pointer" onClick={() => setSelectedProduct(product)} >
+                                        <i className="fas fa-share-alt text-(--color-secondary)" ></i>
+                                    </button>
                                 </section>
                                 <Link to={`/detail/${product.id}`}>
                                     <div className="h-48 overflow-hidden">
