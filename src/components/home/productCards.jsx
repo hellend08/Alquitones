@@ -99,7 +99,7 @@ const ProductCards = ({ products: propProducts }) => {
         });
     };
 
-    const disableLike = () => {
+    const disabledLike = () => {
         alert("Inicia Sesión para interactuar.")
     }
 
@@ -133,7 +133,7 @@ const ProductCards = ({ products: propProducts }) => {
                                         >
                                             <i className={`fa${likedProducts.some((p) => p.id === product.id) ? 's' : 'r'} fa-heart`}></i>
                                         </button> ) : (
-                                        <button className="cursor-pointer" onClick={() => disableLike()}>
+                                        <button className="cursor-pointer" onClick={() => disabledLike()}>
                                             <i className="far fa-heart disabled:text-gray-100" ></i>
                                         </button>
                                     )}
