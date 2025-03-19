@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { localDB } from "../../database/LocalDB";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
+import ShareProduct from "./ShareProduct";
 
 const ProductCards = ({ products: propProducts }) => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const productsPerPage = 10;
 
     // Cargar productos desde props o cargar recomendados si no hay props
@@ -88,6 +90,9 @@ const ProductCards = ({ products: propProducts }) => {
                         
                         return (
                             <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                                <section className="p-3 border-b border-gray-300 flex justify-end">
+                                    <i className="fas fa-share cursor-pointer" onClick={() => setSelectedProduct(product)} ></i>
+                                </section>
                                 <Link to={`/detail/${product.id}`}>
                                     <div className="h-48 overflow-hidden">
                                         <img 
@@ -178,6 +183,10 @@ const ProductCards = ({ products: propProducts }) => {
                     </div>
                 )}
             </div>
+            {/* Modal de compartir */}
+            {selectedProduct && (
+                <ShareProduct product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+            )}
 
             {/* Controles de paginación (solo mostrar si hay productos) */}
             {currentProducts.length > 0 && totalPages > 1 && (
