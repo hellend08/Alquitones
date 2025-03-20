@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { localDB } from '../../database/LocalDB';
 import Characteristics from './Characteristics';
 import AvailabilityCalendar from './AvailabilityCalendar';
+import ShareProduct from '../home/ShareProduct'; // Importamos el componente ShareProduct
 
 function CardDetails() {
     const { id } = useParams();
@@ -16,6 +17,8 @@ function CardDetails() {
     const [selectedDates, setSelectedDates] = useState(null);
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     const [availabilityError, setAvailabilityError] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null); // Para compartir producto
+    const [likedProducts, setLikedProducts] = useState([]); // Para productos favoritos
 
     useEffect(() => {
         const product = localDB.getProductById(parseInt(id));
@@ -32,6 +35,10 @@ function CardDetails() {
         // Verificar si el usuario está autenticado
         const currentUser = localDB.getCurrentUser();
         setIsAuthenticated(!!currentUser);
+
+        // Cargar productos favoritos desde localStorage
+        const savedLikes = JSON.parse(localStorage.getItem("likedProducts")) || [];
+        setLikedProducts(Array.isArray(savedLikes) ? savedLikes : []);
     }, [id]);
 
     const loadSuggestions = (currentId) => {
@@ -62,7 +69,34 @@ function CardDetails() {
         setSelectedDates(dates);
     };
 
-  // Calcular el precio total basado en las fechas seleccionadas
+    // Función para alternar entre like/unlike
+    const toggleLike = (product) => {
+        setLikedProducts((prev) => {
+            const prevArray = Array.isArray(prev) ? prev : [];
+            let updatedLikes;
+    
+            // Verificar si ya está en la lista
+            const isLiked = prevArray.some((p) => p.id === product.id);
+    
+            if (isLiked) {
+                // eliminamos
+                updatedLikes = prevArray.filter((p) => p.id !== product.id);
+            } else {
+                // agregamos
+                updatedLikes = [...prevArray, product];
+            }
+    
+            localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+            return updatedLikes;
+        });
+    };
+
+    // Función para alerta cuando usuario no está autenticado
+    const disabledLike = () => {
+        alert("Inicia Sesión para interactuar.");
+    };
+
+    // Calcular el precio total basado en las fechas seleccionadas
     // Utilizando un enfoque más preciso para el cálculo de días
     const calculateTotalPrice = () => {
         if (!selectedDates || !selectedDates.startDate || !instrument) return 0;
@@ -122,15 +156,40 @@ function CardDetails() {
     // Obtener todas las imágenes para la galería
     const allImages = instrument?.images || [];
 
+    // Verificar si el producto está en favoritos
+    const isLiked = likedProducts.some((p) => p?.id === instrument?.id);
+
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-(--color-secondary)">
                     {instrument?.name} <span className="text-gray-500 text-sm">cod {instrument?.id}</span>
                 </h1>
-                <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-(--color-secondary) cursor-pointer text-2xl">
-                    <span className="material-symbols-outlined">arrow_back</span>
-                </button>
+                <div className="flex items-center gap-3">
+                    {/* Botón de Like */}
+                    {isAuthenticated ? ( 
+                        <button 
+                            className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
+                            onClick={() => toggleLike(instrument)} 
+                        >
+                            <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
+                        </button> 
+                    ) : (
+                        <button className="cursor-pointer" onClick={() => disabledLike()}>
+                            <i className="far fa-heart disabled:text-gray-100"></i>
+                        </button>
+                    )}
+                    
+                    {/* Botón de compartir */}
+                    <button className="cursor-pointer" onClick={() => setSelectedProduct(instrument)}>
+                        <i className="fas fa-share-alt text-(--color-secondary)"></i>
+                    </button>
+                    
+                    {/* Botón de volver */}
+                    <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-(--color-secondary) cursor-pointer text-2xl">
+                        <span className="material-symbols-outlined">arrow_back</span>
+                    </button>
+                </div>
             </div>
             
             {/* Vista principal - Solo 5 imágenes */}
@@ -300,6 +359,11 @@ function CardDetails() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Modal de Compartir Producto */}
+            {selectedProduct && (
+                <ShareProduct product={selectedProduct} onClose={() => setSelectedProduct(null)} />
             )}
         </div>
     );
