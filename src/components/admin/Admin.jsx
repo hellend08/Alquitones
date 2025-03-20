@@ -51,7 +51,7 @@ const Instruments = () => {
     const getProductCategory = (categoryId) => {
         const categories = localDB.data.categories;
         const category = categories.find(cat => cat.id === categoryId);
-        return category ? category.name : 'Sin categoría';
+        return category ? category.name : 'Sin categoria';
     };
 
     const handleSearch = (e) => {
@@ -208,7 +208,7 @@ const Instruments = () => {
                             <th>ID</th>
                             <th>Imagen</th>
                             <th>Nombre</th>
-                            <th>Categoría</th>
+                            <th>categoria</th>
                             <th>Estado</th>
                             <th>Precio/Día</th>
                             <th>Acciones</th>
@@ -279,13 +279,13 @@ const Instruments = () => {
                             </div>
                             <section className="flex flex-row justify-between">
                                 <div className="flex flex-col gap-2">
-                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">Categoría</label>
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">categoria</label>
                                     <select
                                         id="instrument-category"
                                         defaultValue={currentInstrument?.categoryId || ''}
                                         className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     >
-                                        <option value="">Seleccionar categoría</option>
+                                        <option value="">Seleccionar categoria</option>
                                         {localDB.data.categories.map(category => (
                                             <option className="text-gray-900" key={category.id} value={category.id}>
                                                 {category.name}
@@ -425,7 +425,7 @@ const Categories = () => {
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     // Add this with your other state variables at the top of the component
-const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
+    const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
 
     useEffect(() => {
         loadCategories();
@@ -532,10 +532,10 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
         try {
             if (modalMode === 'create') {
                 await localDB.createCategory(categoryData);
-                alert('Categoría creada con éxito');
+                alert('categoria creada con éxito');
             } else {
                 await localDB.updateCategory(currentCategory.id, categoryData);
-                alert('Categoría actualizada con éxito');
+                alert('categoria actualizada con éxito');
             }
 
             loadCategories();
@@ -565,7 +565,7 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                 await localDB.deleteProduct(product.id);
             });
 
-            // Eliminar la categoría
+            // Eliminar la categoria
             await localDB.deleteCategory(categoryToDelete.id);
 
             // Actualizar la lista de categorías
@@ -575,13 +575,13 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
             setDeleteModalOpen(false);
 
             // Mostrar mensaje de éxito
-            setSuccessMessage('Categoría y productos asociados eliminados exitosamente');
+            setSuccessMessage('categoria y productos asociados eliminados exitosamente');
             setSuccessModalOpen(true);
 
             // Limpiar el estado
             setCategoryToDelete(null);
         } catch (error) {
-            console.error('Error al eliminar categoría:', error);
+            console.error('Error al eliminar categoria:', error);
 
             // También podríamos usar un popup para errores
             alert(`Error: ${error.message}`);
@@ -667,7 +667,7 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                         onClick={handleAddCategory}
                         className={styles.addButton}
                     >
-                        <i className="fas fa-plus"></i> Agregar Categoría
+                        <i className="fas fa-plus"></i> Agregar categoria
                     </button>
                 </div>
             </div>
@@ -740,12 +740,12 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                             &times;
                         </button>
                         <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                            {modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}
+                            {modalMode === 'create' ? 'Agregar categoria' : 'Editar categoria'}
                         </h3>
                         <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
                                 <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-name">
-                                    Nombre de la Categoría
+                                    Nombre de la categoria
                                 </label>
                                 <input
                                     type="text"
@@ -861,7 +861,7 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                             <div className="flex flex-col gap-2 text-center">
                                 <i className="fas fa-exclamation-triangle text-yellow-500 text-5xl mb-2"></i>
                                 <p className="font-semibold text-lg text-(--color-secondary)">
-                                    ¿Estás seguro que deseas eliminar la categoría?
+                                    ¿Estás seguro que deseas eliminar la categoria?
                                 </p>
                                 <p className="text-base text-gray-700">
                                     <span className="font-bold">{categoryToDelete.name}</span>
@@ -877,7 +877,7 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                                             Esta acción eliminará permanentemente:
                                         </p>
                                         <ul className="list-disc pl-5 text-sm text-gray-600">
-                                            <li>La categoría</li>
+                                            <li>La categoria</li>
                                             <li>{associatedProducts.length} producto(s) asociado(s)</li>
                                         </ul>
                                         <p className="text-sm italic text-gray-500 mt-2">
@@ -891,10 +891,10 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                                 );
                             })()}
 
-                            {/* Nuevo campo para confirmar la eliminación */}
+                            {/* Campo para confirmar la eliminación */}
                             <div className="flex flex-col gap-2 mt-2">
                                 <label className="font-semibold text-sm text-gray-700">
-                                    Para eliminar definitivamente la categoría, escribe: "eliminar categoría {categoryToDelete.name}"
+                                    Para eliminar definitivamente la categoria, escribe: "eliminar categoria {categoryToDelete.name}"
                                 </label>
                                 <input
                                     type="text"
@@ -902,7 +902,7 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                                     className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     placeholder="Escribe el texto de confirmación"
                                     onChange={(e) => {
-                                        const confirmText = `eliminar categoría ${categoryToDelete.name}`.toLowerCase();
+                                        const confirmText = `eliminar categoria ${categoryToDelete.name}`.toLowerCase();
                                         const inputText = e.target.value.toLowerCase();
                                         setDeleteConfirmationValid(confirmText === inputText);
                                     }}
@@ -910,16 +910,7 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                             </div>
 
                             <div className={styles.formActions}>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setDeleteModalOpen(false);
-                                        setCategoryToDelete(null);
-                                    }}
-                                    className="border-2 border-(--color-secondary) w-[110px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
-                                >
-                                    Cancelar
-                                </button>
+                                {/* CAMBIO DE POSICIÓN: Botón de Eliminar primero (izquierda) */}
                                 <button
                                     id="delete-button"
                                     type="button"
@@ -930,11 +921,23 @@ const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
                                     }}
                                     disabled={!deleteConfirmationValid}
                                     className={`w-[110px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200 ${deleteConfirmationValid
-                                            ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
-                                            : 'bg-gray-400 cursor-not-allowed'
+                                        ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                                        : 'bg-gray-400 cursor-not-allowed'
                                         }`}
                                 >
                                     Eliminar
+                                </button>
+
+                                {/* CAMBIO DE POSICIÓN: Botón de Cancelar después (derecha) */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setDeleteModalOpen(false);
+                                        setCategoryToDelete(null);
+                                    }}
+                                    className="border-2 border-(--color-secondary) w-[110px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
+                                >
+                                    Cancelar
                                 </button>
                             </div>
                         </div>
