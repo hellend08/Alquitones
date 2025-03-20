@@ -198,7 +198,24 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/06.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-15", availableQuantity: 3 },
+  { date: "2025-03-16", availableQuantity: 2 },
+  { date: "2025-03-17", availableQuantity: 5 },
+  { date: "2025-03-18", availableQuantity: 4 },
+  { date: "2025-03-19", availableQuantity: 3 },
+  { date: "2025-03-20", availableQuantity: 2 },
+  { date: "2025-03-21", availableQuantity: 1 },
+  { date: "2025-03-27", availableQuantity: 2 },
+  { date: "2025-03-28", availableQuantity: 3 },
+  { date: "2025-03-29", availableQuantity: 4 },
+  { date: "2025-03-30", availableQuantity: 2 },
+  { date: "2025-04-05", availableQuantity: 1 },
+  { date: "2025-04-06", availableQuantity: 1 },
+  { date: "2025-04-12", availableQuantity: 2 },
+  { date: "2025-04-13", availableQuantity: 3 }
+                      ]
                 },
                 {
                     id: 2,
@@ -228,7 +245,25 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/3.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-18", availableQuantity: 2 },
+                        { date: "2025-03-19", availableQuantity: 2 },
+                        { date: "2025-03-20", availableQuantity: 2 },
+                        { date: "2025-03-21", availableQuantity: 2 },
+                        { date: "2025-03-22", availableQuantity: 2 },
+                        { date: "2025-04-01", availableQuantity: 3 },
+                        { date: "2025-04-02", availableQuantity: 3 },
+                        { date: "2025-04-03", availableQuantity: 3 },
+                        { date: "2025-04-04", availableQuantity: 3 },
+                        { date: "2025-04-05", availableQuantity: 3 },
+                        { date: "2025-04-15", availableQuantity: 1 },
+                        { date: "2025-04-16", availableQuantity: 1 },
+                        { date: "2025-04-17", availableQuantity: 1 },
+                        { date: "2025-05-01", availableQuantity: 4 },
+                        { date: "2025-05-02", availableQuantity: 4 },
+                        { date: "2025-05-03", availableQuantity: 4 }
+                      ]
                 },
                 {
                     id: 3,
@@ -258,7 +293,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/11.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-15", availableQuantity: 1 },
+                        { date: "2025-03-17", availableQuantity: 1 },
+                        { date: "2025-03-19", availableQuantity: 1 },
+                        { date: "2025-03-21", availableQuantity: 1 },
+                        { date: "2025-03-23", availableQuantity: 1 },
+                        { date: "2025-04-02", availableQuantity: 2 },
+                        { date: "2025-04-04", availableQuantity: 2 },
+                        { date: "2025-04-06", availableQuantity: 2 },
+                        { date: "2025-04-08", availableQuantity: 2 },
+                        { date: "2025-04-10", availableQuantity: 2 },
+                        { date: "2025-05-03", availableQuantity: 3 },
+                        { date: "2025-05-05", availableQuantity: 3 },
+                        { date: "2025-05-07", availableQuantity: 3 },
+                        { date: "2025-05-09", availableQuantity: 3 },
+                        { date: "2025-05-11", availableQuantity: 3 }
+                      ]
                 },
 
                 // VIENTO (ID: 2)
@@ -290,7 +342,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-25", availableQuantity: 1 },
+  { date: "2025-03-26", availableQuantity: 1 },
+  { date: "2025-03-27", availableQuantity: 1 },
+  { date: "2025-04-05", availableQuantity: 5 },
+  { date: "2025-04-06", availableQuantity: 5 },
+  { date: "2025-04-07", availableQuantity: 5 },
+  { date: "2025-04-08", availableQuantity: 5 },
+  { date: "2025-04-09", availableQuantity: 5 },
+  { date: "2025-04-15", availableQuantity: 4 },
+  { date: "2025-04-16", availableQuantity: 4 },
+  { date: "2025-04-17", availableQuantity: 4 },
+  { date: "2025-04-18", availableQuantity: 4 },
+  { date: "2025-05-10", availableQuantity: 2 },
+  { date: "2025-05-11", availableQuantity: 2 },
+  { date: "2025-05-12", availableQuantity: 2 }
+                      ]
                 },
                 {
                     id: 5,
@@ -320,7 +389,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/32.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-20", availableQuantity: 2 },
+  { date: "2025-03-21", availableQuantity: 2 },
+  { date: "2025-03-22", availableQuantity: 2 },
+  { date: "2025-04-01", availableQuantity: 3 },
+  { date: "2025-04-02", availableQuantity: 3 },
+  { date: "2025-04-03", availableQuantity: 3 },
+  { date: "2025-04-10", availableQuantity: 4 },
+  { date: "2025-04-11", availableQuantity: 4 },
+  { date: "2025-04-12", availableQuantity: 4 },
+  { date: "2025-04-20", availableQuantity: 2 },
+  { date: "2025-04-21", availableQuantity: 2 },
+  { date: "2025-04-22", availableQuantity: 2 },
+  { date: "2025-05-05", availableQuantity: 1 },
+  { date: "2025-05-06", availableQuantity: 1 },
+  { date: "2025-05-07", availableQuantity: 1 }
+                      ]
                 },
                 {
                     id: 6,
@@ -350,7 +436,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/41.webp',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-15", availableQuantity: 1 },
+  { date: "2025-03-16", availableQuantity: 1 },
+  { date: "2025-03-17", availableQuantity: 1 },
+  { date: "2025-03-18", availableQuantity: 1 },
+  { date: "2025-03-19", availableQuantity: 1 },
+  { date: "2025-04-10", availableQuantity: 1 },
+  { date: "2025-04-11", availableQuantity: 1 },
+  { date: "2025-04-12", availableQuantity: 1 },
+  { date: "2025-04-13", availableQuantity: 1 },
+  { date: "2025-04-14", availableQuantity: 1 },
+  { date: "2025-05-01", availableQuantity: 1 },
+  { date: "2025-05-02", availableQuantity: 1 },
+  { date: "2025-05-03", availableQuantity: 1 },
+  { date: "2025-05-04", availableQuantity: 1 },
+  { date: "2025-05-05", availableQuantity: 1 }
+                      ]
                 },
 
                 // PERCUSIÓN (ID: 3)
@@ -383,7 +486,25 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/50.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-22", availableQuantity: 6 },
+  { date: "2025-03-23", availableQuantity: 6 },
+  { date: "2025-03-29", availableQuantity: 6 },
+  { date: "2025-03-30", availableQuantity: 6 },
+  { date: "2025-04-05", availableQuantity: 5 },
+  { date: "2025-04-06", availableQuantity: 5 },
+  { date: "2025-04-12", availableQuantity: 5 },
+  { date: "2025-04-13", availableQuantity: 5 },
+  { date: "2025-04-19", availableQuantity: 5 },
+  { date: "2025-04-20", availableQuantity: 5 },
+  { date: "2025-05-03", availableQuantity: 4 },
+  { date: "2025-05-04", availableQuantity: 4 },
+  { date: "2025-05-10", availableQuantity: 4 },
+  { date: "2025-05-11", availableQuantity: 4 },
+  { date: "2025-05-17", availableQuantity: 4 },
+  { date: "2025-05-18", availableQuantity: 4 }
+                      ]
                 },
                 {
                     id: 8,
@@ -414,7 +535,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/61.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-18", availableQuantity: 2 },
+  { date: "2025-03-19", availableQuantity: 3 },
+  { date: "2025-03-20", availableQuantity: 4 },
+  { date: "2025-03-21", availableQuantity: 3 },
+  { date: "2025-03-22", availableQuantity: 2 },
+  { date: "2025-04-08", availableQuantity: 1 },
+  { date: "2025-04-09", availableQuantity: 2 },
+  { date: "2025-04-10", availableQuantity: 3 },
+  { date: "2025-04-11", availableQuantity: 2 },
+  { date: "2025-04-12", availableQuantity: 1 },
+  { date: "2025-05-05", availableQuantity: 5 },
+  { date: "2025-05-06", availableQuantity: 4 },
+  { date: "2025-05-07", availableQuantity: 3 },
+  { date: "2025-05-08", availableQuantity: 2 },
+  { date: "2025-05-09", availableQuantity: 1 }
+                      ]
                 },
                 {
                     id: 9,
@@ -444,7 +582,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-12", availableQuantity: 3 },
+                        { date: "2025-03-13", availableQuantity: 3 },
+                        { date: "2025-03-14", availableQuantity: 3 },
+                        { date: "2025-03-15", availableQuantity: 3 },
+                        { date: "2025-03-16", availableQuantity: 3 },
+                        { date: "2025-04-10", availableQuantity: 2 },
+                        { date: "2025-04-11", availableQuantity: 2 },
+                        { date: "2025-04-12", availableQuantity: 2 },
+                        { date: "2025-04-13", availableQuantity: 2 },
+                        { date: "2025-04-14", availableQuantity: 2 },
+                        { date: "2025-05-15", availableQuantity: 4 },
+                        { date: "2025-05-16", availableQuantity: 4 },
+                        { date: "2025-05-17", availableQuantity: 4 },
+                        { date: "2025-05-18", availableQuantity: 4 },
+                        { date: "2025-05-19", availableQuantity: 4 }
+                      ]
                 },
 
                 // TECLADOS (ID: 4)
@@ -477,7 +632,25 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/81.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-10", availableQuantity: 2 },
+                        { date: "2025-03-11", availableQuantity: 2 },
+                        { date: "2025-03-12", availableQuantity: 2 },
+                        { date: "2025-03-13", availableQuantity: 2 },
+                        { date: "2025-04-07", availableQuantity: 3 },
+                        { date: "2025-04-08", availableQuantity: 3 },
+                        { date: "2025-04-09", availableQuantity: 3 },
+                        { date: "2025-04-10", availableQuantity: 3 },
+                        { date: "2025-05-05", availableQuantity: 1 },
+                        { date: "2025-05-06", availableQuantity: 1 },
+                        { date: "2025-05-07", availableQuantity: 1 },
+                        { date: "2025-05-08", availableQuantity: 1 },
+                        { date: "2025-05-25", availableQuantity: 4 },
+                        { date: "2025-05-26", availableQuantity: 4 },
+                        { date: "2025-05-27", availableQuantity: 4 },
+                        { date: "2025-05-28", availableQuantity: 4 }
+                      ]
                 },
                 {
                     id: 11,
@@ -508,7 +681,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-05", availableQuantity: 1 },
+                        { date: "2025-03-06", availableQuantity: 1 },
+                        { date: "2025-03-07", availableQuantity: 1 },
+                        { date: "2025-03-08", availableQuantity: 1 },
+                        { date: "2025-03-09", availableQuantity: 1 },
+                        { date: "2025-04-15", availableQuantity: 2 },
+                        { date: "2025-04-16", availableQuantity: 2 },
+                        { date: "2025-04-17", availableQuantity: 2 },
+                        { date: "2025-04-18", availableQuantity: 2 },
+                        { date: "2025-04-19", availableQuantity: 2 },
+                        { date: "2025-05-10", availableQuantity: 3 },
+                        { date: "2025-05-11", availableQuantity: 3 },
+                        { date: "2025-05-12", availableQuantity: 3 },
+                        { date: "2025-05-13", availableQuantity: 3 },
+                        { date: "2025-05-14", availableQuantity: 3 }
+                      ]
                 },
                 {
                     id: 12,
@@ -533,7 +723,22 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/115.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-08", availableQuantity: 7 },
+                        { date: "2025-03-15", availableQuantity: 7 },
+                        { date: "2025-03-22", availableQuantity: 7 },
+                        { date: "2025-03-29", availableQuantity: 7 },
+                        { date: "2025-04-05", availableQuantity: 6 },
+                        { date: "2025-04-12", availableQuantity: 6 },
+                        { date: "2025-04-19", availableQuantity: 6 },
+                        { date: "2025-04-26", availableQuantity: 6 },
+                        { date: "2025-05-03", availableQuantity: 5 },
+                        { date: "2025-05-10", availableQuantity: 5 },
+                        { date: "2025-05-17", availableQuantity: 5 },
+                        { date: "2025-05-24", availableQuantity: 5 },
+                        { date: "2025-05-31", availableQuantity: 5 }
+                      ]
                 }
             ]
         };
