@@ -953,7 +953,7 @@ class LocalDB {
 
         const newSpecification = {
             id: this.data.specifications.length + 1,
-            name: specificationData.name,
+            label: specificationData.label,
             description: specificationData.description || '',
             icon: specificationData.icon || 'fa-tag' // Nuevo campo
           };
@@ -969,7 +969,7 @@ class LocalDB {
 
         // Validar nombre único
         const existingSpecification = this.data.specifications.find(
-            spec => spec.name.toLowerCase() === specificationData.name.toLowerCase() && spec.id !== id
+            spec => spec.label.toLowerCase() === specificationData.name.toLowerCase() && spec.id !== id
         );
         if (existingSpecification) {
             throw new Error('Ya existe una característica con este nombre');
@@ -978,7 +978,8 @@ class LocalDB {
         this.data.specifications[index] = {
             ...this.data.specifications[index],
             ...specificationData,
-            icon: specificationData.icon // Asegurar que se actualice el icono
+            icon: specificationData.icon, // Asegurar que se actualice el icono
+            label: specificationData.name // Actualizar el nombre de la característica
           };
 
         this.saveToStorage();

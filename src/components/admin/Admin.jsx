@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { localDB } from '../../database/LocalDB';
-import { apiService } from "../../services/apiService";
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
@@ -28,7 +27,7 @@ const Instruments = () => {
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-    const { instruments, loading: instrumentsLoading, addInstrument } = useInstrumentState();
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
     const dispatch = useInstrumentDispatch();
 
     useEffect(() => {
@@ -68,7 +67,7 @@ const Instruments = () => {
 
         // Validación de imágenes SOLO para creación
         if (modalMode === 'create' && (images.length < 1 || images.length > 6)) {
-            alert('Debes seleccionar entre 1 y 5 imágenes');
+            alert('Debes seleccionar entre 1 y 6 imágenes');
             return;
         }
 
@@ -85,7 +84,6 @@ const Instruments = () => {
                 : null;
 
             // Recopilar especificaciones
-            const specifications = localDB.getAllSpecifications();
             const productSpecifications = specifications
                 .map(spec => {
                     const value = form[`spec-${spec.id}`]?.value;
@@ -112,8 +110,9 @@ const Instruments = () => {
                 await addInstrument(instrumentData, imagesAdj);
                 alert('Instrumento creado con éxito');
             } else {
-                await apiService.updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
-                dispatch({ type: "UPDATE_INSTRUMENT", payload: { id: currentInstrument.id, ...instrumentData } });
+                await updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
+                // await apiService.updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
+                // dispatch({ type: "UPDATE_INSTRUMENT", payload: { id: currentInstrument.id, ...instrumentData } });
                 alert('Instrumento actualizado con éxito');
             }
 
@@ -133,8 +132,9 @@ const Instruments = () => {
         }
 
         try {
-            await localDB.deleteProduct(instrument.id);
-            dispatch({ type: "DELETE_INSTRUMENT", payload: instrument.id });
+            await deleteInstrument(instrument.id);
+            // await localDB.deleteProduct(instrument.id);
+            // dispatch({ type: "DELETE_INSTRUMENT", payload: instrument.id });
             alert('Instrumento eliminado exitosamente');
         } catch (error) {
             console.error('Error al eliminar instrumento:', error);
@@ -325,12 +325,12 @@ const Instruments = () => {
                                 <div className={styles.specificationsContainer}>
                                     {localDB.getAllSpecifications().map(spec => (
                                         <div key={spec.id} className="flex flex-col gap-1 bg-(--color-light) p-2 rounded-md">
-                                            <label className="font-semibold text-sm text-(--color-secondary)" htmlFor={`spec-${spec.id}`}>{spec.name}</label>
+                                            <label className="font-semibold text-sm text-(--color-secondary)" htmlFor={`spec-${spec.id}`}>{spec.label}</label>
                                             <input
                                                 type="text"
                                                 id={`spec-${spec.id}`}
                                                 name={`spec-${spec.id}`}
-                                                placeholder={`Valor para ${spec.name}`}
+                                                placeholder={`Valor para ${spec.label}`}
                                                 defaultValue={
                                                     currentInstrument?.specifications?.find(
                                                         s => s.specification.id === spec.id
@@ -974,12 +974,12 @@ const Specifications = () => {
                                     ) : (
                                         <img
                                             src={specification.icon}
-                                            alt={`Icono de ${specification.name}`}
+                                            alt={`Icono de ${specification.label}`}
                                             className={styles.productImage}
                                         />
                                     )}
                                 </td>
-                                <td>{specification.name}</td>
+                                <td>{specification.label}</td>
                                 <td>{specification.description}</td>
                                 <td>{localDB.getProductsBySpecification(specification.id).length}</td>
                                 <td className="flex items-center gap-4 h-[83.33px]">
@@ -1049,7 +1049,7 @@ const Specifications = () => {
                                 <input
                                     type="text"
                                     id="specification-name"
-                                    defaultValue={currentSpecification?.name || ''}
+                                    defaultValue={currentSpecification?.label || ''}
                                     required
                                     className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     placeholder="Ingresa un nombre"

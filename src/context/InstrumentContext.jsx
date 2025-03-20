@@ -42,9 +42,31 @@ export const InstrumentProvider = ({ children }) => {
             throw error;
         }
     };
+    const updateInstrument = async (instrumentId, instrumentData, imagesAdj) => {
+        try {
+            console.log("instrumentData", instrumentData);
+            
+            const response = await apiService.updateInstrument(instrumentId , instrumentData, imagesAdj);
+            dispatch({ type: "UPDATE_INSTRUMENT", payload: response.data });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al actualizar instrumento" });
+            throw error;
+        }
+    }
+    const deleteInstrument = async (instrumentId) => {
+        try {
+            const response = await apiService.deleteInstrument(instrumentId);
+            dispatch({ type: "DELETE_INSTRUMENT", payload: instrumentId });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al eliminar instrumento" });
+            throw error;
+        }
+    }
 
     return (
-        <InstrumentStateContext.Provider value={{ ...state, addInstrument }}>
+        <InstrumentStateContext.Provider value={{ ...state, addInstrument, updateInstrument, deleteInstrument }}>
             <InstrumentDispatchContext.Provider value={dispatch}>
                 {children}
             </InstrumentDispatchContext.Provider>

@@ -137,4 +137,11 @@ export const apiService = {
             headers: { "Content-Type": "multipart/form-data" },
         });
     },
+    deleteInstrument: async (id) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.deleteProduct(id);
+        }
+        
+        return axios.delete(`${API_BASE_URL}/instruments/${id}`);
+    },
 };
