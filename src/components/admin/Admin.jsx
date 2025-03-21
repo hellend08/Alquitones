@@ -27,8 +27,10 @@ const Instruments = () => {
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
+    const { categories, loading: categoriesLoading } = useCategoryState();
     const dispatch = useInstrumentDispatch();
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
+    
 
     useEffect(() => {
         if (searchTerm) {
@@ -40,7 +42,6 @@ const Instruments = () => {
             dispatch({ type: "SET_INSTRUMENTS", payload: instruments });
         }
     }, [searchTerm, instruments]);
-    };
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -134,8 +135,6 @@ const Instruments = () => {
 
         try {
             await deleteInstrument(instrument.id);
-            // await localDB.deleteProduct(instrument.id);
-            // dispatch({ type: "DELETE_INSTRUMENT", payload: instrument.id });
             alert('Instrumento eliminado exitosamente');
         } catch (error) {
             console.error('Error al eliminar instrumento:', error);
@@ -144,7 +143,6 @@ const Instruments = () => {
     };
 
     const getProductCategory = (categoryId) => {
-        const categories = localDB.data.categories;
         const category = categories.find(cat => cat.id === categoryId);
         return category ? category.name : 'Sin categoría';
     };
@@ -271,7 +269,7 @@ const Instruments = () => {
                                         className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     >
                                         <option value="">Seleccionar categoria</option>
-                                        {localDB.data.categories.map(category => (
+                                        {categories.map(category => (
                                             <option className="text-gray-900" key={category.id} value={category.id}>
                                                 {category.name}
                                             </option>
@@ -324,7 +322,7 @@ const Instruments = () => {
                             <div className="flex flex-col gap-2">
                                 <label className="font-semibold text-sm text-(--color-secondary)" >Características</label>
                                 <div className={styles.specificationsContainer}>
-                                    {localDB.getAllSpecifications().map(spec => (
+                                    {specifications.map(spec => (
                                         <div key={spec.id} className="flex flex-col gap-1 bg-(--color-light) p-2 rounded-md">
                                             <label className="font-semibold text-sm text-(--color-secondary)" htmlFor={`spec-${spec.id}`}>{spec.label}</label>
                                             <input
@@ -399,9 +397,15 @@ const Categories = () => {
     const [currentCategory, setCurrentCategory] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-    const { categories, loading: categoriesLoading } = useCategoryState();
     const dispatch = useCategoryDispatch();
-
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
+    const [successModalOpen, setSuccessModalOpen] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
+    const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
+    
     useEffect(() => {
         if (searchTerm) {
             const filteredCategories = categories.filter(category =>
@@ -448,12 +452,10 @@ const Categories = () => {
 
         try {
             if (modalMode === 'create') {
-                await localDB.createCategory(categoryData);
-                dispatch({ type: "ADD_CATEGORY", payload: categoryData });
+                await addCategory(categoryData);
                 alert('Categoría creada con éxito');
             } else {
-                await localDB.updateCategory(currentCategory.id, categoryData);
-                dispatch({ type: "UPDATE_CATEGORY", payload: { id: currentCategory.id, ...categoryData } });
+                await updateCategory(currentCategory.id, categoryData);
                 alert('Categoría actualizada con éxito');
             }
     
@@ -476,15 +478,15 @@ const Categories = () => {
 
         try {
             // Obtener productos asociados
-            const associatedProducts = localDB.getProductsByCategory(categoryToDelete.id);
+            const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);	
 
             // Eliminar productos asociados primero
             associatedProducts.forEach(async product => {
-                await localDB.deleteProduct(product.id);
+                await deleteProduct(product.id);
             });
 
             // Eliminar la categoria
-            await localDB.deleteCategory(categoryToDelete.id);
+            await deleteCategory(categoryToDelete.id);
 
             // Actualizar la lista de categorías
             loadCategories();
@@ -775,7 +777,7 @@ const Categories = () => {
 
                             {/* Productos asociados */}
                             {(() => {
-                                const associatedProducts = localDB.getProductsByCategory(categoryToDelete.id);
+                                const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);
                                 return associatedProducts.length > 0 ? (
                                     <div className="bg-gray-100 p-3 rounded-md">
                                         <p className="text-sm font-semibold text-gray-700 mb-2">
@@ -880,13 +882,13 @@ const Categories = () => {
 };
 
 // Specifications component - Solo eliminando imagen personalizada pero manteniendo la funcionalidad original
-const Specifications = () => {
-    const [specifications, setSpecifications] = useState([]);
+const Specifications = ( { specifications } ) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentSpecification, setCurrentSpecification] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
+
 
     // Estados para paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -941,7 +943,7 @@ const Specifications = () => {
 
     const loadSpecifications = () => {
         try {
-            const allSpecifications = localDB.getAllSpecifications();
+            const allSpecifications = specifications;
             // Verificación adicional
             if (!Array.isArray(allSpecifications)) {
                 console.error("Las especificaciones no son un array");
@@ -1625,7 +1627,9 @@ const Admin = () => {
             document.head.removeChild(link);
         };
     }, []);
-
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
+    const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
+    
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);
 
@@ -1709,7 +1713,7 @@ const Admin = () => {
                         <Routes>
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
-                            <Route path="specifications" element={<Specifications />} />
+                            <Route path="specifications" element={<Specifications specifications={specifications} />} />
                             <Route path="rentals" element={<Rentals />} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />

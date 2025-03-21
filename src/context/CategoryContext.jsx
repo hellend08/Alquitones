@@ -27,8 +27,41 @@ export const CategoryProvider = ({ children }) => {
         fetchCategories();
     }, []);
 
+    const addCategory = async (categoryData) => {
+        try {
+            const response = await apiService.addCategory(categoryData);
+            dispatch({ type: "ADD_CATEGORY", payload: response.data });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al agregar categoría" });
+            throw error;
+        }
+    };
+
+    const updateCategory = async (categoryId, categoryData) => {
+        try {
+            const response = await apiService.updateCategory(categoryId, categoryData);
+            dispatch({ type: "UPDATE_CATEGORY", payload: response.data });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al actualizar categoría" });
+            throw error;
+        }
+    };
+
+    const deleteCategory = async (categoryId) => {
+        try {
+            const response = await apiService.deleteCategory(categoryId);
+            dispatch({ type: "DELETE_CATEGORY", payload: categoryId });
+            return response;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al eliminar categoría" });
+            throw error;
+        }
+    };
+
     return (
-        <CategoryStateContext.Provider value={state}>
+        <CategoryStateContext.Provider value={ { ...state, addCategory, updateCategory, deleteCategory } }>
             <CategoryDispatchContext.Provider value={dispatch}>
                 {children}
             </CategoryDispatchContext.Provider>

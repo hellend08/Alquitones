@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import SearchBar from './search';
 import Category from './categorias';
 import ProductCards from './productCards';
@@ -12,10 +12,6 @@ const Home = () => {
     const [categoryFiltered, setCategoryFiltered] = useState(false);
     const [dateRange, setDateRange] = useState(null);
 
-    useEffect(() => {
-        const allProducts = localDB.getAllProducts();
-        setProducts(allProducts);
-    }, []);
 
     const handleSearch = (results) => {
         // Comprobar si los resultados incluyen información de fechas
@@ -30,7 +26,7 @@ const Home = () => {
     };
 
     const handleCategoryFilter = (filteredResults) => {
-        console.log("Home recibió productos filtrados:", filteredResults.length);
+        // console.log("Home recibió productos filtrados:", filteredResults.length);
         
         // Si hay un rango de fechas activo, filtrar también por fechas
         if (dateRange) {

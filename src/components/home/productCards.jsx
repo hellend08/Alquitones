@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 import ShareProduct from "./ShareProduct";
+import { localDB }  from "../../database/LocalDB";
 
 const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -115,10 +116,10 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                     <div className="h-48 overflow-hidden">
                                         <img 
                                             className="w-full h-full object-contain" 
-                                            src={product.images?.[0] || product.mainImage} 
+                                            src={product.mainImage || product.images?.[0].url} 
                                             alt={product.name} 
                                             onError={(e) => {
-                                                e.target.src = 'https://via.placeholder.com/300x200?text=Imagen+no+disponible';
+                                                e.target.src = 'https://dummyimage.com/300x200/cccccc/000000&text=Imagen+no+disponible';
                                             }}
                                         />
                                     </div>

@@ -28,6 +28,11 @@ function CardDetails() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const { categories } = useCategoryState();
     const { instruments } = useInstrumentState();
+    const [selectedDates, setSelectedDates] = useState(null);
+    const [loadingAvailability, setLoadingAvailability] = useState(true);
+    const [availabilityError, setAvailabilityError] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null); // Para compartir producto
+    const [likedProducts, setLikedProducts] = useState([]); // Para productos favoritos
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,6 +42,7 @@ function CardDetails() {
                     setInstrument(product);
                     loadSuggestions(parseInt(id));
                     window.scrollTo(0, 0);
+                    setLoadingAvailability(false);
                 }
                 
                 // Verificar si el usuario está autenticado

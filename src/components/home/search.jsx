@@ -1,6 +1,7 @@
 // SearchBar.jsx con navegación de meses mejorada
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { localDB } from '../../database/LocalDB';
 
 import SearchResults from './SearchResults';
 
