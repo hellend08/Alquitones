@@ -51,7 +51,7 @@ const Instruments = () => {
     const getProductCategory = (categoryId) => {
         const categories = localDB.data.categories;
         const category = categories.find(cat => cat.id === categoryId);
-        return category ? category.name : 'Sin categoría';
+        return category ? category.name : 'Sin categoria';
     };
 
     const handleSearch = (e) => {
@@ -208,7 +208,7 @@ const Instruments = () => {
                             <th>ID</th>
                             <th>Imagen</th>
                             <th>Nombre</th>
-                            <th>Categoría</th>
+                            <th>categoria</th>
                             <th>Estado</th>
                             <th>Precio/Día</th>
                             <th>Acciones</th>
@@ -279,13 +279,13 @@ const Instruments = () => {
                             </div>
                             <section className="flex flex-row justify-between">
                                 <div className="flex flex-col gap-2">
-                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">Categoría</label>
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">categoria</label>
                                     <select
                                         id="instrument-category"
                                         defaultValue={currentInstrument?.categoryId || ''}
                                         className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     >
-                                        <option value="">Seleccionar categoría</option>
+                                        <option value="">Seleccionar categoria</option>
                                         {localDB.data.categories.map(category => (
                                             <option className="text-gray-900" key={category.id} value={category.id}>
                                                 {category.name}
@@ -306,7 +306,7 @@ const Instruments = () => {
                                     />
                                 </div>
                             </section>
-                            
+
                             <div className="flex flex-col gap-2">
                                 <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-images">Imágenes del Instrumento</label>
                                 <input
@@ -321,7 +321,7 @@ const Instruments = () => {
                                         setPreviews(previews);
                                     }}
                                     className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
-                                    
+
                                 />
                                 {previews.length > 0 && (
                                     <div className={styles.imagePreviewContainer}>
@@ -420,6 +420,12 @@ const Categories = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
+    const [successModalOpen, setSuccessModalOpen] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    // Add this with your other state variables at the top of the component
+    const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
 
     useEffect(() => {
         loadCategories();
@@ -433,7 +439,7 @@ const Categories = () => {
 
             const updateIconPreview = () => {
                 if (!iconClassSelect || !iconPreviewContainer) return;
-                
+
                 const selectedIcon = iconClassSelect.value;
                 iconPreviewContainer.querySelectorAll('i').forEach(icon => {
                     icon.classList.remove(styles.selectedIcon);
@@ -445,7 +451,7 @@ const Categories = () => {
 
             const handleIconSelection = (e) => {
                 if (!iconClassSelect) return;
-                
+
                 if (e.target.classList.contains('fas')) {
                     iconClassSelect.value = e.target.classList[1];
                     updateIconPreview();
@@ -513,25 +519,25 @@ const Categories = () => {
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        
+
         // Obtener SOLO el icono de Font Awesome, eliminar cualquier otra opción
         const icon = form['icon-class'].value;
-    
+
         const categoryData = {
             name: form['category-name'].value,
             description: form['category-description'].value,
             icon: icon // Siempre usar el valor del select, sin considerar imágenes personalizadas
         };
-    
+
         try {
             if (modalMode === 'create') {
                 await localDB.createCategory(categoryData);
-                alert('Categoría creada con éxito');
+                alert('categoria creada con éxito');
             } else {
                 await localDB.updateCategory(currentCategory.id, categoryData);
-                alert('Categoría actualizada con éxito');
+                alert('categoria actualizada con éxito');
             }
-    
+
             loadCategories();
             setModalOpen(false);
             setPreviews([]);
@@ -541,18 +547,44 @@ const Categories = () => {
         }
     };
 
-    const handleDeleteCategory = async (category) => {
-        const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar la categoría "${category.name}"?`);
+    const handleDeleteCategory = (category) => {
+        setCategoryToDelete(category);
+        setDeleteModalOpen(true);
+    };
 
-        if (!confirmDelete) return;
+    // Agregar esta nueva función para procesar la eliminación confirmada:
+    const confirmDeleteCategory = async () => {
+        if (!categoryToDelete) return;
 
         try {
-            await localDB.deleteCategory(category.id);
-            loadCategories(); // Recargar categorías después de eliminar
-            alert('Categoría eliminada exitosamente');
+            // Obtener productos asociados
+            const associatedProducts = localDB.getProductsByCategory(categoryToDelete.id);
+
+            // Eliminar productos asociados primero
+            associatedProducts.forEach(async product => {
+                await localDB.deleteProduct(product.id);
+            });
+
+            // Eliminar la categoria
+            await localDB.deleteCategory(categoryToDelete.id);
+
+            // Actualizar la lista de categorías
+            loadCategories();
+
+            // Cerrar el modal de eliminación
+            setDeleteModalOpen(false);
+
+            // Mostrar mensaje de éxito
+            setSuccessMessage('categoria y productos asociados eliminados exitosamente');
+            setSuccessModalOpen(true);
+
+            // Limpiar el estado
+            setCategoryToDelete(null);
         } catch (error) {
-            console.error('Error al eliminar categoría:', error);
-            alert(error.message);
+            console.error('Error al eliminar categoria:', error);
+
+            // También podríamos usar un popup para errores
+            alert(`Error: ${error.message}`);
         }
     };
 
@@ -570,41 +602,41 @@ const Categories = () => {
     };
 
     // Iconos específicos para categorías de instrumentos musicales
-const categoryIcons = [
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/accordion.png', label: 'Acordeón' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/bagpipes.png', label: 'Gaita' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/banjo.png', label: 'Banjo' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/bassoon.png', label: 'Fagot' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/clarinet.png', label: 'Clarinete' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/djembe.png', label: 'Djembe' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/drum.png', label: 'Tambor' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/drum-kit.png', label: 'Batería' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/flute.png', label: 'Flauta' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/french-horn.png', label: 'Trompa' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/gong.png', label: 'Gong' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/grand-piano.png', label: 'Piano de Cola' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar.png', label: 'Guitarra' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar-bass-head.png', label: 'Bajo' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar-head.png', label: 'Mástil de Guitarra' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/harp.png', label: 'Arpa' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/lyre.png', label: 'Lira' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/maracas.png', label: 'Maracas' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/musical-keyboard.png', label: 'Teclado' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/ocarina.png', label: 'Ocarina' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/otamatone.png', label: 'Otamatone' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pan-flute.png', label: 'Flauta de Pan' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pianist.png', label: 'Pianista' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/piano-keys.png', label: 'Teclas de Piano' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pipe-organ.png', label: 'Órgano' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/saxophone.png', label: 'Saxofón' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/tambourine.png', label: 'Pandereta' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/trombone.png', label: 'Trombón' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/trumpet.png', label: 'Trompeta' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/tuba.png', label: 'Tuba' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/violin.png', label: 'Violín' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/xylophone.png', label: 'Xilófono' },
-    { value: 'https://alquitones.s3.us-east-2.amazonaws.com/yunluo.png', label: 'Yunluo' }
-];
+    const categoryIcons = [
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/accordion.png', label: 'Acordeón' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/bagpipes.png', label: 'Gaita' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/banjo.png', label: 'Banjo' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/bassoon.png', label: 'Fagot' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/clarinet.png', label: 'Clarinete' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/djembe.png', label: 'Djembe' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/drum.png', label: 'Tambor' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/drum-kit.png', label: 'Batería' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/flute.png', label: 'Flauta' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/french-horn.png', label: 'Trompa' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/gong.png', label: 'Gong' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/grand-piano.png', label: 'Piano de Cola' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar.png', label: 'Guitarra' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar-bass-head.png', label: 'Bajo' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/guitar-head.png', label: 'Mástil de Guitarra' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/harp.png', label: 'Arpa' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/lyre.png', label: 'Lira' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/maracas.png', label: 'Maracas' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/musical-keyboard.png', label: 'Teclado' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/ocarina.png', label: 'Ocarina' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/otamatone.png', label: 'Otamatone' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pan-flute.png', label: 'Flauta de Pan' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pianist.png', label: 'Pianista' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/piano-keys.png', label: 'Teclas de Piano' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/pipe-organ.png', label: 'Órgano' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/saxophone.png', label: 'Saxofón' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/tambourine.png', label: 'Pandereta' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/trombone.png', label: 'Trombón' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/trumpet.png', label: 'Trompeta' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/tuba.png', label: 'Tuba' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/violin.png', label: 'Violín' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/xylophone.png', label: 'Xilófono' },
+        { value: 'https://alquitones.s3.us-east-2.amazonaws.com/yunluo.png', label: 'Yunluo' }
+    ];
 
     return (
         <div className={styles.instrumentsSection}>
@@ -635,7 +667,7 @@ const categoryIcons = [
                         onClick={handleAddCategory}
                         className={styles.addButton}
                     >
-                        <i className="fas fa-plus"></i> Agregar Categoría
+                        <i className="fas fa-plus"></i> Agregar categoria
                     </button>
                 </div>
             </div>
@@ -708,12 +740,12 @@ const categoryIcons = [
                             &times;
                         </button>
                         <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                            {modalMode === 'create' ? 'Agregar Categoría' : 'Editar Categoría'}
+                            {modalMode === 'create' ? 'Agregar categoria' : 'Editar categoria'}
                         </h3>
                         <form onSubmit={handleModalSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
                                 <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="category-name">
-                                    Nombre de la Categoría
+                                    Nombre de la categoria
                                 </label>
                                 <input
                                     type="text"
@@ -757,33 +789,33 @@ const categoryIcons = [
                                 <div className={styles.iconPreview}>
                                     <p className="font-semibold text-sm text-(--color-secondary)">Vista previa:</p>
                                     <div className={styles.iconPreviewBox}>
-    {categoryIcons.map((icon, index) => (
-        <img
-            key={index}
-            src={icon.value}
-            alt={icon.label}
-            title={icon.label}
-            style={{
-                margin: '5px',
-                cursor: 'pointer',
-                width: '32px',
-                height: '32px',
-                background: 'transparent',
-                mixBlendMode: 'multiply'
-            }}
-            onClick={(e) => {
-                document.getElementById('icon-class').value = icon.value;
-                // Mantener la funcionalidad para resaltar el seleccionado
-                const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
-                iconPreviewContainer.querySelectorAll('img').forEach(img => {
-                    img.classList.remove(styles.selectedIcon);
-                });
-                e.target.classList.add(styles.selectedIcon);
-            }}
-            className={icon.value === (currentCategory?.icon || categoryIcons[0].value) ? styles.selectedIcon : ''}
-        />
-    ))}
-</div>
+                                        {categoryIcons.map((icon, index) => (
+                                            <img
+                                                key={index}
+                                                src={icon.value}
+                                                alt={icon.label}
+                                                title={icon.label}
+                                                style={{
+                                                    margin: '5px',
+                                                    cursor: 'pointer',
+                                                    width: '32px',
+                                                    height: '32px',
+                                                    background: 'transparent',
+                                                    mixBlendMode: 'multiply'
+                                                }}
+                                                onClick={(e) => {
+                                                    document.getElementById('icon-class').value = icon.value;
+                                                    // Mantener la funcionalidad para resaltar el seleccionado
+                                                    const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
+                                                    iconPreviewContainer.querySelectorAll('img').forEach(img => {
+                                                        img.classList.remove(styles.selectedIcon);
+                                                    });
+                                                    e.target.classList.add(styles.selectedIcon);
+                                                }}
+                                                className={icon.value === (currentCategory?.icon || categoryIcons[0].value) ? styles.selectedIcon : ''}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
@@ -806,6 +838,135 @@ const categoryIcons = [
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {deleteModalOpen && categoryToDelete && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <button
+                            onClick={() => {
+                                setDeleteModalOpen(false);
+                                setCategoryToDelete(null);
+                            }}
+                            className={styles.modalClose}
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            Confirmar Eliminación
+                        </h3>
+
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2 text-center">
+                                <i className="fas fa-exclamation-triangle text-yellow-500 text-5xl mb-2"></i>
+                                <p className="font-semibold text-lg text-(--color-secondary)">
+                                    ¿Estás seguro que deseas eliminar la categoria?
+                                </p>
+                                <p className="text-base text-gray-700">
+                                    <span className="font-bold">{categoryToDelete.name}</span>
+                                </p>
+                            </div>
+
+                            {/* Productos asociados */}
+                            {(() => {
+                                const associatedProducts = localDB.getProductsByCategory(categoryToDelete.id);
+                                return associatedProducts.length > 0 ? (
+                                    <div className="bg-gray-100 p-3 rounded-md">
+                                        <p className="text-sm font-semibold text-gray-700 mb-2">
+                                            Esta acción eliminará permanentemente:
+                                        </p>
+                                        <ul className="list-disc pl-5 text-sm text-gray-600">
+                                            <li>La categoria</li>
+                                            <li>{associatedProducts.length} producto(s) asociado(s)</li>
+                                        </ul>
+                                        <p className="text-sm italic text-gray-500 mt-2">
+                                            Esta acción no se puede deshacer.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm italic text-gray-500">
+                                        Esta acción no se puede deshacer.
+                                    </p>
+                                );
+                            })()}
+
+                            {/* Campo para confirmar la eliminación */}
+                            <div className="flex flex-col gap-2 mt-2">
+                                <label className="font-semibold text-sm text-gray-700">
+                                    Para eliminar definitivamente la categoria, escribe: "eliminar categoria {categoryToDelete.name}"
+                                </label>
+                                <input
+                                    type="text"
+                                    id="delete-confirmation"
+                                    className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
+                                    placeholder="Escribe el texto de confirmación"
+                                    onChange={(e) => {
+                                        const confirmText = `eliminar categoria ${categoryToDelete.name}`.toLowerCase();
+                                        const inputText = e.target.value.toLowerCase();
+                                        setDeleteConfirmationValid(confirmText === inputText);
+                                    }}
+                                />
+                            </div>
+
+                            <div className={styles.formActions}>
+                                {/* CAMBIO DE POSICIÓN: Botón de Eliminar primero (izquierda) */}
+                                <button
+                                    id="delete-button"
+                                    type="button"
+                                    onClick={() => {
+                                        if (deleteConfirmationValid) {
+                                            confirmDeleteCategory();
+                                        }
+                                    }}
+                                    disabled={!deleteConfirmationValid}
+                                    className={`w-[110px] text-white font-semibold py-1 rounded shadow-sm transition-colors duration-200 ${deleteConfirmationValid
+                                        ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                                        : 'bg-gray-400 cursor-not-allowed'
+                                        }`}
+                                >
+                                    Eliminar
+                                </button>
+
+                                {/* CAMBIO DE POSICIÓN: Botón de Cancelar después (derecha) */}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setDeleteModalOpen(false);
+                                        setCategoryToDelete(null);
+                                    }}
+                                    className="border-2 border-(--color-secondary) w-[110px] text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-1 px-4 rounded shadow-sm transition-colors duration-200"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {successModalOpen && (
+                <div className={styles.modal}>
+                    <div className={`${styles.modalContent} max-w-md`}>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            Operación Exitosa
+                        </h3>
+
+                        <div className="flex flex-col items-center gap-4 text-center">
+                            <div className="flex justify-center items-center h-16 w-16 rounded-full bg-green-100">
+                                <i className="fas fa-check text-green-500 text-3xl"></i>
+                            </div>
+
+                            <p className="text-gray-700">
+                                {successMessage}
+                            </p>
+
+                            <button
+                                onClick={() => setSuccessModalOpen(false)}
+                                className="bg-(--color-primary) hover:bg-(--color-secondary) w-[110px] text-white font-semibold py-1 px-4 rounded shadow-sm transition-colors duration-200 mt-2"
+                            >
+                                Aceptar
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -839,7 +1000,7 @@ const Specifications = () => {
 
             const updateIconPreview = () => {
                 if (!iconClassSelect || !iconPreviewContainer) return;
-                
+
                 const selectedIcon = iconClassSelect.value;
                 iconPreviewContainer.querySelectorAll('i').forEach(icon => {
                     icon.classList.remove(styles.selectedIcon);
@@ -851,7 +1012,7 @@ const Specifications = () => {
 
             const handleIconSelection = (e) => {
                 if (!iconClassSelect) return;
-                
+
                 if (e.target.classList.contains('fas')) {
                     iconClassSelect.value = e.target.classList[1];
                     updateIconPreview();
@@ -926,7 +1087,7 @@ const Specifications = () => {
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-        
+
         // Obtener el icono de Font Awesome
         const icon = form['icon-class'].value;
 
@@ -1159,7 +1320,7 @@ const Specifications = () => {
                                     placeholder="Ingresa una descripción"
                                 />
                             </div>
-                            
+
                             <div className="flex flex-col gap-2" id="font-awesome-selector">
                                 <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="icon-class">
                                     Seleccionar Icono
@@ -1243,34 +1404,34 @@ const Users = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
-    
+
     // Estados para el popup de confirmación
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [pendingRoleChange, setPendingRoleChange] = useState(null);
-    
+
     useEffect(() => {
         loadUsers();
     }, [searchTerm, currentPage]);
-    
+
     const loadUsers = () => {
         try {
             const allUsers = localDB.getAllUsers();
             console.log('Todos los usuarios:', allUsers);
-            
+
             let filteredUsers = allUsers;
-            
+
             if (searchTerm) {
-                filteredUsers = allUsers.filter(user => 
+                filteredUsers = allUsers.filter(user =>
                     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     user.email.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-            
+
             // Calcular paginación
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-            
+
             setUsers(paginatedUsers);
             setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
         } catch (error) {
@@ -1278,21 +1439,21 @@ const Users = () => {
             alert('Error al cargar los usuarios');
         }
     };
-    
+
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
     };
-    
+
     // Modificado para mostrar la confirmación
     const initiateRoleChange = (userId, newRole, currentRole) => {
         // Si no hay cambio, no hacer nada
         if (newRole === currentRole) return;
-        
+
         // Obtener información del usuario
         const user = users.find(u => u.id === userId);
         if (!user) return;
-        
+
         // Guardar la información del cambio pendiente
         setPendingRoleChange({
             userId,
@@ -1300,15 +1461,15 @@ const Users = () => {
             currentRole,
             newRole
         });
-        
+
         // Mostrar el popup de confirmación
         setShowConfirmation(true);
     };
-    
+
     // Ejecutar el cambio de rol después de la confirmación
     const executeRoleChange = async () => {
         if (!pendingRoleChange) return;
-        
+
         try {
             // Obtener el usuario actual para verificar que no se quite permisos a sí mismo
             const currentUser = localDB.getCurrentUser();
@@ -1317,21 +1478,21 @@ const Users = () => {
                 setShowConfirmation(false);
                 return;
             }
-            
+
             // Actualizar el rol del usuario
             await localDB.updateUser(pendingRoleChange.userId, { role: pendingRoleChange.newRole });
-            
+
             // Verificar explícitamente que los cambios se guardaron correctamente
             const updatedUsers = localDB.getAllUsers();
             const updatedUser = updatedUsers.find(u => u.id === pendingRoleChange.userId);
-            
+
             if (!updatedUser || updatedUser.role !== pendingRoleChange.newRole) {
                 throw new Error('Error: Los cambios no se aplicaron correctamente');
             }
-            
+
             // Forzar una actualización de localStorage
             localDB.saveToStorage();
-            
+
             // Si el usuario modificado es el actual, actualizar la sesión
             if (currentUser && currentUser.id === pendingRoleChange.userId) {
                 // Actualizar el usuario en sesión con el nuevo rol
@@ -1341,7 +1502,7 @@ const Users = () => {
                 };
                 localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
             }
-            
+
             // Recargar la lista de usuarios
             loadUsers();
             alert(`Permisos actualizados correctamente`);
@@ -1354,7 +1515,7 @@ const Users = () => {
             setPendingRoleChange(null);
         }
     };
-    
+
     // Cancelar el cambio de rol
     const cancelRoleChange = () => {
         setShowConfirmation(false);
@@ -1362,19 +1523,19 @@ const Users = () => {
         // Recargar los usuarios para restaurar los selectores
         loadUsers();
     };
-    
+
     const handlePreviousPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
-    
+
     const handleNextPage = () => {
         if (currentPage < totalPages) {
             setCurrentPage(currentPage + 1);
         }
     };
-    
+
     return (
         <div className={styles.usersSection}>
             <div className={styles.sectionHeader}>
@@ -1402,7 +1563,7 @@ const Users = () => {
                     </div>
                 </div>
             </div>
-            
+
             <div className={styles.tableContainer}>
                 <table className={styles.instrumentsTable}>
                     <thead>
@@ -1442,7 +1603,7 @@ const Users = () => {
                     </tbody>
                 </table>
             </div>
-            
+
             <div className={styles.pagination}>
                 <button
                     onClick={() => setCurrentPage(1)}
@@ -1476,7 +1637,7 @@ const Users = () => {
                     Último
                 </button>
             </div>
-            
+
             {/* Popup de confirmación */}
             {showConfirmation && pendingRoleChange && (
                 <div className={styles.modal}>
@@ -1492,40 +1653,40 @@ const Users = () => {
                         </div>
                         <div style={{ padding: '1rem' }}>
                             <p style={{ marginBottom: '1rem' }}>
-                                ¿Estás seguro de que deseas cambiar el rol de <strong>{pendingRoleChange.username}</strong> de 
-                                <strong> {pendingRoleChange.currentRole === 'admin' ? 'Administrador' : 'Cliente'}</strong> a 
+                                ¿Estás seguro de que deseas cambiar el rol de <strong>{pendingRoleChange.username}</strong> de
+                                <strong> {pendingRoleChange.currentRole === 'admin' ? 'Administrador' : 'Cliente'}</strong> a
                                 <strong> {pendingRoleChange.newRole === 'admin' ? 'Administrador' : 'Cliente'}</strong>?
                             </p>
-                            
-                            {pendingRoleChange.currentRole === 'admin' && pendingRoleChange.newRole !== 'admin' && (
-    <div style={{ 
-        backgroundColor: '#FFF3CD', 
-        color: '#856404', 
-        padding: '0.5rem', 
-        borderRadius: '4px',
-        marginBottom: '1rem'
-    }}>
-        <p style={{ fontWeight: 'bold' }}>
-            <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
-            Advertencia: Estás removiendo privilegios de administrador
-        </p>
-    </div>
-)}
 
-{pendingRoleChange.newRole === 'admin' && (
-    <div style={{ 
-        backgroundColor: '#FFF3CD', 
-        color: '#856404', 
-        padding: '0.5rem', 
-        borderRadius: '4px',
-        marginBottom: '1rem'
-    }}>
-        <p style={{ fontWeight: 'bold' }}>
-            <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
-            Advertencia: Estás otorgando acceso completo al panel de administración
-        </p>
-    </div>
-)}
+                            {pendingRoleChange.currentRole === 'admin' && pendingRoleChange.newRole !== 'admin' && (
+                                <div style={{
+                                    backgroundColor: '#FFF3CD',
+                                    color: '#856404',
+                                    padding: '0.5rem',
+                                    borderRadius: '4px',
+                                    marginBottom: '1rem'
+                                }}>
+                                    <p style={{ fontWeight: 'bold' }}>
+                                        <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
+                                        Advertencia: Estás removiendo privilegios de administrador
+                                    </p>
+                                </div>
+                            )}
+
+                            {pendingRoleChange.newRole === 'admin' && (
+                                <div style={{
+                                    backgroundColor: '#FFF3CD',
+                                    color: '#856404',
+                                    padding: '0.5rem',
+                                    borderRadius: '4px',
+                                    marginBottom: '1rem'
+                                }}>
+                                    <p style={{ fontWeight: 'bold' }}>
+                                        <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
+                                        Advertencia: Estás otorgando acceso completo al panel de administración
+                                    </p>
+                                </div>
+                            )}
                         </div>
                         <div className="flex gap-4 justify-end p-4">
                             <button
@@ -1605,7 +1766,7 @@ const Admin = () => {
                     <nav className={styles.sidebarNav}>
                         <ul>
                             <li>
-                            <Link to="/administracion/dashboard">
+                                <Link to="/administracion/dashboard">
                                     <i className="fas fa-home"></i> Dashboard
                                 </Link>
                             </li>
