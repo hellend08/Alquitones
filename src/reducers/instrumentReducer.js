@@ -24,6 +24,21 @@ export const instrumentReducer = (state, action) => {
             return { ...state, error: action.payload, loading: false };
         case 'SET_SPECIFICATIONS':
             return { ...state, specifications: action.payload };
+
+        case 'ADD_SPECIFICATION':
+            return { ...state, specifications: [...state.specifications, action.payload] };
+        case 'UPDATE_SPECIFICATION':
+            return {
+                ...state,
+                specifications: state.specifications.map(spec =>
+                    spec.id === action.payload.id ? action.payload : spec
+                ),
+            };
+        case 'DELETE_SPECIFICATION':
+            return {
+                ...state,
+                specifications: state.specifications.filter(spec => spec.id !== action.payload),
+            };
         default:
             return state;
     }

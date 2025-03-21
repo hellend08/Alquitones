@@ -63,10 +63,43 @@ export const InstrumentProvider = ({ children }) => {
             dispatch({ type: "SET_ERROR", payload: "Error al eliminar instrumento" });
             throw error;
         }
+    };
+
+    const addSpecification = async (specificationData) => {
+        try {
+            const response = await apiService.addSpecification(specificationData);
+            dispatch({ type: "ADD_SPECIFICATION", payload: response.data });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al agregar especificación" });
+            throw error;
+        }
+    };
+    
+    const updateSpecification = async (specificationId, specificationData) => {
+        try {
+            const response = await apiService.updateSpecification(specificationId, specificationData);
+            dispatch({ type: "UPDATE_SPECIFICATION", payload: response.data });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al actualizar especificación" });
+            throw error;
+        }
     }
+    const deleteSpecification = async (specificationId) => {
+        try {
+            const response = await apiService.deleteSpecification(specificationId);
+            dispatch({ type: "DELETE_SPECIFICATION", payload: specificationId });
+            return response.data;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al eliminar especificación" });
+            throw error;
+        }
+    };
+
 
     return (
-        <InstrumentStateContext.Provider value={{ ...state, addInstrument, updateInstrument, deleteInstrument }}>
+        <InstrumentStateContext.Provider value={{ ...state, addInstrument, updateInstrument, deleteInstrument, addSpecification }}>
             <InstrumentDispatchContext.Provider value={dispatch}>
                 {children}
             </InstrumentDispatchContext.Provider>

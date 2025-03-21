@@ -14,6 +14,7 @@ function CardDetails() {
         link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
         link.rel = "stylesheet";
         document.head.appendChild(link);
+        
 
         return () => {
             document.head.removeChild(link);
@@ -111,7 +112,7 @@ function CardDetails() {
         
         // Simular una nueva carga
         setTimeout(() => {
-            const product = localDB.getProductById(parseInt(id));
+            const product = instruments.find((product) => product.id === parseInt(id));
             if (product) {
                 setInstrument(product);
                 setLoadingAvailability(false);
@@ -122,7 +123,10 @@ function CardDetails() {
         }, 1000);
     };
 
-    if (!instrument && !loadingAvailability && !availabilityError) {
+    console.log("Instrumento:", instrument);
+    console.log("Error de disponibilidad:", availabilityError);
+    
+    if (!instrument && !availabilityError) {
         return (
             <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
                 <div className="flex justify-between items-center mb-6 animate-pulse">

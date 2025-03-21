@@ -403,7 +403,8 @@ const Categories = () => {
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
-    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification,
+        deleteSpecification, updateSpecification } = useInstrumentState();
     const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
     
     useEffect(() => {
@@ -613,7 +614,7 @@ const Categories = () => {
                                 </td>
                                 <td>{category.name}</td>
                                 <td>{category.description}</td>
-                                <td>{localDB.getProductsByCategory(category.id).length}</td>
+                                <td>{instruments.filter(instrument => instrument.categoryId === category.id).length}</td>
                                 <td className="flex items-center gap-4 h-[83.33px]">
                                     <button
                                         onClick={() => handleEditCategory(category)}
@@ -882,7 +883,7 @@ const Categories = () => {
 };
 
 // Specifications component - Solo eliminando imagen personalizada pero manteniendo la funcionalidad original
-const Specifications = ( { specifications } ) => {
+const Specifications = ( { instruments, specifications, addSpecification, updateSpecification, deleteSpecification } ) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentSpecification, setCurrentSpecification] = useState(null);
@@ -947,7 +948,6 @@ const Specifications = ( { specifications } ) => {
             // Verificación adicional
             if (!Array.isArray(allSpecifications)) {
                 console.error("Las especificaciones no son un array");
-                setSpecifications([]);
                 setTotalPages(1);
                 return;
             }
@@ -964,7 +964,6 @@ const Specifications = ( { specifications } ) => {
             const endIndex = startIndex + itemsPerPage;
             const paginatedSpecifications = filteredSpecifications.slice(startIndex, endIndex);
 
-            setSpecifications(paginatedSpecifications);
             setTotalPages(Math.ceil(filteredSpecifications.length / itemsPerPage));
         } catch (error) {
             console.error('Error al cargar características:', error);
@@ -1006,10 +1005,9 @@ const Specifications = ( { specifications } ) => {
 
         try {
             if (modalMode === 'create') {
-                await localDB.createSpecification(specificationData);
+                await addSpecification(specificationData);
                 alert('Característica creada con éxito');
-            } else {
-                await localDB.updateSpecification(currentSpecification.id, specificationData);
+            } else {updateSpecification(currentSpecification.id, specificationData);
                 alert('Característica actualizada con éxito');
             }
 
@@ -1028,7 +1026,7 @@ const Specifications = ( { specifications } ) => {
         if (!confirmDelete) return;
 
         try {
-            await localDB.deleteSpecification(specification.id);
+            await deleteSpecification(specification.id);
             loadSpecifications();
             alert('Característica eliminada exitosamente');
         } catch (error) {
@@ -1140,7 +1138,7 @@ const Specifications = ( { specifications } ) => {
                                 </td>
                                 <td>{specification.label}</td>
                                 <td>{specification.description}</td>
-                                <td>{localDB.getProductsBySpecification(specification.id).length}</td>
+                                <td>{instruments.filter(instrument => instrument.specifications.some(spec => spec.specification.id === specification.id)).length}</td>
                                 <td className="flex items-center gap-4 h-[83.33px]">
                                     <button
                                         onClick={() => handleEditSpecification(specification)}
@@ -1627,7 +1625,7 @@ const Admin = () => {
             document.head.removeChild(link);
         };
     }, []);
-    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification, updateSpecification, deleteSpecification } = useInstrumentState();
     const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
     
     // const navigate = useNavigate();
@@ -1713,7 +1711,7 @@ const Admin = () => {
                         <Routes>
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
-                            <Route path="specifications" element={<Specifications specifications={specifications} />} />
+                            <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
                             <Route path="rentals" element={<Rentals />} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />

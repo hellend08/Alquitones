@@ -144,4 +144,48 @@ export const apiService = {
         
         return axios.delete(`${API_BASE_URL}/instruments/${id}`);
     },
+    addCategory: async (categoryData) => {
+        if (!(await checkBackendStatus())) {
+            const newCategory = await localDB.createCategory(categoryData);
+            return { data: newCategory };
+        }
+        
+        return axios.post(`${API_BASE_URL}/categories/add`, categoryData);
+    },
+    updateCategory: async (id, categoryData) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.updateCategory(id, categoryData);
+        }
+        
+        return axios.put(`${API_BASE_URL}/categories/${id}`, categoryData);
+    },
+    deleteCategory: async (id) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.deleteCategory(id);
+        }
+        
+        return axios.delete(`${API_BASE_URL}/categories/${id}`);
+    },
+    addSpecification: async (specificationData) => {
+        if (!(await checkBackendStatus())) {
+            const newSpecification = await localDB.createSpecification(specificationData);
+            return { data: newSpecification };
+        }
+        
+        return axios.post(`${API_BASE_URL}/specifications/add`, specificationData);
+    },
+    updateSpecification: async (id, specificationData) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.updateSpecification(id, specificationData);
+        }
+        
+        return axios.put(`${API_BASE_URL}/specifications/${id}`, specificationData);
+    },
+    deleteSpecification: async (id) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.deleteSpecification(id);
+        }
+        
+        return axios.delete(`${API_BASE_URL}/specifications/${id}`);
+    },
 };

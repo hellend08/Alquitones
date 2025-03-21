@@ -10,22 +10,35 @@ const Category = ({ onFilterChange = () => {}, products: instruments, categories
     const sliderRef = useRef(null);
 
     useEffect(() => {
+        loadFontAwesome();
+    }, []);
+
+    useEffect(() => {
         filterProducts();
     }, [selectedCategories]);
 
-const filterProducts = () => {
-    if (selectedCategories.length === 0) {
-        setFilteredProducts(instruments.length > 0 ? instruments : null);
-        onFilterChange(instruments.length > 0 ? instruments : null);
-    } else {
-        const filteredResults = instruments.filter(product =>
-            selectedCategories.includes(product.categoryId)
-        );
+    const loadFontAwesome = () => {
+        if (!document.querySelector('link[href*="font-awesome"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+            document.head.appendChild(link);
+        }
+    };
+    
+    const filterProducts = () => {
+        if (selectedCategories.length === 0) {
+            setFilteredProducts(instruments.length > 0 ? instruments : null);
+            onFilterChange(instruments.length > 0 ? instruments : null);
+        } else {
+            const filteredResults = instruments.filter(product =>
+                selectedCategories.includes(product.categoryId)
+            );
 
-        setFilteredProducts(filteredResults);
-        onFilterChange(filteredResults);
-    }
-};
+            setFilteredProducts(filteredResults);
+            onFilterChange(filteredResults);
+        }
+    };
 
 
     const toggleCategorySelection = (categoryId) => {
