@@ -7,4 +7,19 @@ export default defineConfig({
   plugins: [react(),
     tailwindcss()
   ],
+<<<<<<< HEAD
 })
+=======
+  server: {
+    host: '0.0.0.0',  // Expone la app públicamente
+    port: 5173, // Usa el puerto asignado por Railway
+    strictPort: true
+  },
+  preview: {
+    host: '0.0.0.0',  // Expone el preview públicamente
+    port:  4173,
+    strictPort: true,
+    allowedHosts: ["alquitonesfront-production.up.railway.app"]
+  }
+});
+>>>>>>> parent of 9aa6a43 (Update vite.config.js)
