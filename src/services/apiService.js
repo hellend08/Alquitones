@@ -10,11 +10,10 @@ const fetchData = async (endpoint, localFallback) => {
     const backendAvailable = await checkBackendStatus();
     
     if (backendAvailable) {
-        console.log(`>>> Obteniendo datos de ${endpoint} desde el backend...`);
         try {
             await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate server delay
             const response = await axios.get(`${API_BASE_URL}${endpoint}`);
-            console.log(`Datos obtenidos de ${endpoint}: `, response.data);
+            console.log(`>>> 💻 ${endpoint}: `, response.data);
             
             return response.data;
         } catch (error) {
@@ -31,21 +30,6 @@ export const apiService = {
         const instruments = await fetchData("/instruments", localDB.getAllProducts().sort(() => Math.random() - 0.5));
         
         return instruments;
-    },
-    getCategories: async () => {
-        const categories = await fetchData("/categories", localDB.getAllCategories());
-        // let instruments = await fetchData("/instruments", localDB.getAllProducts());
-        
-        // categories = categories.map(category => ({
-        //     ...category,
-        //     productCount: instruments.filter(instrument => instrument.categoryId === category.id).length,
-        // }));
-        
-        return categories;
-    },
-    getSpecifications: async () => {
-        const specifications = await fetchData("/specifications", localDB.getAllSpecifications());
-        return specifications;
     },
     getInstrumentsPagined: async (page, size, searchQuery, paginated) => {
         let instrumentsPaginated = await fetchData(`/instruments/results?page=${page}&size=${size}&search=${searchQuery}&paginated=${paginated}`, localDB.getProductsPaginated(page, size, searchQuery, paginated));
@@ -144,6 +128,17 @@ export const apiService = {
         
         return axios.delete(`${API_BASE_URL}/instruments/${id}`);
     },
+    getCategories: async () => {
+        const categories = await fetchData("/categories", localDB.getAllCategories());
+        // let instruments = await fetchData("/instruments", localDB.getAllProducts());
+        
+        // categories = categories.map(category => ({
+        //     ...category,
+        //     productCount: instruments.filter(instrument => instrument.categoryId === category.id).length,
+        // }));
+        
+        return categories;
+    },
     addCategory: async (categoryData) => {
         if (!(await checkBackendStatus())) {
             const newCategory = await localDB.createCategory(categoryData);
@@ -166,6 +161,10 @@ export const apiService = {
         
         return axios.delete(`${API_BASE_URL}/categories/${id}`);
     },
+    getSpecifications: async () => {
+        const specifications = await fetchData("/specifications", localDB.getAllSpecifications());
+        return specifications;
+    },
     addSpecification: async (specificationData) => {
         if (!(await checkBackendStatus())) {
             const newSpecification = await localDB.createSpecification(specificationData);
@@ -187,5 +186,50 @@ export const apiService = {
         }
         
         return axios.delete(`${API_BASE_URL}/specifications/${id}`);
+    },
+    getUsers: async () => {
+        const users = await fetchData("/users", localDB.getAllUsers());
+        console.log("👥 Usuarios: ", users);
+        
+        return users;
+    },
+    updateUserRole: async (userId, newRole) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.updateUserRole(userId, newRole);
+        }
+        
+        return axios.put(`${API_BASE_URL}/users/${userId}/role?role=${newRole}`);
+    },
+    login: async (email, password) => {
+        const backendAvailable = await checkBackendStatus();
+        if (backendAvailable) {
+            try {
+                const userLogin = {
+                    email: email,
+                    password: password,
+                };
+                console.log("🔑 Autenticando usuario...");
+                
+                const response = await axios.post(`http://localhost:8080/login`, userLogin, {
+                    headers: {
+                      'Content-Type': 'application/json'
+                    }
+                  });
+                  localStorage.setItem('currentUser', JSON.stringify(response.data));
+                  console.log("currentUser", JSON.parse(localStorage.getItem('currentUser')));
+                  
+                  console.log("🔑 Usuario autenticado: ", response.data);
+                  
+                
+                console.log("🔑 Usuario autenticado: ", response.data);
+                
+                return response.data;
+            } catch (error) {
+                console.error("Error en login:", error.response?.data || error.message);
+                throw new Error(error.response?.data?.message || 'Credenciales inválidas');
+            }
+        } else {
+            return localDB.login(email, password);
+        }
     },
 };

@@ -37,9 +37,8 @@ const AuthButtons = () => {
     };
 
     const avatarName = () => {
-        const name = user.username.split(" ");
-        const firstName = name[0] ? name[0][0].toUpperCase() : "";
-        const lastName = name[1] ? name[1][0].toUpperCase() : "";
+        const firstName = user.username ? user.username[0].toUpperCase() : "";
+        const lastName = user.lastname ? user.lastname[0].toUpperCase() : "";
         return `${firstName}${lastName ? lastName : ""}`;
     }
 
@@ -58,8 +57,8 @@ const AuthButtons = () => {
                 </div>
 
                 {isOpen && (
-                    <div className={`absolute z-10 bg-white sm:border sm:border-gray-200 rounded-lg sm:shadow-lg sm:max-h-60 overflow-y-auto text-sm mx-1 p-2 font-normal text-(--color-secondary) w-full md:w-auto ${user.role === 'admin' ? 'mt-45' : 'mt-35'}`}>
-                        {user.role === 'admin' && (
+                    <div className={`absolute z-10 bg-white sm:border sm:border-gray-200 rounded-lg sm:shadow-lg sm:max-h-60 overflow-y-auto text-sm mx-1 p-2 font-normal text-(--color-secondary) w-full md:w-auto ${user.role === 'ADMIN' ? 'mt-45' : 'mt-35'}`}>
+                        {user.role === 'ADMIN' && (
                             <a className='relative block rounded-lg p-2 px-4' href="/administracion/dashboard">Dashboard</a>
                         )}
                         <a className='relative block rounded-lg p-2 px-4' href="/profile">Mi Perfil</a>

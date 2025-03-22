@@ -13,153 +13,170 @@ class LocalDB {
                 {
                     id: 1,
                     username: 'admin',
+                    lastname: 'todopoderoso',
                     email: 'admin@alquitones.com',
-                    password: 'admin123',
-                    role: 'admin',
+                    password: 'admin123456',
+                    role: 'ADMIN',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 2,
                     username: 'cliente1',
+                    lastname: 'apellido1',
                     email: 'cliente@alquitones.com',
                     password: 'cliente123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 3,
-                    username: 'mariaperez',
+                    username: 'maria',
+                    lastname: 'perez',
                     email: 'maria@ejemplo.com',
                     password: 'maria123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 4,
-                    username: 'juangarcia',
+                    username: 'juan',
+                    lastname: 'garcia',
                     email: 'juan@ejemplo.com',
                     password: 'juan123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 5,
-                    username: 'carlosmendez',
+                    username: 'carlos',
+                    lastname: 'mendez',
                     email: 'carlos@ejemplo.com',
                     password: 'carlos123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 6,
-                    username: 'luisafernandez',
+                    username: 'luisa',
+                    lastname: 'fernandez',
                     email: 'luisa@ejemplo.com',
                     password: 'luisa123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 7,
-                    username: 'pedroramirez',
+                    username: 'pedro',
+                    lastname: 'ramirez',
                     email: 'pedro@ejemplo.com',
                     password: 'pedro123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 8,
-                    username: 'sofiavega',
+                    username: 'sofia',
+                    lastname: 'vega',
                     email: 'sofia@ejemplo.com', 
                     password: 'sofia123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 9,
-                    username: 'davidmartinez',
+                    username: 'david',
+                    lastname: 'martinez',
                     email: 'david@ejemplo.com',
                     password: 'david123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 10,
-                    username: 'anaromero',
+                    username: 'ana',
+                    lastname: 'romero',
                     email: 'ana@ejemplo.com',
                     password: 'ana123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 11,
-                    username: 'josegonzalez',
+                    username: 'jose',
+                    lastname: 'gonzalez',
                     email: 'jose@ejemplo.com',
                     password: 'jose123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: false
                 },
                 {
                     id: 12,
-                    username: 'laurarodriguez',
+                    username: 'laura',
+                    lastname: 'rodriguez',
                     email: 'laura@ejemplo.com',
                     password: 'laura123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 13,
-                    username: 'albertorivas',
+                    username: 'alberto',
+                    lastname: 'rivas',
                     email: 'alberto@ejemplo.com',
                     password: 'alberto123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 14,
-                    username: 'martacortes',
+                    username: 'marta',
+                    lastname: 'cortes',
                     email: 'marta@ejemplo.com',
                     password: 'marta123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 15,
-                    username: 'felipeduran',
+                    username: 'felipe',
+                    lastname: 'duran',
                     email: 'felipe@ejemplo.com',
                     password: 'felipe123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 16,
-                    username: 'paolaherrera',
+                    username: 'paola',
+                    lastname: 'herrera',
                     email: 'paola@ejemplo.com',
                     password: 'paola123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 17,
-                    username: 'robertocastro',
+                    username: 'roberto',
+                    lastname: 'castro',
                     email: 'roberto@ejemplo.com',
                     password: 'roberto123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: false
                 }
@@ -882,7 +899,7 @@ class LocalDB {
             username: userData.username || `${userData.firstName} ${userData.lastName}`,
             email: userData.email,
             password: userData.password,
-            role: userData.role || 'client',
+            role: userData.role || 'USER',
             createdAt: new Date().toISOString(),
             isActive: true,
             // Eliminar el campo emailVerified
@@ -1057,8 +1074,8 @@ class LocalDB {
     getUserStats() {
         return {
             total: this.data.users.length,
-            admins: this.data.users.filter(user => user.role === 'admin').length,
-            clients: this.data.users.filter(user => user.role === 'client').length
+            admins: this.data.users.filter(user => user.role === 'ADMIN').length,
+            clients: this.data.users.filter(user => user.role === 'USER').length
         };
     }
 
@@ -1072,7 +1089,7 @@ class LocalDB {
         }
         
         // Eliminar solo la verificación de correo electrónico
-        // if (user.role !== 'admin' && !user.emailVerified) {
+        // if (user.role !== 'ADMIN' && !user.emailVerified) {
         //     const confirmedInStorage = localStorage.getItem(`email_confirmed_${email}`) === 'true';
         //     if (confirmedInStorage) {
         //         user.emailVerified = true;
@@ -1129,7 +1146,7 @@ class LocalDB {
 
     isAdmin() {
         const user = this.getCurrentUser();
-        return user?.role === 'admin';
+        return user?.role === 'ADMIN';
     }
 
     // Métodos para gestionar especificaciones

@@ -6,6 +6,7 @@ import Header from '../crossSections/header';
 import Footer from '../crossSections/footer';
 import { useInstrumentState, useInstrumentDispatch } from "../../context/InstrumentContext";
 import { useCategoryState, useCategoryDispatch } from "../../context/CategoryContext";
+import { useUserState, useUserDispatch } from "../../context/UserContext"; // Asegúrate de tener este context
 
 // Dashboard component
 const Dashboard = () => (
@@ -1304,7 +1305,8 @@ const Rentals = () => (
 // Actualizar el componente Users en Admin.jsx
 // Users component con popup de confirmación
 const Users = () => {
-    const [users, setUsers] = useState([]);
+    const { users, loading, error, updateUserRole} = useUserState();
+    const dispatch = useUserDispatch();
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -1318,9 +1320,9 @@ const Users = () => {
         loadUsers();
     }, [searchTerm, currentPage]);
 
-    const loadUsers = () => {
+    const loadUsers = async () => {
         try {
-            const allUsers = localDB.getAllUsers();
+            const allUsers = users;
             console.log('Todos los usuarios:', allUsers);
 
             let filteredUsers = allUsers;
@@ -1337,7 +1339,7 @@ const Users = () => {
             const endIndex = startIndex + itemsPerPage;
             const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
-            setUsers(paginatedUsers);
+            dispatch({ type: "SET_USERS", payload: paginatedUsers });
             setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
         } catch (error) {
             console.error('Error al cargar usuarios:', error);
@@ -1378,37 +1380,14 @@ const Users = () => {
         try {
             // Obtener el usuario actual para verificar que no se quite permisos a sí mismo
             const currentUser = localDB.getCurrentUser();
-            if (currentUser && currentUser.id === pendingRoleChange.userId && pendingRoleChange.newRole !== 'admin') {
+            if (currentUser && currentUser.id === pendingRoleChange.userId && pendingRoleChange.newRole !== 'ADMIN') {
                 alert('No puedes quitarte permisos de administrador a ti mismo');
                 setShowConfirmation(false);
                 return;
             }
 
-            // Actualizar el rol del usuario
-            await localDB.updateUser(pendingRoleChange.userId, { role: pendingRoleChange.newRole });
+            await updateUserRole(pendingRoleChange.userId, pendingRoleChange.newRole);
 
-            // Verificar explícitamente que los cambios se guardaron correctamente
-            const updatedUsers = localDB.getAllUsers();
-            const updatedUser = updatedUsers.find(u => u.id === pendingRoleChange.userId);
-
-            if (!updatedUser || updatedUser.role !== pendingRoleChange.newRole) {
-                throw new Error('Error: Los cambios no se aplicaron correctamente');
-            }
-
-            // Forzar una actualización de localStorage
-            localDB.saveToStorage();
-
-            // Si el usuario modificado es el actual, actualizar la sesión
-            if (currentUser && currentUser.id === pendingRoleChange.userId) {
-                // Actualizar el usuario en sesión con el nuevo rol
-                const updatedCurrentUser = {
-                    ...currentUser,
-                    role: pendingRoleChange.newRole
-                };
-                localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
-            }
-
-            // Recargar la lista de usuarios
             loadUsers();
             alert(`Permisos actualizados correctamente`);
         } catch (error) {
@@ -1488,8 +1467,8 @@ const Users = () => {
                                 <td>{user.username}</td>
                                 <td>{user.email}</td>
                                 <td>
-                                    <span className={`${styles.statusBadge} ${user.role === 'admin' ? styles.disponible : styles.reservado}`}>
-                                        {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                                    <span className={`${styles.statusBadge} ${user.role === 'ADMIN' ? styles.disponible : styles.reservado}`}>
+                                        {user.role === 'ADMIN' ? 'Administrador' : 'Cliente'}
                                     </span>
                                 </td>
                                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>
@@ -1499,8 +1478,8 @@ const Users = () => {
                                         onChange={(e) => initiateRoleChange(user.id, e.target.value, user.role)}
                                         className={styles.roleSelector}
                                     >
-                                        <option value="client">Cliente</option>
-                                        <option value="admin">Administrador</option>
+                                        <option value="USER">Cliente</option>
+                                        <option value="ADMIN">Administrador</option>
                                     </select>
                                 </td>
                             </tr>
@@ -1559,11 +1538,11 @@ const Users = () => {
                         <div style={{ padding: '1rem' }}>
                             <p style={{ marginBottom: '1rem' }}>
                                 ¿Estás seguro de que deseas cambiar el rol de <strong>{pendingRoleChange.username}</strong> de
-                                <strong> {pendingRoleChange.currentRole === 'admin' ? 'Administrador' : 'Cliente'}</strong> a
-                                <strong> {pendingRoleChange.newRole === 'admin' ? 'Administrador' : 'Cliente'}</strong>?
+                                <strong> {pendingRoleChange.currentRole === 'ADMIN' ? 'Administrador' : 'Cliente'}</strong> a
+                                <strong> {pendingRoleChange.newRole === 'ADMIN' ? 'Administrador' : 'Cliente'}</strong>?
                             </p>
 
-                            {pendingRoleChange.currentRole === 'admin' && pendingRoleChange.newRole !== 'admin' && (
+                            {pendingRoleChange.currentRole === 'ADMIN' && pendingRoleChange.newRole !== 'ADMIN' && (
                                 <div style={{
                                     backgroundColor: '#FFF3CD',
                                     color: '#856404',
@@ -1578,7 +1557,7 @@ const Users = () => {
                                 </div>
                             )}
 
-                            {pendingRoleChange.newRole === 'admin' && (
+                            {pendingRoleChange.newRole === 'ADMIN' && (
                                 <div style={{
                                     backgroundColor: '#FFF3CD',
                                     color: '#856404',
@@ -1637,7 +1616,7 @@ const Admin = () => {
 
     // const checkAdmin = () => {
     //     const currentUser = localDB.getCurrentUser();
-    //     if (!currentUser || currentUser.role !== 'admin') {
+    //     if (!currentUser || currentUser.role !== 'ADMIN') {
     //         navigate('/login');
     //         return;
     //     }

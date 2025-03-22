@@ -1,13 +1,16 @@
 // Auth.jsx - Simplified email sending
 import { useState, useEffect } from 'react';
-import { localDB } from '../../database/LocalDB';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthState, useAuthDispatch } from '../../context/AuthContext';
+
 import styles from './Auth.module.css';
 import EmailConfirmationService from '../../services/emailConfirmationService';
 
 const Auth = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { login, error, loading } = useAuthState();
+    const dispatch = useAuthDispatch();
     const [activeForm, setActiveForm] = useState('login');
     const [formData, setFormData] = useState({
         firstName: '',
@@ -16,8 +19,6 @@ const Auth = () => {
         password: '',
         confirmPassword: ''
     });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
 
     // Check URL and set active form accordingly
     useEffect(() => {
@@ -34,23 +35,23 @@ const Auth = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
-        setError('');
+        dispatch({ type: 'SET_ERROR', payload: '' });
     };
 
     const validateForm = () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|co|io|info|biz)$/;
         if (!emailRegex.test(formData.email)) {
-            setError('Por favor ingrese un correo electrónico válido con un dominio reconocido');
+            dispatch({ type: 'SET_ERROR', payload: 'Por favor ingrese un correo electrónico válido con un dominio reconocido' });
             return false;
         }
 
         if (formData.password.length < 6) {
-            setError('La contraseña debe tener al menos 6 caracteres');
+            dispatch({ type: 'SET_ERROR', payload: 'La contraseña debe tener al menos 6 caracteres' });
             return false;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            setError('Las contraseñas no coinciden');
+            dispatch({ type: 'SET_ERROR', payload: 'Las contraseñas no coinciden' });
             return false;
         }
 
@@ -63,8 +64,6 @@ const Auth = () => {
             if (!validateForm()) {
                 return;
             }
-            
-            setLoading(true);
             
             const userData = {
                 firstName: formData.firstName,
@@ -83,7 +82,7 @@ const Auth = () => {
             
             if (emailResult.success) {
                 setActiveForm('login');
-                setError('Registro exitoso. Se ha enviado un correo de bienvenida.');
+                dispatch({ type: 'SET_ERROR', payload: 'Registro exitoso. Se ha enviado un correo de bienvenida.' });
                 
                 // Limpiar formulario
                 setFormData({
@@ -100,12 +99,12 @@ const Auth = () => {
                 }, 2000);
             } else {
                 // Si el email falló
-                setError('Tu cuenta fue creada pero hubo un problema al enviar el correo.');
+                dispatch({ type: 'SET_ERROR', payload: 'Tu cuenta fue creada pero hubo un problema al enviar el correo.' });
             }
         } catch (error) {
-            setError(error.message);
+            dispatch({ type: 'SET_ERROR', payload: error.message });
         } finally {
-            setLoading(false);
+            dispatch({ type: 'SET_LOADING', payload: false });
         }
     };
 
@@ -119,16 +118,19 @@ const Auth = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            setLoading(true);
+            dispatch({ type: 'SET_LOADING', payload: true });
             
-            const user = await localDB.login(formData.email, formData.password);
+            
+            const user = await login(formData.email, formData.password);
+            console.log("Usuario autenticado: ", user);
             if (user) {
-                navigate(user.role === 'admin' ? '/administracion' : '/');
+                navigate(user.role === 'ADMIN' ? '/administracion' : '/');
             }
         } catch (error) {
-            setError(error.message);
+            console.error("Error en el inicio de sesión: ", error.message);
+            dispatch({ type: 'SET_ERROR', payload: error.message });
         } finally {
-            setLoading(false);
+            dispatch({ type: 'SET_LOADING', payload: false });
         }
     };
 
