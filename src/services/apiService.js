@@ -1,7 +1,7 @@
 import axios from "axios";
 import { localDB } from "../database/LocalDB";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const URL = import.meta.env.VITE_URL || "http://localhost:8080";
+const API_BASE_URL = URL + "/api";
 const CHECK_BACKEND = import.meta.env.VITE_CHECK_BACKEND === "true";
 
 const checkBackendStatus = async () => CHECK_BACKEND ? await axios.get(`${API_BASE_URL}/health/ping`).then(() => true).catch(() => false) : false;
@@ -225,7 +225,7 @@ export const apiService = {
                 };
                 console.log("🔑 Autenticando usuario...");
                 
-                const response = await axios.post(`http://localhost:8080/login`, userLogin, {
+                const response = await axios.post(`${URL}/login`, userLogin, {
                     headers: {
                       'Content-Type': 'application/json'
                     }
