@@ -63,13 +63,14 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        dispatch({ type: "SET_LOADING", payload: true });
+        dispatch({ type: "SET_LOADING" });
         try {
             const user = await apiService.login(email, password);
             dispatch({ type: "LOGIN_SUCCESS", payload: user });
             return user;
         } catch (error) {
             dispatch({ type: "SET_ERROR", payload: error.message });
+            
             throw error;
         }
     };

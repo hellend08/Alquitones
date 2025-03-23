@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 import ShareProduct from "./ShareProduct";
-import { localDB }  from "../../database/LocalDB";
+import { useAuthState } from "../../context/AuthContext";
 
 const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [likedProducts, setLikedProducts] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { getCurrentUser } = useAuthState();
     const productsPerPage = 10;
 
     const getCategoryName = (categoryId) => {
@@ -33,7 +34,7 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
         const savedLikes = JSON.parse(localStorage.getItem("likedProducts")) || [];
         setLikedProducts(Array.isArray(savedLikes) ? savedLikes : []);
 
-        const currentUser = localDB.getCurrentUser();
+        const currentUser = getCurrentUser();
         setIsAuthenticated(!!currentUser);
     }, []);
 
