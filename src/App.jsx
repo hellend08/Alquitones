@@ -5,18 +5,18 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Auth from './components/auth/Auth';
 import Home from './components/home/Home';
 import Admin from './components/admin/Admin';
-import { localDB } from './database/LocalDB';
 import MainLayout from './Layaouts/MainLayout';
 import CardDetails from './components/cardDetails/CardDetails';
 import UserProfile from './components/userProfile/UserProfile';
 import { CategoryProvider } from "./context/CategoryContext";
 import { InstrumentProvider } from "./context/InstrumentContext";
 import { UserProvider } from "./context/UserContext";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuthState } from "./context/AuthContext";
 
 // Protected Route Component solo para rutas que requieren autenticación
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const user = localDB.getCurrentUser();
+  const { getCurrentUser } = useAuthState();
+  const user =  getCurrentUser();
   console.log("user", user);
   if (!user) {
     return <Navigate to="/login" replace />;

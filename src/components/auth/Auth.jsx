@@ -9,7 +9,7 @@ import EmailConfirmationService from '../../services/emailConfirmationService';
 const Auth = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login, error, loading } = useAuthState();
+    const { login, error, loading, register } = useAuthState();
     const dispatch = useAuthDispatch();
     const [activeForm, setActiveForm] = useState('login');
     const [formData, setFormData] = useState({
@@ -66,16 +66,14 @@ const Auth = () => {
             }
             
             const userData = {
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                username: `${formData.firstName} ${formData.lastName}`,
+                lastname: formData.lastName,
+                username: formData.firstName,
                 email: formData.email,
                 password: formData.password,
-                role: 'client'
             };
             
             // Crear el usuario en la base de datos local
-            await localDB.createUser(userData);
+            await register(userData);
             
             // Mantener el envío del correo de bienvenida
             const emailResult = await EmailConfirmationService.sendWelcomeEmail(userData);

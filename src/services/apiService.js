@@ -211,6 +211,7 @@ export const apiService = {
         if (!(await checkBackendStatus())) {
             return localDB.updateUserRole(userId, newRole);
         }
+        console.log();
         
         return axios.put(`${API_BASE_URL}/users/${userId}/role?role=${newRole}`);
     },
@@ -246,5 +247,15 @@ export const apiService = {
             return localDB.login(email, password);
         }
     },
-
+    logout: () => {
+        localStorage.removeItem('currentUser');
+    },
+    register: async (userData) => {
+        if (!(await checkBackendStatus())) {
+            const newUser = await localDB.createUser(userData);
+            return newUser;
+        }
+        
+        return axios.post(`${API_BASE_URL}/users/register`, userData);
+    },
 };

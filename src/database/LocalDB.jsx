@@ -888,18 +888,18 @@ class LocalDB {
         }
     
         // Verificar que los campos requeridos estén presentes
-        if (!userData.firstName || !userData.lastName || !userData.email || !userData.password) {
+        if (!userData.username || !userData.lastname || !userData.email || !userData.password) {
             throw new Error('Todos los campos son obligatorios');
         }
     
         const newUser = {
             id: this.data.users.length + 1,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            username: userData.username || `${userData.firstName} ${userData.lastName}`,
+            firstName: userData.username,
+            lastName: userData.lastname,
+            username: userData.username || `${userData.usernameame} ${userData.lastname}`,
             email: userData.email,
             password: userData.password,
-            role: userData.role || 'USER',
+            role: 'USER',
             createdAt: new Date().toISOString(),
             isActive: true,
             // Eliminar el campo emailVerified

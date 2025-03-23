@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { localDB } from '../../database/LocalDB';
+import { useAuthState } from '../../context/AuthContext';
 
 const AuthButtons = () => {
+
+    const { getCurrentUser, logout } = useAuthState();
     const [user, setUser] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -12,7 +14,7 @@ const AuthButtons = () => {
     // Efecto para mantener sincronizado el estado del usuario
     useEffect(() => {
         const checkUser = () => {
-            const currentUser = localDB.getCurrentUser();
+            const currentUser = getCurrentUser();
             setUser(currentUser);
         };
 
@@ -27,7 +29,7 @@ const AuthButtons = () => {
     }, []);
 
     const handleLogout = () => {
-        localDB.logout();
+        logout();
         setUser(null); // Actualizar estado local inmediatamente
         window.location.href = '/login';
     };

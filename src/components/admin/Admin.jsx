@@ -483,15 +483,15 @@ const Categories = () => {
             const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);	
 
             // Eliminar productos asociados primero
-            associatedProducts.forEach(async product => {
-                await deleteProduct(product.id);
-            });
+            // associatedProducts.forEach(async product => {
+            //     await deleteProduct(product.id);
+            // });
 
             // Eliminar la categoria
             await deleteCategory(categoryToDelete.id);
 
             // Actualizar la lista de categorías
-            loadCategories();
+            // loadCategories();
 
             // Cerrar el modal de eliminación
             setDeleteModalOpen(false);

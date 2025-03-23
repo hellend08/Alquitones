@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        dispatch({ type: "SET_LOADING" });
+        dispatch({ type: "SET_LOADING", payload: true });
         try {
             const user = await apiService.login(email, password);
             dispatch({ type: "LOGIN_SUCCESS", payload: user });
@@ -75,12 +75,24 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localDB.logout();
+        apiService.logout();
         dispatch({ type: "LOGOUT" });
     };
 
+    const register = async (userData) => {
+        dispatch({ type: "SET_LOADING" });
+        try {
+            const user = await apiService.register(userData);
+            dispatch({ type: "LOGIN_SUCCESS", payload: user });
+            return user;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: error.message });
+            throw error;
+        }
+    };
+
     return (
-        <AuthStateContext.Provider value={{ ...state, login, logout, getCurrentUser }}>
+        <AuthStateContext.Provider value={{ ...state, login, logout, getCurrentUser, register }}>
             <AuthDispatchContext.Provider value={dispatch}>
                 {children}
             </AuthDispatchContext.Provider>
