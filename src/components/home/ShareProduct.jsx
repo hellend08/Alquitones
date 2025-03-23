@@ -1,35 +1,48 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 
-const ShareProduct = ({product, onClose}) => {
+const ShareProduct = ({ product, onClose }) => {
     const [customMessage, setCustomMessage] = useState("");
     if (!product) return null;
 
     const productUrl = `${window.location.origin}/detail/${product.id}`;
 
     const shareOnSocialMedia = (platform) => {
-        const productUrl = `${window.location.origin}/detail/${product.id}`;
         const message = `${customMessage} - Mira este producto: ${product.name} - ${product.description} `;
 
         let shareUrl = "";
 
         switch (platform) {
             case "facebook":
-                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
+                // Intentar con un enfoque más directo
+                const fbUrl = `https://www.facebook.com/sharer.php?display=popup&u=${encodeURIComponent(productUrl)}&quote=${encodeURIComponent(message)}`;
+                const fbPopup = window.open(fbUrl, 'facebook-share', 'width=626,height=436');
+                // Enfocar la ventana
+                if (fbPopup) fbPopup.focus();
                 break;
             case "twitter":
                 shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(message)}`;
+                window.open(shareUrl, "_blank");
                 break;
             case "whatsapp":
                 shareUrl = `https://wa.me/?text=${encodeURIComponent(message + " " + productUrl)}`;
+                window.open(shareUrl, "_blank");
                 break;
-            case "email":
-                shareUrl = `mailto:?subject=${encodeURIComponent("Mira este producto")}&body=${encodeURIComponent(message + " " + productUrl)}`;
+            case "instagram":
+                // Instagram no tiene API directa para compartir, pero podemos abrir la app en móviles
+                // En desktop, dirigimos a Instagram.com
+                if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    // En dispositivos móviles, intentar abrir la app
+                    shareUrl = `instagram://library?AssetPath=${encodeURIComponent(productUrl)}`;
+                } else {
+                    // En desktop, abrir Instagram web
+                    shareUrl = `https://www.instagram.com/`;
+                }
+                window.open(shareUrl, "_blank");
                 break;
             default:
                 return;
         }
-        window.open(shareUrl, "_blank");
     };
 
     return (
@@ -42,17 +55,17 @@ const ShareProduct = ({product, onClose}) => {
                     </button>
                 </div>
                 <div className="flex items-center gap-3 my-4">
-                    <img 
-                        src={product.images?.[0] || product.mainImage || 'https://via.placeholder.com/100'} 
-                        alt={product.name} 
-                        className="w-16 h-16 rounded-md object-cover" 
+                    <img
+                        src={product.images?.[0] || product.mainImage || 'https://via.placeholder.com/100'}
+                        alt={product.name}
+                        className="w-16 h-16 rounded-md object-cover"
                     />
                     <div>
                         <p className="text-sm text-gray-700 font-semibold">{product.name}</p>
                         <p className="text-xs text-gray-500">{product.description}</p>
                     </div>
                 </div>
-                <textarea 
+                <textarea
                     className="w-full rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                     placeholder="Escribe un mensaje..."
                     value={customMessage}
@@ -68,13 +81,25 @@ const ShareProduct = ({product, onClose}) => {
                     <button className="p-1 border-1 border-gray-300 text-(--color-secondary) rounded cursor-pointer hover:bg-gray-100" onClick={() => shareOnSocialMedia("whatsapp")}>
                         <i className="fab fa-whatsapp mr-2"></i> <span className="text-sm">Whatsapp</span>
                     </button>
-                    <button className="p-1 border-1 border-gray-300 text-(--color-secondary) rounded cursor-pointer hover:bg-gray-100" onClick={() => shareOnSocialMedia("email")}>
-                        <i className="fas fa-envelope mr-2"></i> <span className="text-sm">Correo</span>
+                    <button className="p-1 border-1 border-gray-300 text-(--color-secondary) rounded cursor-pointer hover:bg-gray-100" onClick={() => shareOnSocialMedia("instagram")}>
+                        <i className="fab fa-instagram mr-2"></i> <span className="text-sm">Instagram</span>
                     </button>
                 </div>
-                <Link to={productUrl} className="text-sm text-(--color-secondary) hover:text-blue-600">{productUrl}</Link>
+                <div className="flex justify-between items-center">
+                    <Link to={productUrl} className="text-sm text-(--color-secondary) hover:text-blue-600">{productUrl}</Link>
+                    <button 
+                        onClick={() => {
+                            navigator.clipboard.writeText(productUrl);
+                            alert('Enlace copiado al portapapeles');
+                        }}
+                        className="text-xs text-(--color-secondary) hover:text-blue-600"
+                    >
+                        <i className="fas fa-copy mr-1"></i> Copiar enlace
+                    </button>
+                </div>
             </div>
         </section>
     )
 }
+
 export default ShareProduct
