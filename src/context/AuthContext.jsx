@@ -22,6 +22,8 @@ const authReducer = (state, action) => {
             return { ...state, user: null, loading: false };
         case "SET_ERROR":
             return { ...state, error: action.payload, loading: false };
+        case "SET_CURRENT_USER":
+            return { ...state, user: action.payload, loading: false };
         default:
             return state;
     }
@@ -30,13 +32,26 @@ const authReducer = (state, action) => {
 export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
 
+    const getCurrentUser = () => {
+        try {
+            const userStr = localStorage.getItem('currentUser');
+            if (userStr) {
+                return JSON.parse(userStr);
+            }
+            return null;
+        } catch (error) {
+            console.error('Error getting current user:', error);
+            return null;
+        }
+    };
+
     useEffect(() => {
         const checkCurrentUser = async () => {
             dispatch({ type: "SET_LOADING" });
             try {
-                const user = localDB.getCurrentUser();
+                const user = getCurrentUser();
                 if (user) {
-                    dispatch({ type: "LOGIN_SUCCESS", payload: user });
+                    dispatch({ type: "SET_CURRENT_USER", payload: user });
                 } else {
                     dispatch({ type: "LOGOUT" });
                 }
@@ -56,8 +71,6 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             dispatch({ type: "SET_ERROR", payload: error.message });
             throw error;
-
-            
         }
     };
 
@@ -67,7 +80,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthStateContext.Provider value={{ ...state, login, logout }}>
+        <AuthStateContext.Provider value={{ ...state, login, logout, getCurrentUser }}>
             <AuthDispatchContext.Provider value={dispatch}>
                 {children}
             </AuthDispatchContext.Provider>

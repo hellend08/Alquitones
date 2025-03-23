@@ -42,6 +42,16 @@ export const InstrumentProvider = ({ children }) => {
             throw error;
         }
     };
+    const getInstrumentById = async (instrumentId) => {
+        try {
+            const response = await apiService.getInstrumentById(instrumentId);
+            return response;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al obtener instrumento" });
+            throw error;
+        }
+    };
+
     const updateInstrument = async (instrumentId, instrumentData, imagesAdj) => {
         try {
             console.log("instrumentData", instrumentData);
@@ -85,7 +95,7 @@ export const InstrumentProvider = ({ children }) => {
             dispatch({ type: "SET_ERROR", payload: "Error al actualizar especificación" });
             throw error;
         }
-    }
+    };
     const deleteSpecification = async (specificationId) => {
         try {
             const response = await apiService.deleteSpecification(specificationId);
@@ -96,10 +106,19 @@ export const InstrumentProvider = ({ children }) => {
             throw error;
         }
     };
+    const getAvailabilityById = async (instrumentId) => {
+        try {
+            const response = await apiService.getAvailabilityById(instrumentId);
+            return response;
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: "Error al obtener disponibilidad" });
+            throw error;
+        }
+    };
 
 
     return (
-        <InstrumentStateContext.Provider value={{ ...state, addInstrument, updateInstrument, deleteInstrument, addSpecification }}>
+        <InstrumentStateContext.Provider value={{ ...state, addInstrument, updateInstrument, deleteInstrument, addSpecification, getInstrumentById, updateSpecification, deleteSpecification, getAvailabilityById }}>
             <InstrumentDispatchContext.Provider value={dispatch}>
                 {children}
             </InstrumentDispatchContext.Provider>

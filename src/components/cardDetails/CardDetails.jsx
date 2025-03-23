@@ -1,11 +1,10 @@
 // src/components/cardDetails/CardDetails.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { localDB } from '../../database/LocalDB';
 import Characteristics from './Characteristics';
-import { apiService } from '../../services/apiService';
 import { useInstrumentState } from "../../context/InstrumentContext";
 import { useCategoryState } from "../../context/CategoryContext";
+import { useAuthState } from "../../context/AuthContext";
 import AvailabilityCalendar from './AvailabilityCalendar';
 
 function CardDetails() {
@@ -23,12 +22,14 @@ function CardDetails() {
     
     const { id } = useParams();
     const navigate = useNavigate();
+    
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [showGallery, setShowGallery] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const { categories } = useCategoryState();
-    const { instruments } = useInstrumentState();
+    const { instruments, getInstrumentById, getAvailabilityById} = useInstrumentState();
+    const { getCurrentUser } = useAuthState();
     const [selectedDates, setSelectedDates] = useState(null);
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     const [availabilityError, setAvailabilityError] = useState(null);
@@ -38,7 +39,16 @@ function CardDetails() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const product = await apiService.getInstrumentById(parseInt(id));
+
+                const product = await getInstrumentById(parseInt(id));
+                console.log("product", product);
+
+                const availability = await getAvailabilityById(parseInt(id));
+                console.log("availability", availability);
+
+                //quiero agregar dentro de product  la availability
+                product.availability = availability;
+
                 if (product) {
                     setInstrument(product);
                     loadSuggestions(parseInt(id));
@@ -46,8 +56,8 @@ function CardDetails() {
                     setLoadingAvailability(false);
                 }
                 
-                // Verificar si el usuario está autenticado
-                const currentUser = localDB.getCurrentUser();
+                // Verificar si el usuario está autenticado usando el contexto
+                const currentUser = getCurrentUser();
                 setIsAuthenticated(!!currentUser);
             } catch (error) {
                 console.error(error);
@@ -55,7 +65,7 @@ function CardDetails() {
         };
 
         fetchData();
-    }, [id]);
+    }, [id, getCurrentUser]);
 
     const loadSuggestions = (currentId) => {
         let allProducts = instruments.filter(p => p.id !== currentId);

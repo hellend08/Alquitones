@@ -35,7 +35,6 @@ function App() {
     <AuthProvider>
       <InstrumentProvider>
         <CategoryProvider>
-          <UserProvider>
             <Router>
               <Routes>
                 <Route path="/" element={<MainLayout />} >
@@ -49,7 +48,9 @@ function App() {
                     path="/administracion/*" 
                     element={
                       <ProtectedRoute adminOnly={true}>
-                        <Admin />
+                        <UserProvider>
+                          <Admin /> 
+                        </UserProvider>
                       </ProtectedRoute>
                     } 
                   />
@@ -69,7 +70,6 @@ function App() {
                 </Route>
               </Routes>
             </Router>
-          </UserProvider>
         </CategoryProvider>
       </InstrumentProvider>
     </AuthProvider>

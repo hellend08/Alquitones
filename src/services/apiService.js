@@ -128,6 +128,20 @@ export const apiService = {
         
         return axios.delete(`${API_BASE_URL}/instruments/${id}`);
     },
+    getAvailabilityById: async (id) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.getAvailabilityById(id);
+        }
+        const startDateOfActualMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+        const endDateOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0).toISOString().split('T')[0];
+
+        console.log("endpoint", `${API_BASE_URL}/availability/daily-stock?instrumentId=${id}&startDate=${startDateOfActualMonth}&endDate=${endDateOfNextMonth}`);
+        
+        const availability = await axios.get(`${API_BASE_URL}/availability/daily-stock?instrumentId=${id}&startDate=${startDateOfActualMonth}&endDate=${endDateOfNextMonth}`);
+        console.log("availability", availability.data);
+
+        return availability.data;
+    },
     getCategories: async () => {
         const categories = await fetchData("/categories", localDB.getAllCategories());
         // let instruments = await fetchData("/instruments", localDB.getAllProducts());
@@ -232,4 +246,5 @@ export const apiService = {
             return localDB.login(email, password);
         }
     },
+
 };

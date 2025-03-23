@@ -1,4 +1,3 @@
-import { localDB } from '../../database/LocalDB';
 import { useInstrumentState } from '../../context/InstrumentContext';
 
 const Characteristics = ({ specifications }) => {
