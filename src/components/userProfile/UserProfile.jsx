@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { localDB } from "../../database/LocalDB";
 import { useNavigate } from "react-router-dom";
+import { useAuthState } from "../../context/AuthContext";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
+    const { getCurrentUser } = useAuthState();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [favorites, setFavorites] = useState(() => {
@@ -58,7 +60,7 @@ const UserProfile = () => {
 
     useEffect(() => {
         const checkUser = () => {
-            const currentUser = localDB.getCurrentUser();
+            const currentUser = getCurrentUser();
             if (currentUser) {
                 setUser(currentUser);
             }

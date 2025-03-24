@@ -76,12 +76,12 @@ const Auth = () => {
             await register(userData);
             
             // Mantener el envío del correo de bienvenida
-            const emailResult = await EmailConfirmationService.sendWelcomeEmail(userData);
+            // const emailResult = await EmailConfirmationService.sendWelcomeEmail(userData);
             
-            if (emailResult.success) {
-                setActiveForm('login');
+            // if (emailResult.success) {
+            //     setActiveForm('login');
                 dispatch({ type: 'SET_ERROR', payload: 'Registro exitoso. Se ha enviado un correo de bienvenida.' });
-                
+                dispatch({ type: 'SET_LOADING', payload: false });
                 // Limpiar formulario
                 setFormData({
                     firstName: '',
@@ -95,10 +95,10 @@ const Auth = () => {
                 setTimeout(() => {
                     navigate('/login');
                 }, 2000);
-            } else {
-                // Si el email falló
-                dispatch({ type: 'SET_ERROR', payload: 'Tu cuenta fue creada pero hubo un problema al enviar el correo.' });
-            }
+            // } else {
+            //     // Si el email falló
+            //     dispatch({ type: 'SET_ERROR', payload: 'Tu cuenta fue creada pero hubo un problema al enviar el correo.' });
+            // }
         } catch (error) {
             dispatch({ type: 'SET_ERROR', payload: error.message });
         } finally {
