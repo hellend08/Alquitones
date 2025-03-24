@@ -252,4 +252,31 @@ export const apiService = {
         
         return axios.post(`${API_BASE_URL}/users/register`, userData);
     },
+    // Métodos para favoritos
+    addFavorite: async (userId, instrumentId) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.addFavorite(userId, instrumentId);
+        }
+        return axios.post(`${API_BASE_URL}/favorites/users/${userId}/instruments/${instrumentId}`);
+    },
+    removeFavorite: async (userId, instrumentId) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.removeFavorite(userId, instrumentId);
+        }
+        return axios.delete(`${API_BASE_URL}/favorites/users/${userId}/instruments/${instrumentId}`);
+    },
+    getFavorites: async (userId) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.getFavorites(userId);
+        }
+        const favorites = await axios.get(`${API_BASE_URL}/favorites/users/${userId}`);
+        //favorites.data es un array de objetos con la estructura { id: 1, user:{}, instrument:{}, createdAt: "2021-09-01T00:00:00.000Z" }, necesito solo los instrumentos, que sea un array de instrumentos
+        console.log("🌟 Favoritos: ", favorites.data);
+        
+        const instruments = favorites.data.map(favorite => favorite.instrument);
+        console.log("🌟 Favoritos: ", instruments);
+        
+        //necesito retornar un array de objetos instrument
+        return instruments;
+    }
 };

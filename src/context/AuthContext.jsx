@@ -1,7 +1,6 @@
 // filepath: p:\React\alquitonesfront\src\context\AuthContext.jsx
 import { createContext, useReducer, useEffect, useContext } from "react";
 import { apiService } from "../services/apiService";
-import { localDB } from "../database/LocalDB";
 
 const AuthStateContext = createContext();
 const AuthDispatchContext = createContext();
@@ -9,7 +8,8 @@ const AuthDispatchContext = createContext();
 const initialState = {
     user: null,
     loading: true,
-    error: null
+    error: null,
+    favorites: []
 };
 
 const authReducer = (state, action) => {
@@ -24,6 +24,12 @@ const authReducer = (state, action) => {
             return { ...state, error: action.payload, loading: false };
         case "SET_CURRENT_USER":
             return { ...state, user: action.payload, loading: false };
+        case "SET_FAVORITES":
+            return { ...state, favorites: action.payload, loading: false };
+        case "ADD_FAVORITE":
+            return { ...state, favorites: [...state.favorites, action.payload], loading: false };
+        case "REMOVE_FAVORITE":
+            return { ...state, favorites: state.favorites.filter(fav => fav.id !== action.payload), loading: false };
         default:
             return state;
     }
@@ -52,8 +58,14 @@ export const AuthProvider = ({ children }) => {
                 const user = getCurrentUser();
                 if (user) {
                     dispatch({ type: "SET_CURRENT_USER", payload: user });
+                    // Cargar favoritos al iniciar sesión
+                    const favorites = await apiService.getFavorites(user.id);
+                    dispatch({ type: "SET_FAVORITES", payload: favorites });
+                    localStorage.setItem('favorites', JSON.stringify(favorites));
                 } else {
                     dispatch({ type: "LOGOUT" });
+                    dispatch({ type: "SET_FAVORITES", payload: [] });
+                    localStorage.removeItem('favorites');
                 }
             } catch (error) {
                 dispatch({ type: "SET_ERROR", payload: "Error al obtener el usuario actual" });
@@ -92,8 +104,45 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const toggleFavorite = async (instrument) => {
+        console.log(instrument);
+        
+        if (!state.user) {
+            throw new Error("Usuario no autenticado");
+        }
+
+        try {
+            const isFavorite = state.favorites.some(fav => fav.id === instrument.id);
+            
+            if (isFavorite) {
+                await apiService.removeFavorite(state.user.id, instrument.id);
+                dispatch({ type: "REMOVE_FAVORITE", payload: instrument.id });
+                const updatedFavorites = state.favorites.filter(fav => fav.id !== instrument.id);
+                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+            } else {
+                await apiService.addFavorite(state.user.id, instrument.id);
+                dispatch({ type: "ADD_FAVORITE", payload: instrument });
+                const updatedFavorites = [...state.favorites, instrument];
+                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+            }
+        } catch (error) {
+            dispatch({ type: "SET_ERROR", payload: error.message });
+            throw error;
+        }
+    };
+    const isAuthenticated = () => !!state.user;
+
     return (
-        <AuthStateContext.Provider value={{ ...state, login, logout, getCurrentUser, register }}>
+        <AuthStateContext.Provider value={{ 
+            ...state, 
+            login, 
+            logout, 
+            getCurrentUser, 
+            register,
+            toggleFavorite,
+            isAuthenticated,
+            favorites: state.favorites
+        }}>
             <AuthDispatchContext.Provider value={dispatch}>
                 {children}
             </AuthDispatchContext.Provider>

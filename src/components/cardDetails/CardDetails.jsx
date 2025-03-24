@@ -27,15 +27,13 @@ function CardDetails() {
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [showGallery, setShowGallery] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const { categories } = useCategoryState();
     const { instruments, getInstrumentById, getAvailabilityById} = useInstrumentState();
-    const { getCurrentUser } = useAuthState();
+    const { getCurrentUser, isAuthenticated, toggleFavorite, favorites } = useAuthState();
     const [selectedDates, setSelectedDates] = useState(null);
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     const [availabilityError, setAvailabilityError] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null); // Para compartir producto
-    const [likedProducts, setLikedProducts] = useState([]); // Para productos favoritos
 
     useEffect(() => {
         const fetchData = async () => {
@@ -85,31 +83,12 @@ function CardDetails() {
         setSelectedDates(dates);
     };
 
-    // Función para alternar entre like/unlike
-    const toggleLike = (product) => {
-        setLikedProducts((prev) => {
-            const prevArray = Array.isArray(prev) ? prev : [];
-            let updatedLikes;
-    
-            // Verificar si ya está en la lista
-            const isLiked = prevArray.some((p) => p.id === product.id);
-    
-            if (isLiked) {
-                // eliminamos
-                updatedLikes = prevArray.filter((p) => p.id !== product.id);
-            } else {
-                // agregamos
-                updatedLikes = [...prevArray, product];
-            }
-    
-            localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-            return updatedLikes;
-        });
-    };
-
-    // Función para alerta cuando usuario no está autenticado
-    const disabledLike = () => {
-        alert("Inicia Sesión para interactuar.");
+    const handleToggleFavorite = async () => {
+        try {
+            await toggleFavorite(instrument);
+        } catch (error) {
+            alert("Inicia Sesión para interactuar.");
+        }
     };
 
     // Calcular el precio total basado en las fechas seleccionadas
@@ -199,7 +178,7 @@ function CardDetails() {
     const allImages = instrument?.images || [];
 
     // Verificar si el producto está en favoritos
-    const isLiked = likedProducts.some((p) => p?.id === instrument?.id);
+    const isLiked = favorites.some((fav) => fav?.id === instrument?.id);
 
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
@@ -212,12 +191,12 @@ function CardDetails() {
                     {isAuthenticated ? ( 
                         <button 
                             className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
-                            onClick={() => toggleLike(instrument)} 
+                            onClick={handleToggleFavorite} 
                         >
                             <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
                         </button> 
                     ) : (
-                        <button className="cursor-pointer" onClick={() => disabledLike()}>
+                        <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
                             <i className="far fa-heart disabled:text-gray-100"></i>
                         </button>
                     )}

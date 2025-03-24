@@ -8,9 +8,7 @@ import { useAuthState } from "../../context/AuthContext";
 const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [likedProducts, setLikedProducts] = useState({});
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const { getCurrentUser } = useAuthState();
+    const { isAuthenticated, toggleFavorite, favorites } = useAuthState();
     const productsPerPage = 10;
 
     const getCategoryName = (categoryId) => {
@@ -30,38 +28,13 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
         });
     };
 
-    useEffect(() => {
-        const savedLikes = JSON.parse(localStorage.getItem("likedProducts")) || [];
-        setLikedProducts(Array.isArray(savedLikes) ? savedLikes : []);
-
-        const currentUser = getCurrentUser();
-        setIsAuthenticated(!!currentUser);
-    }, []);
-
-    const toggleLike = (product) => {
-        setLikedProducts((prev) => {
-            const prevArray = Array.isArray(prev) ? prev : [];
-            let updatedLikes;
-    
-            // Verificar si ya está en la lista
-            const isLiked = prevArray.some((p) => p.id === product.id);
-    
-            if (isLiked) {
-                // eliminamos
-                updatedLikes = prevArray.filter((p) => p.id !== product.id);
-            } else {
-                // agregamos
-                updatedLikes = [...prevArray, product];
-            }
-    
-            localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-            return updatedLikes;
-        });
+    const handleToggleFavorite = async (product) => {
+        try {
+            await toggleFavorite(product);
+        } catch (error) {
+            alert(error.message);
+        }
     };
-
-    const disabledLike = () => {
-        alert("Inicia Sesión para interactuar.")
-    }
 
     // Lógica de paginación
     const totalPages = Math.ceil(products.length / productsPerPage);
@@ -92,20 +65,19 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                     ))
                 ) : currentProducts.length > 0 ? (
                     currentProducts.map((product) => {
-                        // Verificar si hay fechas seleccionadas basándonos en availabilityDetails
-                        const hasDateFiltering = product.availabilityDetails !== undefined;
+                        const isLiked = favorites.some(fav => fav.id === product.id);
                         
                         return (
                             <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
                                 <section className="p-3 border-b border-gray-300 flex justify-start gap-5">
                                     {isAuthenticated ? ( 
                                         <button 
-                                            className={`transition cursor-pointer ${likedProducts.some((p) => p.id === product.id) ? "text-red-500" : "text-(--color-secondary)"}`}
-                                            onClick={() => toggleLike(product)} 
+                                            className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
+                                            onClick={() => handleToggleFavorite(product)} 
                                         >
-                                            <i className={`fa${likedProducts.some((p) => p.id === product.id) ? 's' : 'r'} fa-heart`}></i>
+                                            <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
                                         </button> ) : (
-                                        <button className="cursor-pointer" onClick={() => disabledLike()}>
+                                        <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
                                             <i className="far fa-heart disabled:text-gray-100" ></i>
                                         </button>
                                     )}
@@ -168,7 +140,7 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                                 </tbody>
                                             </table>
                                         </div>
-                                    ) : hasDateFiltering ? (
+                                    ) : product.availabilityDetails === undefined ? (
                                         <div className="my-4 py-2 text-center text-sm text-gray-500 bg-gray-50 rounded-md">
                                             Disponible en fechas seleccionadas
                                         </div>
