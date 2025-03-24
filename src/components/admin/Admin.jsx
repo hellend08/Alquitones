@@ -28,6 +28,7 @@ const Instruments = () => {
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
+    const [existingImages, setExistingImages] = useState([]);
     const { categories, loading: categoriesLoading } = useCategoryState();
     const dispatch = useInstrumentDispatch();
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
@@ -57,6 +58,10 @@ const Instruments = () => {
     const handleEditInstrument = (instrument) => {
         setModalMode('edit');
         setCurrentInstrument(instrument);
+        // Cargar las imágenes existentes
+        if (instrument.images && Array.isArray(instrument.images)) {
+            setExistingImages(instrument.images);
+        }
         setModalOpen(true);
     };
 
@@ -65,26 +70,26 @@ const Instruments = () => {
 
         const form = e.target;
         const fileInput = document.getElementById('instrument-images');
-        const images = Array.from(fileInput.files);
+        const newImages = Array.from(fileInput.files);
         const imagesAdj = fileInput.files;
 
         // Validación de imágenes SOLO para creación
-        if (modalMode === 'create' && (images.length < 1 || images.length > 6)) {
+        if (modalMode === 'create' && (newImages.length < 1 || newImages.length > 6)) {
             alert('Debes seleccionar entre 1 y 6 imágenes');
             return;
         }
 
         try {
-            // Convertir imágenes solo si hay nuevas
-            const imageUrls = images.length > 0
-                ? await Promise.all(images.map(file => {
+            // Convertir nuevas imágenes solo si hay
+            const newImageUrls = newImages.length > 0
+                ? await Promise.all(newImages.map(file => {
                     return new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = (e) => resolve(e.target.result);
                         reader.readAsDataURL(file);
                     });
                 }))
-                : null;
+                : [];
 
             // Recopilar especificaciones
             const productSpecifications = specifications
@@ -104,8 +109,8 @@ const Instruments = () => {
                 pricePerDay: parseFloat(form['instrument-price'].value) || currentInstrument?.pricePerDay,
                 description: form['instrument-description'].value.trim() || currentInstrument?.description,
                 status: form['instrument-status'].value || currentInstrument?.status,
-                images: imageUrls || currentInstrument?.images,
-                mainImage: (imageUrls?.[0]) || currentInstrument?.mainImage,
+                images: existingImages,
+                mainImage: existingImages[0].url || currentInstrument?.mainImage,
                 specifications: productSpecifications.length > 0 ? productSpecifications : currentInstrument?.specifications
             };
 
@@ -114,13 +119,12 @@ const Instruments = () => {
                 alert('Instrumento creado con éxito');
             } else {
                 await updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
-                // await apiService.updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
-                // dispatch({ type: "UPDATE_INSTRUMENT", payload: { id: currentInstrument.id, ...instrumentData } });
                 alert('Instrumento actualizado con éxito');
             }
 
             setModalOpen(false);
             setPreviews([]);
+            setExistingImages([]);
         } catch (error) {
             console.error('Error:', error);
             alert(error.message);
@@ -305,20 +309,47 @@ const Instruments = () => {
                                         setPreviews(previews);
                                     }}
                                     className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
-
                                 />
-                                {previews.length > 0 && (
-                                    <div className={styles.imagePreviewContainer}>
-                                        {previews.map((preview, index) => (
+                                <div className={styles.imagePreviewContainer}>
+                                    {/* Mostrar imágenes existentes */}
+                                    {existingImages.map((image, index) => (
+                                        <div key={`existing-${index}`} className="relative">
                                             <img
-                                                key={index}
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
+                                                src={image.url}
+                                                alt={`Imagen existente ${index + 1}`}
                                                 className={styles.imagePreview}
                                             />
-                                        ))}
-                                    </div>
-                                )}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setExistingImages(prev => prev.filter((_, i) => i !== index));
+                                                }}
+                                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {/* Mostrar previsualizaciones de nuevas imágenes */}
+                                    {previews.map((preview, index) => (
+                                        <div key={`new-${index}`} className="relative">
+                                            <img
+                                                src={preview}
+                                                alt={`Nueva imagen ${index + 1}`}
+                                                className={styles.imagePreview}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPreviews(prev => prev.filter((_, i) => i !== index));
+                                                }}
+                                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                             <div className="flex flex-col gap-2">
                                 <label className="font-semibold text-sm text-(--color-secondary)" >Características</label>

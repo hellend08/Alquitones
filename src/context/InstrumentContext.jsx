@@ -110,9 +110,9 @@ export const InstrumentProvider = ({ children }) => {
             throw error;
         }
     };
-    const getAvailabilityById = async (instrumentId) => {
+    const getAvailabilityById = async (instrumentId, startDate, endDate) => {
         try {
-            const response = await apiService.getAvailabilityById(instrumentId);
+            const response = await apiService.getAvailabilityById(instrumentId, startDate, endDate);
             return response;
         } catch (error) {
             dispatch({ type: "SET_ERROR", payload: "Error al obtener disponibilidad" });
