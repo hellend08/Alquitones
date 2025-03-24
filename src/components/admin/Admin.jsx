@@ -1035,7 +1035,7 @@ const Specifications = ( { instruments, specifications, addSpecification, update
         const icon = form['icon-class'].value;
 
         const specificationData = {
-            name: form['specification-name'].value,
+            label: form['specification-name'].value,
             description: form['specification-description'].value,
             icon: icon
         };

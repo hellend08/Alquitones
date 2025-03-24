@@ -54,7 +54,6 @@ export const InstrumentProvider = ({ children }) => {
 
     const updateInstrument = async (instrumentId, instrumentData, imagesAdj) => {
         try {
-            console.log("instrumentData", instrumentData);
             
             const response = await apiService.updateInstrument(instrumentId , instrumentData, imagesAdj);
             dispatch({ type: "UPDATE_INSTRUMENT", payload: response.data });

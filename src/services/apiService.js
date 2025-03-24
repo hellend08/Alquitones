@@ -102,13 +102,13 @@ export const apiService = {
         const formData = new FormData();
         const processedInstrument = {
             ...instrumentData,
+            images: instrumentData.images.map(image => ({ id: image.id })),
             category: { id: instrumentData.categoryId },
             stock: 5,
             mainImage: "url",
         };
         delete processedInstrument.categoryId;
         delete processedInstrument.status;
-        delete processedInstrument.images;
         
         formData.append("instrument", JSON.stringify(processedInstrument));
         
