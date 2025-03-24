@@ -105,7 +105,6 @@ export const apiService = {
             images: instrumentData.images.map(image => ({ id: image.id })),
             category: { id: instrumentData.categoryId },
             stock: 5,
-            mainImage: "url",
         };
         delete processedInstrument.categoryId;
         delete processedInstrument.status;
