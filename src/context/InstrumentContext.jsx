@@ -76,6 +76,8 @@ export const InstrumentProvider = ({ children }) => {
     };
 
     const addSpecification = async (specificationData) => {
+        console.log("specificationData", specificationData);
+        
         try {
             const response = await apiService.addSpecification(specificationData);
             dispatch({ type: "ADD_SPECIFICATION", payload: response.data });
@@ -87,6 +89,8 @@ export const InstrumentProvider = ({ children }) => {
     };
     
     const updateSpecification = async (specificationId, specificationData) => {
+        console.log("specificationData", specificationData);
+        
         try {
             const response = await apiService.updateSpecification(specificationId, specificationData);
             dispatch({ type: "UPDATE_SPECIFICATION", payload: response.data });

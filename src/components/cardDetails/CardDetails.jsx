@@ -43,8 +43,10 @@ function CardDetails() {
 
                 const product = await getInstrumentById(parseInt(id));
                 console.log("product", product);
+                const startDateOfActualMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+                const endDateOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0).toISOString().split('T')[0];
 
-                const availability = await getAvailabilityById(parseInt(id));
+                const availability = await getAvailabilityById(parseInt(id), startDateOfActualMonth, endDateOfNextMonth);
                 console.log("availability", availability);
 
                 //quiero agregar dentro de product  la availability

@@ -7,7 +7,7 @@ import { useCategoryState } from "../../context/CategoryContext";
 
 const Home = () => {
     const { categories, loading: loadingCategories, error: errorCategories } = useCategoryState();
-    const { instruments, loading, error } = useInstrumentState();
+    const { instruments, loading, error, getAvailabilityById } = useInstrumentState();
     const [filteredProducts, setFilteredProducts] = useState(null);
     const [categoryFiltered, setCategoryFiltered] = useState(false);
     const [dateRange, setDateRange] = useState(null);
@@ -76,7 +76,7 @@ const Home = () => {
     return (
         <main className="max-w-5xl justify-center mx-auto">
             <div className="bg-(--color-primary) py-4 mb-4">
-                <SearchBar onSearch={handleSearch} products={instruments} />
+                <SearchBar onSearch={handleSearch} products={instruments} getAvailabilityById={getAvailabilityById} />
             </div>
             <Category onFilterChange={handleCategoryFilter} products={instruments} categories={categories} loadingCategories={loadingCategories} />
 

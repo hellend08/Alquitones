@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
@@ -7,6 +6,7 @@ import Footer from '../crossSections/footer';
 import { useInstrumentState, useInstrumentDispatch } from "../../context/InstrumentContext";
 import { useCategoryState, useCategoryDispatch } from "../../context/CategoryContext";
 import { useUserState, useUserDispatch } from "../../context/UserContext"; // Asegúrate de tener este context
+import { useAuthState } from "../../context/AuthContext"; // Asegúrate de tener este context
 
 // Dashboard component
 const Dashboard = () => (
@@ -440,6 +440,8 @@ const Categories = () => {
     };
 
     const handleModalSubmit = async (e) => {
+        console.log('Modal submit');
+        
         e.preventDefault();
         const form = e.target;
 
@@ -451,12 +453,15 @@ const Categories = () => {
             description: form['category-description'].value,
             icon: icon // Siempre usar el valor del select, sin considerar imágenes personalizadas
         };
-
+        console.log('categoryData:', categoryData);
+        
         try {
             if (modalMode === 'create') {
                 await addCategory(categoryData);
                 alert('Categoría creada con éxito');
             } else {
+                console.log('currentCategory:', currentCategory);
+                
                 await updateCategory(currentCategory.id, categoryData);
                 alert('Categoría actualizada con éxito');
             }
@@ -1307,6 +1312,7 @@ const Rentals = () => (
 const Users = () => {
     const { users, loading, error, updateUserRole} = useUserState();
     const dispatch = useUserDispatch();
+    const { getCurrentUser } = useAuthState();
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -1379,7 +1385,7 @@ const Users = () => {
 
         try {
             // Obtener el usuario actual para verificar que no se quite permisos a sí mismo
-            const currentUser = localDB.getCurrentUser();
+            const currentUser = getCurrentUser();
             if (currentUser && currentUser.id === pendingRoleChange.userId && pendingRoleChange.newRole !== 'ADMIN') {
                 alert('No puedes quitarte permisos de administrador a ti mismo');
                 setShowConfirmation(false);
@@ -1615,7 +1621,7 @@ const Admin = () => {
     // }, []);
 
     // const checkAdmin = () => {
-    //     const currentUser = localDB.getCurrentUser();
+    //     const currentUser = getCurrentUser();
     //     if (!currentUser || currentUser.role !== 'ADMIN') {
     //         navigate('/login');
     //         return;
@@ -1624,7 +1630,7 @@ const Admin = () => {
     // };
 
     // // const handleLogout = () => {
-    // //     localDB.logout();
+    // //     logout();
     // //     navigate('/login');
     // // };
 

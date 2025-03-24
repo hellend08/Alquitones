@@ -128,18 +128,12 @@ export const apiService = {
         
         return axios.delete(`${API_BASE_URL}/instruments/${id}`);
     },
-    getAvailabilityById: async (id) => {
+    getAvailabilityById: async (id, startDate, endDate ) => {
         if (!(await checkBackendStatus())) {
             return localDB.getAvailabilityById(id);
         }
-        const startDateOfActualMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-        const endDateOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0).toISOString().split('T')[0];
 
-        console.log("endpoint", `${API_BASE_URL}/availability/daily-stock?instrumentId=${id}&startDate=${startDateOfActualMonth}&endDate=${endDateOfNextMonth}`);
-        
-        const availability = await axios.get(`${API_BASE_URL}/availability/daily-stock?instrumentId=${id}&startDate=${startDateOfActualMonth}&endDate=${endDateOfNextMonth}`);
-        console.log("availability", availability.data);
-
+        const availability = await axios.get(`${API_BASE_URL}/availability/daily-stock?instrumentId=${id}&startDate=${startDate}&endDate=${endDate}`);
         return availability.data;
     },
     getCategories: async () => {

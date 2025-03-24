@@ -41,6 +41,12 @@ export const CategoryProvider = ({ children }) => {
     const updateCategory = async (categoryId, categoryData) => {
         try {
             const response = await apiService.updateCategory(categoryId, categoryData);
+            console.log("response", response);
+            console.log("categoryData", categoryData);
+            console.log("categoryId", categoryId);
+            
+            
+            
             dispatch({ type: "UPDATE_CATEGORY", payload: response.data });
             return response.data;
         } catch (error) {

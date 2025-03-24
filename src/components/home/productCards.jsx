@@ -160,7 +160,7 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                                             </td>
                                                             <td className="px-3 py-1.5 text-right font-medium">
                                                                 <span className="text-green-600">
-                                                                    {item.availableQuantity}
+                                                                    {item.availableStock}
                                                                 </span>
                                                             </td>
                                                         </tr>
