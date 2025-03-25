@@ -7,6 +7,7 @@ import Home from './components/home/Home';
 import Admin from './components/admin/Admin';
 import MainLayout from './Layaouts/MainLayout';
 import CardDetails from './components/cardDetails/CardDetails';
+import Reservation from './components/cardDetails/Reservation';
 import UserProfile from './components/userProfile/UserProfile';
 import { CategoryProvider } from "./context/CategoryContext";
 import { InstrumentProvider } from "./context/InstrumentContext";
@@ -43,6 +44,16 @@ function App() {
                   <Route path="/detail/:id" element={<CardDetails />} />
                   <Route path="/login" element={<Auth />} />
                   <Route path="/register" element={<Auth />} />
+                  
+                  {/* Ruta de Reserva (protegida) */}
+                  <Route 
+                    path="/reservation/:id" 
+                    element={
+                      <ProtectedRoute>
+                        <Reservation />
+                      </ProtectedRoute>
+                    } 
+                  />
                   
                   <Route 
                     path="/administracion/*" 

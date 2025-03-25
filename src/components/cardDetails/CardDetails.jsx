@@ -304,16 +304,25 @@ function CardDetails() {
                     
                         {isAuthenticated ? (
                             <button 
-                                className={`w-full mt-4 py-2 px-4 rounded-lg text-white font-medium transition
-                                    ${selectedDates && selectedDates.startDate 
-                                        ? 'bg-(--color-secondary) hover:bg-(--color-primary) cursor-pointer' 
-                                        : 'bg-gray-400 cursor-not-allowed'}`}
-                                disabled={!selectedDates || !selectedDates.startDate}
-                            >
-                                {selectedDates && selectedDates.startDate 
-                                    ? 'Reservar ahora' 
-                                    : 'Selecciona fechas para reservar'}
-                            </button>
+                            className={`w-full mt-4 py-2 px-4 rounded-lg text-white font-medium transition
+                                ${selectedDates && selectedDates.startDate 
+                                    ? 'bg-(--color-secondary) hover:bg-(--color-primary) cursor-pointer' 
+                                    : 'bg-gray-400 cursor-not-allowed'}`}
+                            disabled={!selectedDates || !selectedDates.startDate}
+                            onClick={() => {
+                                if (selectedDates && selectedDates.startDate) {
+                                    // Guardar las fechas seleccionadas en localStorage para usarlas en el componente de reserva
+                                    localStorage.setItem('reservationStartDate', selectedDates.startDate);
+                                    localStorage.setItem('reservationEndDate', selectedDates.endDate || selectedDates.startDate);
+                                    // Navegar a la página de reserva
+                                    navigate(`/reservation/${instrument.id}`);
+                                }
+                            }}
+                        >
+                            {selectedDates && selectedDates.startDate 
+                                ? 'Reservar ahora' 
+                                : 'Selecciona fechas para reservar'}
+                        </button>
                         ) : (
                             <div className="mt-4 text-center">
                                 <div className="flex flex-col items-center text-center">
