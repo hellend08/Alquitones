@@ -1,10 +1,11 @@
 // SearchBar.jsx con navegación de meses mejorada
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { localDB } from '../../database/LocalDB';
+
+
 import SearchResults from './SearchResults';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -83,8 +84,8 @@ const SearchBar = ({ onSearch }) => {
         };
     }, []);
 
-    const handleSearch = () => {
-        const allProducts = localDB.getAllProducts();
+    const handleSearch = async () => {
+        const allProducts = products;
 
         // Filtrar por término de búsqueda
         let filteredProducts = allProducts.filter(product => 
@@ -96,14 +97,35 @@ const SearchBar = ({ onSearch }) => {
         if (startDate) {
             const datesInRange = getDatesInRange(startDate, endDate || startDate);
 
-            filteredProducts = filteredProducts.filter(product => {
-                // Si no tiene datos de disponibilidad, lo incluimos de todas formas (para mantener compatibilidad)
-                if (!product.availability || product.availability.length === 0) return true;
+            // Crear un array de promesas para obtener la disponibilidad de cada producto
+            const availabilityPromises = filteredProducts.map(async (product) => {
+                try {
+                    const availability = await getAvailabilityById(product.id, startDate, endDate);
+                    return {
+                        ...product,
+                        availability
+                    };
+                } catch (error) {
+                    console.error(`Error al obtener disponibilidad para el producto ${product.id}:`, error);
+                    return {
+                        ...product,
+                        availability: []
+                    };
+                }
+            });
 
-                // Verificar si ALGUNA fecha del rango está disponible
+            // Esperar a que todas las promesas se resuelvan
+            const productsWithAvailability = await Promise.all(availabilityPromises);
+
+            // Filtrar productos basados en la disponibilidad
+            filteredProducts = productsWithAvailability
+                .filter(({ availability }) => {
+                    
+                    if (!availability || availability.length === 0) return true;
+
                 return datesInRange.some(date => {
-                    const availItem = product.availability.find(a => a.date === date);
-                    return availItem && availItem.availableQuantity > 0;
+                    const availItem = availability.find(a => a.date === date);
+                    return availItem && availItem.availableStock > 0;
                 });
             });
 
@@ -114,10 +136,10 @@ const SearchBar = ({ onSearch }) => {
                         const availItem = product.availability?.find(a => a.date === date);
                         return {
                             date,
-                            availableQuantity: availItem ? availItem.availableQuantity : 0
+                            availableStock: availItem ? availItem.availableStock : 0
                         };
                     })
-                    .filter(detail => detail.availableQuantity > 0);
+                    .filter(detail => detail.availableStock > 0);
 
                 return {
                     ...product,
@@ -143,7 +165,7 @@ const SearchBar = ({ onSearch }) => {
 
         // Realizar búsqueda inmediata si hay texto
         if (value.trim()) {
-            const allProducts = localDB.getAllProducts();
+            const allProducts = products
             const filteredResults = allProducts.filter(product =>
                 product.name.toLowerCase().includes(value.toLowerCase()) ||
                 product.description.toLowerCase().includes(value.toLowerCase())
@@ -316,7 +338,8 @@ const SearchBar = ({ onSearch }) => {
         testDate.setMonth(testDate.getMonth() - 1);
         return testDate.getMonth() >= today.getMonth() || testDate.getFullYear() > today.getFullYear();
     };
-
+    console.log("Results", searchResults);
+    
     return (
         <div className="max-w-lg mx-auto relative">
             <form onSubmit={handleSubmit} className="flex flex-col mx-4 lg:mx-0 gap-3">

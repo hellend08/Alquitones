@@ -1,62 +1,20 @@
 // productCards.jsx - corregido
 import { useState, useEffect } from "react";
-import { localDB } from "../../database/LocalDB";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 import ShareProduct from "./ShareProduct";
+import { useAuthState } from "../../context/AuthContext";
 
-const ProductCards = ({ products: propProducts }) => {
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
+const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [likedProducts, setLikedProducts] = useState({});
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { isAuthenticated, toggleFavorite, favorites } = useAuthState();
     const productsPerPage = 10;
-
-    // Cargar productos desde props o cargar recomendados si no hay props
-    useEffect(() => {
-        if (propProducts && propProducts.length > 0) {
-            console.log("ProductCards: Usando productos recibidos por props:", propProducts.length);
-            setProducts(propProducts);
-            setCurrentPage(1); // Reset a primera página con nuevos productos
-        } else {
-            console.log("ProductCards: Cargando productos recomendados");
-            recomendedProducts();
-        }
-    }, [propProducts]);
-
-    const recomendedProducts = () => {
-        try {
-            const productsDB = localDB.getAllProducts();
-            if (productsDB.length > 0) {
-                // Obtener todos los productos en orden aleatorio
-                const randomProducts = productsDB.sort(() => Math.random() - 0.5);
-                setProducts(randomProducts);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const getCategories = () => {
-        try {
-            const categoriesDB = localDB.getAllCategories();
-            setCategories(categoriesDB);
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
-
-    useEffect(() => {
-        getCategories();
-    }, []);
 
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
         return category?.name || "Sin categoría";
-    }
+    };
 
     // Formatear fecha para mostrar
     const formatDate = (dateStr) => {
@@ -70,38 +28,13 @@ const ProductCards = ({ products: propProducts }) => {
         });
     };
 
-    useEffect(() => {
-        const savedLikes = JSON.parse(localStorage.getItem("likedProducts")) || [];
-        setLikedProducts(Array.isArray(savedLikes) ? savedLikes : []);
-
-        const currentUser = localDB.getCurrentUser();
-        setIsAuthenticated(!!currentUser);
-    }, []);
-
-    const toggleLike = (product) => {
-        setLikedProducts((prev) => {
-            const prevArray = Array.isArray(prev) ? prev : [];
-            let updatedLikes;
-    
-            // Verificar si ya está en la lista
-            const isLiked = prevArray.some((p) => p.id === product.id);
-    
-            if (isLiked) {
-                // eliminamos
-                updatedLikes = prevArray.filter((p) => p.id !== product.id);
-            } else {
-                // agregamos
-                updatedLikes = [...prevArray, product];
-            }
-    
-            localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-            return updatedLikes;
-        });
+    const handleToggleFavorite = async (product) => {
+        try {
+            await toggleFavorite(product);
+        } catch (error) {
+            alert(error.message);
+        }
     };
-
-    const disabledLike = () => {
-        alert("Inicia Sesión para interactuar.")
-    }
 
     // Lógica de paginación
     const totalPages = Math.ceil(products.length / productsPerPage);
@@ -116,24 +49,35 @@ const ProductCards = ({ products: propProducts }) => {
 
     return (
         <div className="flex flex-col gap-6">
-            {/* Grid de productos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {currentProducts.length > 0 ? (
+                {isLoading ? (
+                    // 🔹 Renderiza el Skeleton mientras carga
+                    [...Array(6)].map((_, index) => (
+                        <div key={index} className="bg-gray-200 animate-pulse border border-gray-300 rounded-lg shadow-sm">
+                            <div className="h-48 w-96 mx-auto bg-gray-300 rounded-t-lg"></div>
+                            <div className="p-5 border-t border-gray-300">
+                                <div className="h-6 bg-gray-400 rounded w-3/4 mb-2"></div>
+                                <div className="h-4 bg-gray-300 rounded w-1/2 mb-3"></div>
+                                <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                                <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                            </div>
+                        </div>
+                    ))
+                ) : currentProducts.length > 0 ? (
                     currentProducts.map((product) => {
-                        // Verificar si hay fechas seleccionadas basándonos en availabilityDetails
-                        const hasDateFiltering = product.availabilityDetails !== undefined;
+                        const isLiked = favorites.some(fav => fav.id === product.id);
                         
                         return (
                             <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
                                 <section className="p-3 border-b border-gray-300 flex justify-start gap-5">
                                     {isAuthenticated ? ( 
                                         <button 
-                                            className={`transition cursor-pointer ${likedProducts.some((p) => p.id === product.id) ? "text-red-500" : "text-(--color-secondary)"}`}
-                                            onClick={() => toggleLike(product)} 
+                                            className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
+                                            onClick={() => handleToggleFavorite(product)} 
                                         >
-                                            <i className={`fa${likedProducts.some((p) => p.id === product.id) ? 's' : 'r'} fa-heart`}></i>
+                                            <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
                                         </button> ) : (
-                                        <button className="cursor-pointer" onClick={() => disabledLike()}>
+                                        <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
                                             <i className="far fa-heart disabled:text-gray-100" ></i>
                                         </button>
                                     )}
@@ -145,10 +89,10 @@ const ProductCards = ({ products: propProducts }) => {
                                     <div className="h-48 overflow-hidden">
                                         <img 
                                             className="w-full h-full object-contain" 
-                                            src={product.images?.[0] || product.mainImage} 
+                                            src={product.mainImage || product.images?.[0].url} 
                                             alt={product.name} 
                                             onError={(e) => {
-                                                e.target.src = 'https://via.placeholder.com/300x200?text=Imagen+no+disponible';
+                                                e.target.src = 'https://dummyimage.com/300x200/cccccc/000000&text=Imagen+no+disponible';
                                             }}
                                         />
                                     </div>
@@ -188,7 +132,7 @@ const ProductCards = ({ products: propProducts }) => {
                                                             </td>
                                                             <td className="px-3 py-1.5 text-right font-medium">
                                                                 <span className="text-green-600">
-                                                                    {item.availableQuantity}
+                                                                    {item.availableStock}
                                                                 </span>
                                                             </td>
                                                         </tr>
@@ -196,7 +140,7 @@ const ProductCards = ({ products: propProducts }) => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                    ) : hasDateFiltering ? (
+                                    ) : product.availabilityDetails === undefined ? (
                                         <div className="my-4 py-2 text-center text-sm text-gray-500 bg-gray-50 rounded-md">
                                             Disponible en fechas seleccionadas
                                         </div>
@@ -262,7 +206,7 @@ const ProductCards = ({ products: propProducts }) => {
                         disabled={currentPage === totalPages || totalPages === 0}
                         className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                     >
-                        <span className="material-symbols-outlined text-sm">navigate_next</span>
+                        <span className="material-symbols-outlined text-sm">chevron_right</span>
                     </button>
                     <button
                         onClick={() => paginate(totalPages)}
@@ -277,9 +221,9 @@ const ProductCards = ({ products: propProducts }) => {
     );
 };
 
-// Añadir propTypes para validar las props
 ProductCards.propTypes = {
-    products: PropTypes.array
+    products: PropTypes.array.isRequired,
+    isLoading: PropTypes.bool.isRequired,
 };
 
 export default ProductCards;

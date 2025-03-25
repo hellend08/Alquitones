@@ -46,7 +46,7 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
         if (!availability || availability.length === 0) return false;
         const formattedDate = formatDateForComparison(date);
         const availabilityEntry = availability.find(a => a.date === formattedDate);
-        return availabilityEntry ? availabilityEntry.availableQuantity > 0 : false;
+        return availabilityEntry ? availabilityEntry.availableStock > 0 : false;
     };
 
     // Obtener la cantidad disponible para una fecha
@@ -54,7 +54,7 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
         if (!availability || availability.length === 0) return 0;
         const formattedDate = formatDateForComparison(date);
         const availabilityEntry = availability.find(a => a.date === formattedDate);
-        return availabilityEntry ? availabilityEntry.availableQuantity : 0;
+        return availabilityEntry ? availabilityEntry.availableStock : 0;
     };
 
     // Verificar si una fecha es seleccionable (no pasada)
@@ -107,6 +107,8 @@ const handleDateClick = (date) => {
             // Verificar si todo el rango está disponible
             if (!isRangeAvailable(newStart, newEnd)) {
                 setCalendarError("El rango seleccionado contiene fechas no disponibles");
+                setSelectedStartDate(null);
+                setSelectedEndDate(null);
                 return;
             }
             
@@ -116,6 +118,8 @@ const handleDateClick = (date) => {
             // Verificar si todo el rango está disponible
             if (!isRangeAvailable(selectedStartDate, date)) {
                 setCalendarError("El rango seleccionado contiene fechas no disponibles");
+                setSelectedStartDate(null);
+                setSelectedEndDate(null);
                 return;
             }
             
@@ -126,12 +130,18 @@ const handleDateClick = (date) => {
     // Efecto para notificar cuando cambia la selección
     useEffect(() => {
         if (onSelect && (selectedStartDate || selectedEndDate)) {
-            onSelect({
-                startDate: selectedStartDate ? formatDateForComparison(selectedStartDate) : null,
-                endDate: selectedEndDate ? formatDateForComparison(selectedEndDate) : null
-            });
+            const startDateStr = selectedStartDate ? formatDateForComparison(selectedStartDate) : null;
+            const endDateStr = selectedEndDate ? formatDateForComparison(selectedEndDate) : null;
+            
+            // Solo llamar a onSelect si realmente hay un cambio en las fechas
+            if (startDateStr !== null || endDateStr !== null) {
+                onSelect({
+                    startDate: startDateStr,
+                    endDate: endDateStr
+                });
+            }
         }
-    }, [selectedStartDate, selectedEndDate, onSelect]);
+    }, [selectedStartDate, selectedEndDate]); // Removido onSelect de las dependencias
 
     // Verificar si una fecha está en el rango seleccionado
     const isDateInSelectedRange = (date) => {
@@ -456,7 +466,7 @@ const handleDateClick = (date) => {
 AvailabilityCalendar.propTypes = {
     availability: PropTypes.arrayOf(PropTypes.shape({
         date: PropTypes.string.isRequired,
-        availableQuantity: PropTypes.number.isRequired
+        availableStock: PropTypes.number.isRequired
     })).isRequired,
     onSelect: PropTypes.func
 };

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { localDB } from '../../database/LocalDB';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Header from '../crossSections/header';
 import Footer from '../crossSections/footer';
+import { useInstrumentState, useInstrumentDispatch } from "../../context/InstrumentContext";
+import { useCategoryState, useCategoryDispatch } from "../../context/CategoryContext";
+import { useUserState, useUserDispatch } from "../../context/UserContext"; // Asegúrate de tener este context
+import { useAuthState } from "../../context/AuthContext"; // Asegúrate de tener este context
 
 // Dashboard component
 const Dashboard = () => (
@@ -20,39 +23,27 @@ const Dashboard = () => (
 
 // Instruments component (moved from main Admin component)
 const Instruments = () => {
-    const [instruments, setInstruments] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentInstrument, setCurrentInstrument] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
+    const [existingImages, setExistingImages] = useState([]);
+    const { categories, loading: categoriesLoading } = useCategoryState();
+    const dispatch = useInstrumentDispatch();
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
+    
 
     useEffect(() => {
-        loadInstruments();
-    }, [searchTerm]);
-
-    const loadInstruments = () => {
-        try {
-            // Obtener todos los productos sin paginación
-            const result = localDB.getProductsPaginated(
-                1,
-                Infinity, // Tamaño infinito para obtener todos
-                searchTerm,
-                false // Desactivar paginación
+        if (searchTerm) {
+            const filteredInstruments = instruments.filter(instrument =>
+                instrument.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
-
-            setInstruments(result.products);
-        } catch (error) {
-            console.error('Error al cargar instrumentos:', error);
-            alert('Error al cargar los instrumentos');
+            dispatch({ type: "SET_INSTRUMENTS", payload: filteredInstruments });
+        } else {
+            dispatch({ type: "SET_INSTRUMENTS", payload: instruments });
         }
-    };
-
-    const getProductCategory = (categoryId) => {
-        const categories = localDB.data.categories;
-        const category = categories.find(cat => cat.id === categoryId);
-        return category ? category.name : 'Sin categoria';
-    };
+    }, [searchTerm, instruments]);
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -67,6 +58,10 @@ const Instruments = () => {
     const handleEditInstrument = (instrument) => {
         setModalMode('edit');
         setCurrentInstrument(instrument);
+        // Cargar las imágenes existentes
+        if (instrument.images && Array.isArray(instrument.images)) {
+            setExistingImages(instrument.images);
+        }
         setModalOpen(true);
     };
 
@@ -75,28 +70,28 @@ const Instruments = () => {
 
         const form = e.target;
         const fileInput = document.getElementById('instrument-images');
-        const images = Array.from(fileInput.files);
+        const newImages = Array.from(fileInput.files);
+        const imagesAdj = fileInput.files;
 
         // Validación de imágenes SOLO para creación
-        if (modalMode === 'create' && (images.length < 1 || images.length > 6)) {
-            alert('Debes seleccionar entre 1 y 5 imágenes');
+        if (modalMode === 'create' && (newImages.length < 1 || newImages.length > 6)) {
+            alert('Debes seleccionar entre 1 y 6 imágenes');
             return;
         }
 
         try {
-            // Convertir imágenes solo si hay nuevas
-            const imageUrls = images.length > 0
-                ? await Promise.all(images.map(file => {
+            // Convertir nuevas imágenes solo si hay
+            const newImageUrls = newImages.length > 0
+                ? await Promise.all(newImages.map(file => {
                     return new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = (e) => resolve(e.target.result);
                         reader.readAsDataURL(file);
                     });
                 }))
-                : null;
+                : [];
 
             // Recopilar especificaciones
-            const specifications = localDB.getAllSpecifications();
             const productSpecifications = specifications
                 .map(spec => {
                     const value = form[`spec-${spec.id}`]?.value;
@@ -114,22 +109,22 @@ const Instruments = () => {
                 pricePerDay: parseFloat(form['instrument-price'].value) || currentInstrument?.pricePerDay,
                 description: form['instrument-description'].value.trim() || currentInstrument?.description,
                 status: form['instrument-status'].value || currentInstrument?.status,
-                images: imageUrls || currentInstrument?.images,
-                mainImage: (imageUrls?.[0]) || currentInstrument?.mainImage,
+                images: existingImages,
+                mainImage: existingImages[0].url || currentInstrument?.mainImage,
                 specifications: productSpecifications.length > 0 ? productSpecifications : currentInstrument?.specifications
             };
 
             if (modalMode === 'create') {
-                await localDB.createProduct(instrumentData);
+                await addInstrument(instrumentData, imagesAdj);
                 alert('Instrumento creado con éxito');
             } else {
-                await localDB.updateProduct(currentInstrument.id, instrumentData);
+                await updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
                 alert('Instrumento actualizado con éxito');
             }
 
-            loadInstruments();
             setModalOpen(false);
             setPreviews([]);
+            setExistingImages([]);
         } catch (error) {
             console.error('Error:', error);
             alert(error.message);
@@ -144,11 +139,7 @@ const Instruments = () => {
         }
 
         try {
-            await localDB.deleteProduct(instrument.id);
-            // Update the local state immediately by filtering out the deleted instrument
-            setInstruments(prevInstruments =>
-                prevInstruments.filter(item => item.id !== instrument.id)
-            );
+            await deleteInstrument(instrument.id);
             alert('Instrumento eliminado exitosamente');
         } catch (error) {
             console.error('Error al eliminar instrumento:', error);
@@ -156,15 +147,9 @@ const Instruments = () => {
         }
     };
 
-    const checkDuplicateName = (name) => {
-        const normalizedName = name.trim().toLowerCase();
-        // Permitir campo vacío en edición
-        if (modalMode === 'edit' && !normalizedName) return false;
-
-        return instruments.some(instrument =>
-            instrument.name.trim().toLowerCase() === normalizedName &&
-            (modalMode === 'create' || instrument.id !== currentInstrument?.id)
-        );
+    const getProductCategory = (categoryId) => {
+        const category = categories.find(cat => cat.id === categoryId);
+        return category ? category.name : 'Sin categoría';
     };
 
     return (
@@ -215,7 +200,9 @@ const Instruments = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {instruments.map(instrument => (
+                        {instruments.map(instrument => {
+                            const status = (instrument.stock > 0 || instrument.status =='Disponible') ? 'Disponible' : 'No disponible';
+                            return (
                             <tr key={instrument.id}>
                                 <td>{instrument.id}</td>
                                 <td>
@@ -228,8 +215,8 @@ const Instruments = () => {
                                 <td>{instrument.name}</td>
                                 <td>{getProductCategory(instrument.categoryId)}</td>
                                 <td>
-                                    <span className={`${styles.statusBadge} ${styles[instrument.status.toLowerCase()]}`}>
-                                        {instrument.status}
+                                    <span className={`${styles.statusBadge} ${styles[status.toLowerCase()]}`}>
+                                        {status}
                                     </span>
                                 </td>
                                 <td>${instrument.pricePerDay.toFixed(2)}</td>
@@ -248,7 +235,8 @@ const Instruments = () => {
                                     </button>
                                 </td>
                             </tr>
-                        ))}
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>
@@ -286,7 +274,7 @@ const Instruments = () => {
                                         className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     >
                                         <option value="">Seleccionar categoria</option>
-                                        {localDB.data.categories.map(category => (
+                                        {categories.map(category => (
                                             <option className="text-gray-900" key={category.id} value={category.id}>
                                                 {category.name}
                                             </option>
@@ -321,32 +309,59 @@ const Instruments = () => {
                                         setPreviews(previews);
                                     }}
                                     className="rounded-md py-1.5 px-3 text-base bg-(--color-secondary) text-white sm:text-sm/6 outline-[1.5px] -outline-offset-1 cursor-pointer"
-
                                 />
-                                {previews.length > 0 && (
-                                    <div className={styles.imagePreviewContainer}>
-                                        {previews.map((preview, index) => (
+                                <div className={styles.imagePreviewContainer}>
+                                    {/* Mostrar imágenes existentes */}
+                                    {existingImages.map((image, index) => (
+                                        <div key={`existing-${index}`} className="relative">
                                             <img
-                                                key={index}
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
+                                                src={image.url}
+                                                alt={`Imagen existente ${index + 1}`}
                                                 className={styles.imagePreview}
                                             />
-                                        ))}
-                                    </div>
-                                )}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setExistingImages(prev => prev.filter((_, i) => i !== index));
+                                                }}
+                                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {/* Mostrar previsualizaciones de nuevas imágenes */}
+                                    {previews.map((preview, index) => (
+                                        <div key={`new-${index}`} className="relative">
+                                            <img
+                                                src={preview}
+                                                alt={`Nueva imagen ${index + 1}`}
+                                                className={styles.imagePreview}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPreviews(prev => prev.filter((_, i) => i !== index));
+                                                }}
+                                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                             <div className="flex flex-col gap-2">
                                 <label className="font-semibold text-sm text-(--color-secondary)" >Características</label>
                                 <div className={styles.specificationsContainer}>
-                                    {localDB.getAllSpecifications().map(spec => (
+                                    {specifications.map(spec => (
                                         <div key={spec.id} className="flex flex-col gap-1 bg-(--color-light) p-2 rounded-md">
-                                            <label className="font-semibold text-sm text-(--color-secondary)" htmlFor={`spec-${spec.id}`}>{spec.name}</label>
+                                            <label className="font-semibold text-sm text-(--color-secondary)" htmlFor={`spec-${spec.id}`}>{spec.label}</label>
                                             <input
                                                 type="text"
                                                 id={`spec-${spec.id}`}
                                                 name={`spec-${spec.id}`}
-                                                placeholder={`Valor para ${spec.name}`}
+                                                placeholder={`Valor para ${spec.label}`}
                                                 defaultValue={
                                                     currentInstrument?.specifications?.find(
                                                         s => s.specification.id === spec.id
@@ -409,93 +424,32 @@ const Instruments = () => {
 
 // Categories component - Solo con iconos predefinidos (sin imagen personalizada)
 const Categories = () => {
-    const [categories, setCategories] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentCategory, setCurrentCategory] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-
-    // Estados para paginación
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 10;
+    const dispatch = useCategoryDispatch();
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
-    // Add this with your other state variables at the top of the component
     const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
-
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification,
+        deleteSpecification, updateSpecification } = useInstrumentState();
+    const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
+    
     useEffect(() => {
-        loadCategories();
-    }, [searchTerm, currentPage]);
+        if (searchTerm) {
+            const filteredCategories = categories.filter(category =>
+                category.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            dispatch({ type: "SET_CATEGORIES", payload: filteredCategories });
+        } else {
+            dispatch({ type: "SET_CATEGORIES", payload: categories });
 
-    // Mantener el efecto original para manejar la selección de iconos
-    useEffect(() => {
-        if (modalOpen) {
-            const iconClassSelect = document.getElementById('icon-class');
-            const iconPreviewContainer = document.querySelector(`.${styles.iconPreviewBox}`);
-
-            const updateIconPreview = () => {
-                if (!iconClassSelect || !iconPreviewContainer) return;
-
-                const selectedIcon = iconClassSelect.value;
-                iconPreviewContainer.querySelectorAll('i').forEach(icon => {
-                    icon.classList.remove(styles.selectedIcon);
-                    if (icon.classList.contains(selectedIcon)) {
-                        icon.classList.add(styles.selectedIcon);
-                    }
-                });
-            };
-
-            const handleIconSelection = (e) => {
-                if (!iconClassSelect) return;
-
-                if (e.target.classList.contains('fas')) {
-                    iconClassSelect.value = e.target.classList[1];
-                    updateIconPreview();
-                }
-            };
-
-            // Actualizar visibilidad inicial
-            updateIconPreview();
-
-            // Añadir event listeners
-            if (iconClassSelect) iconClassSelect.addEventListener('change', updateIconPreview);
-            if (iconPreviewContainer) iconPreviewContainer.addEventListener('click', handleIconSelection);
-
-            // Cleanup
-            return () => {
-                iconClassSelect?.removeEventListener('change', updateIconPreview);
-                iconPreviewContainer?.removeEventListener('click', handleIconSelection);
-            };
         }
-    }, [modalOpen]);
-
-    const loadCategories = () => {
-        try {
-            const allCategories = localDB.getAllCategories();
-            let filteredCategories = allCategories;
-
-            if (searchTerm) {
-                filteredCategories = allCategories.filter(category =>
-                    category.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
-
-            // Calcular paginación manualmente
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedCategories = filteredCategories.slice(startIndex, endIndex);
-
-            setCategories(paginatedCategories);
-            setTotalPages(Math.ceil(filteredCategories.length / itemsPerPage));
-        } catch (error) {
-            console.error('Error al cargar categorías:', error);
-            alert('Error al cargar las categorías');
-        }
-    };
+    }, [searchTerm, categories]);
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -517,6 +471,8 @@ const Categories = () => {
     };
 
     const handleModalSubmit = async (e) => {
+        console.log('Modal submit');
+        
         e.preventDefault();
         const form = e.target;
 
@@ -528,17 +484,19 @@ const Categories = () => {
             description: form['category-description'].value,
             icon: icon // Siempre usar el valor del select, sin considerar imágenes personalizadas
         };
-
+        console.log('categoryData:', categoryData);
+        
         try {
             if (modalMode === 'create') {
-                await localDB.createCategory(categoryData);
-                alert('categoria creada con éxito');
+                await addCategory(categoryData);
+                alert('Categoría creada con éxito');
             } else {
-                await localDB.updateCategory(currentCategory.id, categoryData);
-                alert('categoria actualizada con éxito');
+                console.log('currentCategory:', currentCategory);
+                
+                await updateCategory(currentCategory.id, categoryData);
+                alert('Categoría actualizada con éxito');
             }
-
-            loadCategories();
+    
             setModalOpen(false);
             setPreviews([]);
         } catch (error) {
@@ -558,18 +516,18 @@ const Categories = () => {
 
         try {
             // Obtener productos asociados
-            const associatedProducts = localDB.getProductsByCategory(categoryToDelete.id);
+            const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);	
 
             // Eliminar productos asociados primero
-            associatedProducts.forEach(async product => {
-                await localDB.deleteProduct(product.id);
-            });
+            // associatedProducts.forEach(async product => {
+            //     await deleteProduct(product.id);
+            // });
 
             // Eliminar la categoria
-            await localDB.deleteCategory(categoryToDelete.id);
+            await deleteCategory(categoryToDelete.id);
 
             // Actualizar la lista de categorías
-            loadCategories();
+            // loadCategories();
 
             // Cerrar el modal de eliminación
             setDeleteModalOpen(false);
@@ -585,19 +543,6 @@ const Categories = () => {
 
             // También podríamos usar un popup para errores
             alert(`Error: ${error.message}`);
-        }
-    };
-
-    // Manejadores de paginación
-    const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
         }
     };
 
@@ -706,7 +651,7 @@ const Categories = () => {
                                 </td>
                                 <td>{category.name}</td>
                                 <td>{category.description}</td>
-                                <td>{localDB.getProductsByCategory(category.id).length}</td>
+                                <td>{instruments.filter(instrument => instrument.categoryId === category.id).length}</td>
                                 <td className="flex items-center gap-4 h-[83.33px]">
                                     <button
                                         onClick={() => handleEditCategory(category)}
@@ -870,7 +815,7 @@ const Categories = () => {
 
                             {/* Productos asociados */}
                             {(() => {
-                                const associatedProducts = localDB.getProductsByCategory(categoryToDelete.id);
+                                const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);
                                 return associatedProducts.length > 0 ? (
                                     <div className="bg-gray-100 p-3 rounded-md">
                                         <p className="text-sm font-semibold text-gray-700 mb-2">
@@ -975,13 +920,13 @@ const Categories = () => {
 };
 
 // Specifications component - Solo eliminando imagen personalizada pero manteniendo la funcionalidad original
-const Specifications = () => {
-    const [specifications, setSpecifications] = useState([]);
+const Specifications = ( { instruments, specifications, addSpecification, updateSpecification, deleteSpecification } ) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentSpecification, setCurrentSpecification] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
+
 
     // Estados para paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -1036,11 +981,10 @@ const Specifications = () => {
 
     const loadSpecifications = () => {
         try {
-            const allSpecifications = localDB.getAllSpecifications();
+            const allSpecifications = specifications;
             // Verificación adicional
             if (!Array.isArray(allSpecifications)) {
                 console.error("Las especificaciones no son un array");
-                setSpecifications([]);
                 setTotalPages(1);
                 return;
             }
@@ -1057,7 +1001,6 @@ const Specifications = () => {
             const endIndex = startIndex + itemsPerPage;
             const paginatedSpecifications = filteredSpecifications.slice(startIndex, endIndex);
 
-            setSpecifications(paginatedSpecifications);
             setTotalPages(Math.ceil(filteredSpecifications.length / itemsPerPage));
         } catch (error) {
             console.error('Error al cargar características:', error);
@@ -1092,17 +1035,16 @@ const Specifications = () => {
         const icon = form['icon-class'].value;
 
         const specificationData = {
-            name: form['specification-name'].value,
+            label: form['specification-name'].value,
             description: form['specification-description'].value,
             icon: icon
         };
 
         try {
             if (modalMode === 'create') {
-                await localDB.createSpecification(specificationData);
+                await addSpecification(specificationData);
                 alert('Característica creada con éxito');
-            } else {
-                await localDB.updateSpecification(currentSpecification.id, specificationData);
+            } else {updateSpecification(currentSpecification.id, specificationData);
                 alert('Característica actualizada con éxito');
             }
 
@@ -1121,7 +1063,7 @@ const Specifications = () => {
         if (!confirmDelete) return;
 
         try {
-            await localDB.deleteSpecification(specification.id);
+            await deleteSpecification(specification.id);
             loadSpecifications();
             alert('Característica eliminada exitosamente');
         } catch (error) {
@@ -1226,14 +1168,14 @@ const Specifications = () => {
                                     ) : (
                                         <img
                                             src={specification.icon}
-                                            alt={`Icono de ${specification.name}`}
+                                            alt={`Icono de ${specification.label}`}
                                             className={styles.productImage}
                                         />
                                     )}
                                 </td>
-                                <td>{specification.name}</td>
+                                <td>{specification.label}</td>
                                 <td>{specification.description}</td>
-                                <td>{localDB.getProductsBySpecification(specification.id).length}</td>
+                                <td>{instruments.filter(instrument => instrument.specifications.some(spec => spec.specification.id === specification.id)).length}</td>
                                 <td className="flex items-center gap-4 h-[83.33px]">
                                     <button
                                         onClick={() => handleEditSpecification(specification)}
@@ -1301,7 +1243,7 @@ const Specifications = () => {
                                 <input
                                     type="text"
                                     id="specification-name"
-                                    defaultValue={currentSpecification?.name || ''}
+                                    defaultValue={currentSpecification?.label || ''}
                                     required
                                     className="rounded-md py-1.5 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     placeholder="Ingresa un nombre"
@@ -1399,7 +1341,9 @@ const Rentals = () => (
 // Actualizar el componente Users en Admin.jsx
 // Users component con popup de confirmación
 const Users = () => {
-    const [users, setUsers] = useState([]);
+    const { users, loading, error, updateUserRole} = useUserState();
+    const dispatch = useUserDispatch();
+    const { getCurrentUser } = useAuthState();
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -1413,9 +1357,9 @@ const Users = () => {
         loadUsers();
     }, [searchTerm, currentPage]);
 
-    const loadUsers = () => {
+    const loadUsers = async () => {
         try {
-            const allUsers = localDB.getAllUsers();
+            const allUsers = users;
             console.log('Todos los usuarios:', allUsers);
 
             let filteredUsers = allUsers;
@@ -1432,7 +1376,7 @@ const Users = () => {
             const endIndex = startIndex + itemsPerPage;
             const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
-            setUsers(paginatedUsers);
+            dispatch({ type: "SET_USERS", payload: paginatedUsers });
             setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
         } catch (error) {
             console.error('Error al cargar usuarios:', error);
@@ -1472,38 +1416,15 @@ const Users = () => {
 
         try {
             // Obtener el usuario actual para verificar que no se quite permisos a sí mismo
-            const currentUser = localDB.getCurrentUser();
-            if (currentUser && currentUser.id === pendingRoleChange.userId && pendingRoleChange.newRole !== 'admin') {
+            const currentUser = getCurrentUser();
+            if (currentUser && currentUser.id === pendingRoleChange.userId && pendingRoleChange.newRole !== 'ADMIN') {
                 alert('No puedes quitarte permisos de administrador a ti mismo');
                 setShowConfirmation(false);
                 return;
             }
 
-            // Actualizar el rol del usuario
-            await localDB.updateUser(pendingRoleChange.userId, { role: pendingRoleChange.newRole });
+            await updateUserRole(pendingRoleChange.userId, pendingRoleChange.newRole);
 
-            // Verificar explícitamente que los cambios se guardaron correctamente
-            const updatedUsers = localDB.getAllUsers();
-            const updatedUser = updatedUsers.find(u => u.id === pendingRoleChange.userId);
-
-            if (!updatedUser || updatedUser.role !== pendingRoleChange.newRole) {
-                throw new Error('Error: Los cambios no se aplicaron correctamente');
-            }
-
-            // Forzar una actualización de localStorage
-            localDB.saveToStorage();
-
-            // Si el usuario modificado es el actual, actualizar la sesión
-            if (currentUser && currentUser.id === pendingRoleChange.userId) {
-                // Actualizar el usuario en sesión con el nuevo rol
-                const updatedCurrentUser = {
-                    ...currentUser,
-                    role: pendingRoleChange.newRole
-                };
-                localStorage.setItem('currentUser', JSON.stringify(updatedCurrentUser));
-            }
-
-            // Recargar la lista de usuarios
             loadUsers();
             alert(`Permisos actualizados correctamente`);
         } catch (error) {
@@ -1583,8 +1504,8 @@ const Users = () => {
                                 <td>{user.username}</td>
                                 <td>{user.email}</td>
                                 <td>
-                                    <span className={`${styles.statusBadge} ${user.role === 'admin' ? styles.disponible : styles.reservado}`}>
-                                        {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                                    <span className={`${styles.statusBadge} ${user.role === 'ADMIN' ? styles.disponible : styles.reservado}`}>
+                                        {user.role === 'ADMIN' ? 'Administrador' : 'Cliente'}
                                     </span>
                                 </td>
                                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>
@@ -1594,8 +1515,8 @@ const Users = () => {
                                         onChange={(e) => initiateRoleChange(user.id, e.target.value, user.role)}
                                         className={styles.roleSelector}
                                     >
-                                        <option value="client">Cliente</option>
-                                        <option value="admin">Administrador</option>
+                                        <option value="USER">Cliente</option>
+                                        <option value="ADMIN">Administrador</option>
                                     </select>
                                 </td>
                             </tr>
@@ -1654,11 +1575,11 @@ const Users = () => {
                         <div style={{ padding: '1rem' }}>
                             <p style={{ marginBottom: '1rem' }}>
                                 ¿Estás seguro de que deseas cambiar el rol de <strong>{pendingRoleChange.username}</strong> de
-                                <strong> {pendingRoleChange.currentRole === 'admin' ? 'Administrador' : 'Cliente'}</strong> a
-                                <strong> {pendingRoleChange.newRole === 'admin' ? 'Administrador' : 'Cliente'}</strong>?
+                                <strong> {pendingRoleChange.currentRole === 'ADMIN' ? 'Administrador' : 'Cliente'}</strong> a
+                                <strong> {pendingRoleChange.newRole === 'ADMIN' ? 'Administrador' : 'Cliente'}</strong>?
                             </p>
 
-                            {pendingRoleChange.currentRole === 'admin' && pendingRoleChange.newRole !== 'admin' && (
+                            {pendingRoleChange.currentRole === 'ADMIN' && pendingRoleChange.newRole !== 'ADMIN' && (
                                 <div style={{
                                     backgroundColor: '#FFF3CD',
                                     color: '#856404',
@@ -1673,7 +1594,7 @@ const Users = () => {
                                 </div>
                             )}
 
-                            {pendingRoleChange.newRole === 'admin' && (
+                            {pendingRoleChange.newRole === 'ADMIN' && (
                                 <div style={{
                                     backgroundColor: '#FFF3CD',
                                     color: '#856404',
@@ -1720,7 +1641,9 @@ const Admin = () => {
             document.head.removeChild(link);
         };
     }, []);
-
+    const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification, updateSpecification, deleteSpecification } = useInstrumentState();
+    const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
+    
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);
 
@@ -1729,8 +1652,8 @@ const Admin = () => {
     // }, []);
 
     // const checkAdmin = () => {
-    //     const currentUser = localDB.getCurrentUser();
-    //     if (!currentUser || currentUser.role !== 'admin') {
+    //     const currentUser = getCurrentUser();
+    //     if (!currentUser || currentUser.role !== 'ADMIN') {
     //         navigate('/login');
     //         return;
     //     }
@@ -1738,7 +1661,7 @@ const Admin = () => {
     // };
 
     // // const handleLogout = () => {
-    // //     localDB.logout();
+    // //     logout();
     // //     navigate('/login');
     // // };
 
@@ -1804,7 +1727,7 @@ const Admin = () => {
                         <Routes>
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
-                            <Route path="specifications" element={<Specifications />} />
+                            <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
                             <Route path="rentals" element={<Rentals />} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />

@@ -1,63 +1,77 @@
 // src/components/cardDetails/CardDetails.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { localDB } from '../../database/LocalDB';
 import Characteristics from './Characteristics';
+import { useInstrumentState } from "../../context/InstrumentContext";
+import { useCategoryState } from "../../context/CategoryContext";
+import { useAuthState } from "../../context/AuthContext";
 import AvailabilityCalendar from './AvailabilityCalendar';
 import ShareProduct from '../home/ShareProduct'; // Importamos el componente ShareProduct
 
 function CardDetails() {
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+        
+
+        return () => {
+            document.head.removeChild(link);
+        };
+    }, []);
+    
     const { id } = useParams();
     const navigate = useNavigate();
+    
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
-    const [categories, setCategories] = useState([]);
     const [showGallery, setShowGallery] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { categories } = useCategoryState();
+    const { instruments, getInstrumentById, getAvailabilityById} = useInstrumentState();
+    const { getCurrentUser, isAuthenticated, toggleFavorite, favorites } = useAuthState();
     const [selectedDates, setSelectedDates] = useState(null);
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     const [availabilityError, setAvailabilityError] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null); // Para compartir producto
-    const [likedProducts, setLikedProducts] = useState([]); // Para productos favoritos
 
     useEffect(() => {
-        const product = localDB.getProductById(parseInt(id));
-        if (product) {
-            setInstrument(product);
-            loadSuggestions(parseInt(id));
-            getCategories();
-            window.scrollTo(0, 0);
-            setLoadingAvailability(false);
-        } else {
-            setAvailabilityError("No se pudo cargar la información del producto");
-        }
-        
-        // Verificar si el usuario está autenticado
-        const currentUser = localDB.getCurrentUser();
-        setIsAuthenticated(!!currentUser);
+        const fetchData = async () => {
+            try {
 
-        // Cargar productos favoritos desde localStorage
-        const savedLikes = JSON.parse(localStorage.getItem("likedProducts")) || [];
-        setLikedProducts(Array.isArray(savedLikes) ? savedLikes : []);
-    }, [id]);
+                const product = await getInstrumentById(parseInt(id));
+                console.log("product", product);
+                const startDateOfActualMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+                const endDateOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 2, 0).toISOString().split('T')[0];
+
+                const availability = await getAvailabilityById(parseInt(id), startDateOfActualMonth, endDateOfNextMonth);
+                console.log("availability", availability);
+
+                //quiero agregar dentro de product  la availability
+                product.availability = availability;
+
+                if (product) {
+                    setInstrument(product);
+                    loadSuggestions(parseInt(id));
+                    window.scrollTo(0, 0);
+                    setLoadingAvailability(false);
+                }
+                
+                // Verificar si el usuario está autenticado usando el contexto
+                const currentUser = getCurrentUser();
+                setIsAuthenticated(!!currentUser);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
+    }, [id, getCurrentUser]);
 
     const loadSuggestions = (currentId) => {
-        try {
-            let allProducts = localDB.getAllProducts().filter(p => p.id !== currentId);
-            allProducts = allProducts.sort(() => Math.random() - 0.5);
-            setSuggestions(allProducts.slice(0, 2));
-        } catch (error) {
-            console.error("Error al cargar sugerencias:", error);
-        }
-    };
-
-    const getCategories = () => {
-        try {
-            const categoriesDB = localDB.getAllCategories();
-            setCategories(categoriesDB);
-        } catch (error) {
-            console.error("Error al cargar categorías:", error);
-        }
+        let allProducts = instruments.filter(p => p.id !== currentId);
+        allProducts = allProducts.sort(() => Math.random() - 0.5);
+        setSuggestions(allProducts.slice(0, 2));
     };
 
     const getCategoryName = (categoryId) => {
@@ -69,31 +83,12 @@ function CardDetails() {
         setSelectedDates(dates);
     };
 
-    // Función para alternar entre like/unlike
-    const toggleLike = (product) => {
-        setLikedProducts((prev) => {
-            const prevArray = Array.isArray(prev) ? prev : [];
-            let updatedLikes;
-    
-            // Verificar si ya está en la lista
-            const isLiked = prevArray.some((p) => p.id === product.id);
-    
-            if (isLiked) {
-                // eliminamos
-                updatedLikes = prevArray.filter((p) => p.id !== product.id);
-            } else {
-                // agregamos
-                updatedLikes = [...prevArray, product];
-            }
-    
-            localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-            return updatedLikes;
-        });
-    };
-
-    // Función para alerta cuando usuario no está autenticado
-    const disabledLike = () => {
-        alert("Inicia Sesión para interactuar.");
+    const handleToggleFavorite = async () => {
+        try {
+            await toggleFavorite(instrument);
+        } catch (error) {
+            alert("Inicia Sesión para interactuar.");
+        }
     };
 
     // Calcular el precio total basado en las fechas seleccionadas
@@ -136,7 +131,7 @@ function CardDetails() {
         
         // Simular una nueva carga
         setTimeout(() => {
-            const product = localDB.getProductById(parseInt(id));
+            const product = instruments.find((product) => product.id === parseInt(id));
             if (product) {
                 setInstrument(product);
                 setLoadingAvailability(false);
@@ -147,8 +142,34 @@ function CardDetails() {
         }, 1000);
     };
 
-    if (!instrument && !loadingAvailability && !availabilityError) {
-        return <div className="text-center py-10">Cargando...</div>;
+    console.log("Instrumento:", instrument);
+    console.log("Error de disponibilidad:", availabilityError);
+    
+    if (!instrument && !availabilityError) {
+        return (
+            <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
+                <div className="flex justify-between items-center mb-6 animate-pulse">
+                    <div className="h-8 bg-gray-300 rounded w-3/4"></div>
+                    <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="w-full h-96 bg-gray-300 rounded-lg"></div>
+                    <div className="grid grid-cols-2 gap-2 md:col-span-2">
+                        {[...Array(4)].map((_, index) => (
+                            <div key={index} className="w-full h-47 bg-gray-300 rounded-lg"></div>
+                        ))}
+                    </div>
+                </div>
+                <div className="mt-6 p-6 bg-white rounded-lg shadow md:flex justify-between items-start md:gap-3 animate-pulse">
+                    <div className="md:w-[70%]">
+                        <div className="h-6 bg-gray-300 rounded w-1/2 mb-4"></div>
+                        <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                        <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                    </div>
+                    <div className="h-10 bg-gray-300 rounded w-32"></div>
+                </div>
+            </div>
+        );
     }
 
     // Obtener solo las primeras 5 imágenes para la vista principal
@@ -157,7 +178,7 @@ function CardDetails() {
     const allImages = instrument?.images || [];
 
     // Verificar si el producto está en favoritos
-    const isLiked = likedProducts.some((p) => p?.id === instrument?.id);
+    const isLiked = favorites.some((fav) => fav?.id === instrument?.id);
 
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
@@ -170,12 +191,12 @@ function CardDetails() {
                     {isAuthenticated ? ( 
                         <button 
                             className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
-                            onClick={() => toggleLike(instrument)} 
+                            onClick={handleToggleFavorite} 
                         >
                             <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
                         </button> 
                     ) : (
-                        <button className="cursor-pointer" onClick={() => disabledLike()}>
+                        <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
                             <i className="far fa-heart disabled:text-gray-100"></i>
                         </button>
                     )}
