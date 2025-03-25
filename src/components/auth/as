@@ -1,0 +1,23 @@
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;border:1px solid #9c6615;border-radius:8px">
+    <div style="text-align:center;padding-bottom:20px">
+        <img src="https://alquitones.s3.us-east-2.amazonaws.com/alquitonesLogo.png" alt="AlquiTones Logo" style="max-width:150px">
+    </div>
+    <div style="padding:20px;background-color:#ffd791;border-radius:8px">
+        <h2 style="color:#413620;margin-top:0">¡Bienvenido a AlquiTones!</h2>
+        <p style="color:#413620">Hola <strong>""" + user.getUsername() + """
+        </strong>,</p>
+        <p style="color:#413620">Tu cuenta ha sido creada exitosamente!!!</p>
+        <div style="text-align:center;margin:30px 0">
+            <a href=""" + loginUrl + """
+         style="background-color:#9c6615;color:white;padding:12px 24px;text-decoration:none;border-radius:4px;font-weight:bold" target="_blank">Iniciar Sesion</a>
+        </div>
+        <p style="color:#413620;font-size:12px">Correo: <strong><a href="mailto:""" + user.getEmail() + """ 
+                target="_blank">""" + user.getEmail() + """
+        </a></strong></p>
+        <p style="color:#413620;font-size:12px">Si no creaste esta cuenta, ignórala.</p>
+    </div>
+    <div style="text-align:center;margin-top:20px;color:#9c6615;font-size:12px">
+        <p>© 2025 AlquiTones</p>
+    </div>
+</div>
+""";

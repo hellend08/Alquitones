@@ -1,9 +1,14 @@
+// productCards.jsx - corregido
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
+import ShareProduct from "./ShareProduct";
+import { useAuthState } from "../../context/AuthContext";
 
 const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const { isAuthenticated, toggleFavorite, favorites } = useAuthState();
     const productsPerPage = 10;
 
     const getCategoryName = (categoryId) => {
@@ -11,6 +16,27 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
         return category?.name || "Sin categoría";
     };
 
+    // Formatear fecha para mostrar
+    const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const localDate = new Date(year, month - 1, day);
+        return localDate.toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'America/Montevideo'
+        });
+    };
+
+    const handleToggleFavorite = async (product) => {
+        try {
+            await toggleFavorite(product);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    // Lógica de paginación
     const totalPages = Math.ceil(products.length / productsPerPage);
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -38,60 +64,124 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                         </div>
                     ))
                 ) : currentProducts.length > 0 ? (
-                    currentProducts.map((product) => (
-                        <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:transform hover:scale-105 transition duration-300">
-                            <img 
-                                className="h-48 w-96 mx-auto object-contain rounded-t-lg" 
-                                src={product.images?.[0]?.url || product.mainImage} 
-                                alt={product.name} 
-                                onError={(e) => {
-                                    console.log("Error cargando imagen:", e.target.src);
-                                    e.target.src = 'https://dummyimage.com/300x200/000/fff&text=Imagen+no+disponible';
-                                }}
-                            />
-                            <div className="p-5 border-t border-gray-300">
-                                <div className="h-20">
-                                    <h5 className="text-xl font-bold tracking-tight text-gray-900">
-                                        {product.name}
-                                    </h5>
-                                    <h6 className="font-semibold text-xs my-1 text-gray-400">
-                                        {getCategoryName(product.categoryId)}
-                                    </h6>
-                                    <p className="mb-3 font-normal text-sm text-gray-500">
-                                        {product.description}
-                                    </p>
-                                </div>
-                                <div className="flex justify-between items-center mt-auto">
-                                    <div>
-                                        <p className="text-xs">Precio por día</p>
-                                        <span className="text-lg font-semibold text-gray-900">
-                                            ${product.pricePerDay}
-                                        </span>
+                    currentProducts.map((product) => {
+                        const isLiked = favorites.some(fav => fav.id === product.id);
+                        
+                        return (
+                            <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                                <section className="p-3 border-b border-gray-300 flex justify-start gap-5">
+                                    {isAuthenticated ? ( 
+                                        <button 
+                                            className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
+                                            onClick={() => handleToggleFavorite(product)} 
+                                        >
+                                            <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
+                                        </button> ) : (
+                                        <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
+                                            <i className="far fa-heart disabled:text-gray-100" ></i>
+                                        </button>
+                                    )}
+                                    <button className="cursor-pointer" onClick={() => setSelectedProduct(product)} >
+                                        <i className="fas fa-share-alt text-(--color-secondary)" ></i>
+                                    </button>
+                                </section>
+                                <Link to={`/detail/${product.id}`}>
+                                    <div className="h-48 overflow-hidden">
+                                        <img 
+                                            className="w-full h-full object-contain" 
+                                            src={product.mainImage || product.images?.[0].url} 
+                                            alt={product.name} 
+                                            onError={(e) => {
+                                                e.target.src = 'https://dummyimage.com/300x200/cccccc/000000&text=Imagen+no+disponible';
+                                            }}
+                                        />
                                     </div>
-                                    <Link 
-                                        to={`/detail/${product.id}`} 
-                                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-secondary)"
-                                    >
-                                        Ver detalles
-                                    </Link>
+                                </Link>
+                                <div className="p-5 border-t border-gray-300">
+                                    <div className="mb-3">
+                                        <h5 className="text-xl font-bold tracking-tight text-gray-900">
+                                            {product.name}
+                                        </h5>
+                                        <h6 className="font-semibold text-xs my-1 text-gray-400">
+                                            {getCategoryName(product.categoryId)}
+                                        </h6>
+                                        <p className="font-normal text-sm text-gray-500 line-clamp-2">
+                                            {product.description}
+                                        </p>
+                                    </div>
+                                    
+                                    {/* Tabla de disponibilidad */}
+                                    {product.availabilityDetails && product.availabilityDetails.length > 0 ? (
+                                        <div className="my-4 overflow-hidden border border-gray-200 rounded-md">
+                                            <table className="w-full divide-y divide-gray-200">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th className="px-3 py-2 text-xs font-medium text-gray-500 text-left">
+                                                            Fecha
+                                                        </th>
+                                                        <th className="px-3 py-2 text-xs font-medium text-gray-500 text-right">
+                                                            Disponibles
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200 text-sm">
+                                                    {product.availabilityDetails.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td className="px-3 py-1.5">
+                                                                {formatDate(item.date)}
+                                                            </td>
+                                                            <td className="px-3 py-1.5 text-right font-medium">
+                                                                <span className="text-green-600">
+                                                                    {item.availableStock}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : product.availabilityDetails === undefined ? (
+                                        <div className="my-4 py-2 text-center text-sm text-gray-500 bg-gray-50 rounded-md">
+                                            Disponible en fechas seleccionadas
+                                        </div>
+                                    ) : null}
+                                    
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <p className="text-xs text-gray-500">Precio por día</p>
+                                            <span className="text-lg font-semibold text-gray-900">
+                                                ${product.pricePerDay}
+                                            </span>
+                                        </div>
+                                        <Link 
+                                            to={`/detail/${product.id}`} 
+                                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-secondary)"
+                                        >
+                                            Ver detalles
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
                     <div className="col-span-2 text-center py-8">
                         <h3 className="text-lg font-semibold text-gray-700">
-                            No se encontraron productos para los filtros seleccionados
+                            No se encontraron productos disponibles
                         </h3>
                         <p className="text-sm text-gray-500 mt-2">
-                            Prueba con diferentes categorías o elimina los filtros
+                            Prueba con otras fechas o cambia tus criterios de búsqueda
                         </p>
                     </div>
                 )}
             </div>
+            {/* Modal de compartir */}
+            {selectedProduct && (
+                <ShareProduct product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+            )}
 
-            {/* Controles de paginación */}
-            {currentProducts.length > 0 && (
+            {/* Controles de paginación (solo mostrar si hay productos) */}
+            {currentProducts.length > 0 && totalPages > 1 && (
                 <div className="flex justify-center items-center gap-2 mt-4 mb-8">
                     <button
                         onClick={() => paginate(1)}
@@ -100,27 +190,27 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                         <span className="material-symbols-outlined text-sm">home</span>
                     </button>
                     <button
-                        onClick={() => paginate(currentPage - 1)}
+                        onClick={() => paginate(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
                         className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                     >
-                        <span className="material-symbols-outlined text-sm">chevron_left</span>
+                        <span className="material-symbols-outlined text-sm">navigate_before</span>
                     </button>
                     
                     <span className="px-4 py-1 text-sm font-medium text-gray-700">
-                        Página {currentPage} de {totalPages}
+                        Página {currentPage} de {totalPages || 1}
                     </span>
 
                     <button
-                        onClick={() => paginate(currentPage + 1)}
-                        disabled={currentPage === totalPages}
+                        onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages || totalPages === 0}
                         className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                     >
                         <span className="material-symbols-outlined text-sm">chevron_right</span>
                     </button>
                     <button
                         onClick={() => paginate(totalPages)}
-                        disabled={currentPage === totalPages}
+                        disabled={currentPage === totalPages || totalPages === 0}
                         className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                     >
                         <span className="material-symbols-outlined text-sm">last_page</span>
