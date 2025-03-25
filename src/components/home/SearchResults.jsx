@@ -27,6 +27,8 @@ const SearchResults = ({ results = null, isVisible, onResultSelect }) => {
     }, [isVisible, onResultSelect]);
 
     if (!isVisible || !results) return null;
+    
+    
 
     return (
         <div 

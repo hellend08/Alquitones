@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { localDB } from "../../database/LocalDB";
 import { useNavigate } from "react-router-dom";
+import { useAuthState } from "../../context/AuthContext";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
+    const { getCurrentUser, favorites, toggleFavorite } = useAuthState();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const [favorites, setFavorites] = useState(() => {
-        const savedFavorites = localStorage.getItem("likedProducts");
-        return savedFavorites ? JSON.parse(savedFavorites) : [];
-    });
-
 
     // Datos de ejemplo para arriendos (en una aplicación real, estos vendrían de una API o base de datos)
     const arriendosEjemplo = [
@@ -58,14 +54,13 @@ const UserProfile = () => {
 
     useEffect(() => {
         const checkUser = () => {
-            const currentUser = localDB.getCurrentUser();
+            const currentUser = getCurrentUser();
             if (currentUser) {
                 setUser(currentUser);
             }
             setLoading(false);
         };
 
-        // Verificar estado inicial
         checkUser();
     }, []);
 
@@ -86,15 +81,14 @@ const UserProfile = () => {
         return null;
     }
 
-    //liked products
-
-    const removeFromLikedProducts = (index) => {
-        const newLikedProducts = favorites.filter((product, i) => i !== index);
-        localStorage.setItem("likedProducts", JSON.stringify(newLikedProducts));
-        setFavorites(newLikedProducts);
+    const handleRemoveFavorite = async (favorite) => {
+        try {
+            await toggleFavorite(favorite);
+        }
+        catch (error) {
+            alert(error.message);
+        }
     };
-
-
     // Obtener el primer nombre para el saludo
     const firstName = user.username ? user.username.split(" ")[0] : "";
 
@@ -156,22 +150,20 @@ const UserProfile = () => {
                                 <th className="px-4 py-2 text-center">Imagen</th>
                                 <th className="px-4 py-2 text-center">Nombre</th>
                                 <th className="px-4 py-2 text-center">Precio por dia</th>
-                                <th className="px-4 py-2 text-center">Estado</th>
                                 <th className="px-4 py-2 text-center">Eliminar</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {favorites.map((likedProducts, index) => (
-                                <tr key={likedProducts.ID || index}>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300">{index + 1}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center"><img className="w-10" src={likedProducts.mainImage} /></td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">{likedProducts.name}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">{likedProducts.pricePerDay}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">{likedProducts.status}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center ">
-                                        <span class="material-symbols-outlined" onClick={() => removeFromLikedProducts(index)}>
-                                            delete
-                                        </span>
+                            {favorites.map((favorite) => (
+                                <tr key={favorite.id}>
+                                    <td className="px-4 py-2 text-center border-b border-gray-300">{favorite.id}</td>
+                                    <td className="px-4 py-2 border-b border-gray-300 text-center">
+                                        <img className="w-10" src={favorite.mainImage} alt={favorite.name} />
+                                    </td>
+                                    <td className="px-4 py-2 border-b border-gray-300 text-center">{favorite.name}</td>
+                                    <td className="px-4 py-2 border-b border-gray-300 text-center">${favorite.pricePerDay}</td>
+                                    <td className="px-4 py-2 border-b border-gray-300 text-center">
+                                        <span className="material-symbols-outlined cursor-pointer" onClick={() => handleRemoveFavorite(favorite)}>delete</span>
                                     </td>
                                 </tr>
                             ))}
