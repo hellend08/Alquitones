@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthState, useAuthDispatch } from '../../context/AuthContext';
 
 import styles from './Auth.module.css';
-import EmailConfirmationService from '../../services/emailConfirmationService';
+// import EmailConfirmationService from '../../services/emailConfirmationService';
 
 const Auth = () => {
     const navigate = useNavigate();
@@ -116,8 +116,7 @@ const Auth = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            dispatch({ type: 'SET_LOADING', payload: true });
-            
+            dispatch({ type: 'SET_LOADING' });
             
             const user = await login(formData.email, formData.password);
             console.log("Usuario autenticado: ", user);
@@ -127,9 +126,6 @@ const Auth = () => {
         } catch (error) {
             console.error("Error en el inicio de sesión: ", error.message);
             dispatch({ type: 'SET_ERROR', payload: error.message });
-            dispatch({ type: 'SET_LOADING', payload: false });
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
         }
     };
 
