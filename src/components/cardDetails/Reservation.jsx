@@ -78,6 +78,19 @@ function Reservation() {
         setLoading(true);
         
         try {
+            // Validaciones adicionales
+            if (!selectedDates.startDate) {
+                throw new Error('Fecha de inicio no seleccionada');
+            }
+            
+            if (!instrument) {
+                throw new Error('No se ha cargado la información del instrumento');
+            }
+            
+            if (!currentUser || !currentUser.id) {
+                throw new Error('Información de usuario no disponible');
+            }
+            
             // Construir el objeto de reserva
             const reservationData = {
                 instrumentId: instrument.id,
@@ -88,8 +101,11 @@ function Reservation() {
                 notes: reservationNote
             };
             
+            console.log('Enviando datos de reserva:', reservationData);
+            
             // Llamar a la API para crear la reserva
-            await apiService.createReservation(reservationData);
+            const result = await apiService.createReservation(reservationData);
+            console.log('Reserva creada exitosamente:', result);
             
             // Limpiar localStorage después de hacer la reserva
             localStorage.removeItem('reservationStartDate');
@@ -100,7 +116,10 @@ function Reservation() {
             setLoading(false);
         } catch (err) {
             console.error('Error al crear reserva:', err);
-            setError('No se pudo completar la reserva. Por favor, intenta de nuevo.');
+            
+            // Mensaje de error más específico si está disponible
+            const errorMessage = err.response?.data?.message || err.message || 'No se pudo completar la reserva. Por favor, intenta de nuevo.';
+            setError(errorMessage);
             setLoading(false);
         }
     };

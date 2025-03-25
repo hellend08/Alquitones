@@ -73,17 +73,27 @@ export const apiService = {
                     quantity: reservationData.quantity || 1
                 };
 
-                const response = await axios.post(`${API_BASE_URL}/availability/reserve`, apiData);
+                console.log('Enviando reserva al backend:', apiData);
+                
+                // Asegurarse de que las cabeceras sean correctas
+                const response = await axios.post(`${API_BASE_URL}/availability/reserve`, apiData, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Respuesta de reserva del backend:', response.data);
                 return response.data;
             } catch (error) {
-                console.error('Error al crear reserva:', error);
+                console.error('Error al crear reserva:', error.response?.data || error.message);
                 throw error;
             }
         } else {
+            console.log('Backend no disponible, utilizando simulación local');
             // Implementación de respaldo usando localDB
             // Esta es una simulación, ya que actualmente localDB no tiene
             // un método específico para reservas
-            return {
+            const mockReservation = {
                 id: Math.floor(Math.random() * 10000),
                 instrumentId: reservationData.instrumentId,
                 userId: reservationData.userId,
@@ -93,8 +103,14 @@ export const apiService = {
                 status: 'CONFIRMED',
                 createdAt: new Date().toISOString()
             };
+            
+            console.log('Reserva simulada creada:', mockReservation);
+            return mockReservation;
         }
     },
+
+
+
     addInstrument: async (instrumentData, imagesAdj) => {
         if (!(await checkBackendStatus())) {
             const newInstrument = await localDB.createProduct(instrumentData);

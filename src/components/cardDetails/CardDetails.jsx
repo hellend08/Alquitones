@@ -57,9 +57,8 @@ function CardDetails() {
                     setLoadingAvailability(false);
                 }
                 
-                // Verificar si el usuario está autenticado usando el contexto
-                const currentUser = getCurrentUser();
-                setIsAuthenticated(!!currentUser);
+                // No necesitamos setIsAuthenticated porque ya estamos obteniendo isAuthenticated del contexto
+                getCurrentUser(); // Solo para mantener la referencia si es necesario
             } catch (error) {
                 console.error(error);
             }
