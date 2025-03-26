@@ -74,14 +74,14 @@ export const apiService = {
                 };
 
                 console.log('Enviando reserva al backend:', apiData);
-                
+
                 // Asegurarse de que las cabeceras sean correctas
                 const response = await axios.post(`${API_BASE_URL}/availability/reserve`, apiData, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 });
-                
+
                 console.log('Respuesta de reserva del backend:', response.data);
                 return response.data;
             } catch (error) {
@@ -103,13 +103,133 @@ export const apiService = {
                 status: 'CONFIRMED',
                 createdAt: new Date().toISOString()
             };
-            
+
             console.log('Reserva simulada creada:', mockReservation);
             return mockReservation;
         }
     },
 
 
+
+    // Agregar estos métodos a apiService.js
+    // Enviar o actualizar una valoración
+    submitRating: async (ratingData) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.submitRating(ratingData);
+        }
+
+        return axios.post(`${API_BASE_URL}/ratings`, ratingData)
+            .then(response => response.data);
+    },
+
+    // Obtener valoraciones por instrumento
+    getRatingsByInstrument: async (instrumentId) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.getRatingsByInstrument(instrumentId);
+        }
+
+        return axios.get(`${API_BASE_URL}/ratings/instrument/${instrumentId}`)
+            .then(response => response.data);
+    },
+
+    // Corrección de la función getUserReservations en apiService.js
+
+    getUserReservations: async (userId) => {
+        const backendAvailable = await checkBackendStatus();
+        
+        if (!backendAvailable) {
+            // Simulación local si el backend no está disponible
+            console.log('Backend no disponible, usando datos simulados');
+            return { 
+                data: [
+                    {
+                        id: 1,
+                        instrumentId: 4,
+                        instrumentName: "Saxofón Alto Selmer Series III",
+                        instrumentImage: "https://alquitones.s3.us-east-2.amazonaws.com/24.PNG",
+                        category: "Viento",
+                        status: "Reservado",
+                        startDate: "2025-03-23",
+                        endDate: "2025-03-26"
+                    },
+                    // Más datos simulados basados en tu imagen
+                ] 
+            };
+        }
+        
+        try {
+            console.log(`Obteniendo reservas para usuario ${userId}`);
+            const response = await axios.get(`${API_BASE_URL}/reservations/user/${userId}`);
+            
+            if (!response.data) return { data: [] };
+            
+            // Obtener los detalles de instrumentos para cada reserva
+            const reservationsWithDetails = await Promise.all(
+                response.data.map(async (reservation) => {
+                    let instrumentDetails = {};
+                    
+                    try {
+                        // Intentar obtener detalles del instrumento
+                        if (reservation.instrumentId) {
+                            const instrument = await apiService.getInstrumentById(reservation.instrumentId);
+                            
+                            if (instrument) {
+                                instrumentDetails = {
+                                    instrumentName: instrument.name,
+                                    instrumentImage: instrument.mainImage || instrument.images?.[0],
+                                    category: instrument.category?.name || "Sin categoría"
+                                };
+                            }
+                        }
+                    } catch (err) {
+                        console.warn(`No se pudieron obtener detalles del instrumento ${reservation.instrumentId}`, err);
+                    }
+                    
+                    return {
+                        id: reservation.id,
+                        instrumentId: reservation.instrumentId,
+                        status: reservation.status || "Reservado",
+                        startDate: reservation.startDate,
+                        endDate: reservation.endDate,
+                        quantity: reservation.quantity,
+                        ...instrumentDetails
+                    };
+                })
+            );
+            
+            return { data: reservationsWithDetails };
+        } catch (error) {
+            console.error("Error al obtener reservas:", error);
+            return { data: [] };
+        }
+    },
+
+
+    cancelReservation: async (reservationId) => {
+        const backendAvailable = await checkBackendStatus();
+        
+        if (!backendAvailable) {
+            // Simulación local para pruebas
+            console.log(`Simulando cancelación de reserva ${reservationId}`);
+            return { success: true, message: "Reserva cancelada (simulación)" };
+        }
+        
+        try {
+            console.log(`Cancelando reserva ${reservationId}`);
+            // Esta URL debe ajustarse según la documentación del swagger
+            const response = await axios.put(
+                `${API_BASE_URL}/reservations/${reservationId}/cancel`, 
+                {}, 
+                {
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Error cancelando reserva:", error);
+            throw new Error(error.response?.data?.message || "No se pudo cancelar la reserva");
+        }
+    },
 
     addInstrument: async (instrumentData, imagesAdj) => {
         if (!(await checkBackendStatus())) {

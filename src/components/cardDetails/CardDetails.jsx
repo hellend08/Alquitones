@@ -6,7 +6,10 @@ import { useInstrumentState } from "../../context/InstrumentContext";
 import { useCategoryState } from "../../context/CategoryContext";
 import { useAuthState } from "../../context/AuthContext";
 import AvailabilityCalendar from './AvailabilityCalendar';
-import ShareProduct from '../home/ShareProduct'; // Importamos el componente ShareProduct
+import ShareProduct from '../home/ShareProduct';
+import RatingDisplay from '../ratings/RatingDisplay';
+import RatingForm from '../ratings/RatingForm';
+import { apiService } from "../../services/apiService"; // Añadir esta importación
 
 function CardDetails() {
     useEffect(() => {
@@ -14,22 +17,24 @@ function CardDetails() {
         link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
         link.rel = "stylesheet";
         document.head.appendChild(link);
-        
 
         return () => {
             document.head.removeChild(link);
         };
     }, []);
-    
+
     const { id } = useParams();
     const navigate = useNavigate();
-    
+
+    const [userHasReservation, setUserHasReservation] = useState(false);
+    const [userRating, setUserRating] = useState(null);
+    const [showRatingForm, setShowRatingForm] = useState(false);
     const [instrument, setInstrument] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [showGallery, setShowGallery] = useState(false);
     const { categories } = useCategoryState();
-    const { instruments, getInstrumentById, getAvailabilityById} = useInstrumentState();
-    const { getCurrentUser, isAuthenticated, toggleFavorite, favorites } = useAuthState();
+    const { instruments, getInstrumentById, getAvailabilityById } = useInstrumentState();
+    const { getCurrentUser, isAuthenticated, toggleFavorite, favorites, user } = useAuthState(); // Añadir user aquí
     const [selectedDates, setSelectedDates] = useState(null);
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     const [availabilityError, setAvailabilityError] = useState(null);
@@ -38,7 +43,6 @@ function CardDetails() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-
                 const product = await getInstrumentById(parseInt(id));
                 console.log("product", product);
                 const startDateOfActualMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
@@ -56,7 +60,7 @@ function CardDetails() {
                     window.scrollTo(0, 0);
                     setLoadingAvailability(false);
                 }
-                
+
                 // No necesitamos setIsAuthenticated porque ya estamos obteniendo isAuthenticated del contexto
                 getCurrentUser(); // Solo para mantener la referencia si es necesario
             } catch (error) {
@@ -65,7 +69,44 @@ function CardDetails() {
         };
 
         fetchData();
-    }, [id, getCurrentUser]);
+        
+        // Mover este código fuera de fetchData para evitar problemas de dependencia
+        if (isAuthenticated && user) {
+            checkUserReservation(parseInt(id), user.id);
+        }
+    }, [id, getCurrentUser, isAuthenticated, user]);
+
+    const checkUserReservation = async (instrumentId, userId) => {
+        try {
+            const reservations = await apiService.getUserReservations(userId);
+
+            // Verificar si hay alguna reserva para este instrumento
+            const hasReservation = Array.isArray(reservations) && reservations.some(
+                reservation => reservation.instrumentId === instrumentId
+            )
+
+            setUserHasReservation(hasReservation);
+
+            // Si el usuario tiene una reserva, verificamos si ya ha valorado el instrumento
+            if (hasReservation) {
+                const ratings = await apiService.getRatingsByInstrument(instrumentId);
+                const userRating = ratings.find(rating => rating.userId === userId);
+
+                if (userRating) {
+                    setUserRating(userRating);
+                }
+            }
+        } catch (error) {
+            console.error("Error al verificar reservas del usuario:", error);
+        }
+    };
+
+    const handleRatingSubmitted = (newRating) => {
+        setUserRating(newRating);
+        setShowRatingForm(false);
+        // Recargar las valoraciones
+        window.location.reload();
+    };
 
     const loadSuggestions = (currentId) => {
         let allProducts = instruments.filter(p => p.id !== currentId);
@@ -94,11 +135,11 @@ function CardDetails() {
     // Utilizando un enfoque más preciso para el cálculo de días
     const calculateTotalPrice = () => {
         if (!selectedDates || !selectedDates.startDate || !instrument) return 0;
-        
+
         // Parsear las fechas correctamente
         // Formato esperado: "2025-03-21"
         const [startYear, startMonth, startDay] = selectedDates.startDate.split('-').map(Number);
-        
+
         // Si hay fecha de fin, usarla; de lo contrario usar la fecha de inicio
         let endYear, endMonth, endDay;
         if (selectedDates.endDate) {
@@ -106,20 +147,20 @@ function CardDetails() {
         } else {
             [endYear, endMonth, endDay] = [startYear, startMonth, startDay];
         }
-        
+
         // Crear objetos Date con los valores exactos (mes -1 porque en JS los meses van de 0-11)
         const start = new Date(startYear, startMonth - 1, startDay);
         const end = new Date(endYear, endMonth - 1, endDay);
-        
+
         // Calcular días totales considerando fechas inclusivas
         const oneDay = 24 * 60 * 60 * 1000; // milisegundos en un día
         const diffDays = Math.round(Math.abs((end - start) / oneDay)) + 1; // +1 para incluir ambos días
-        
+
         // El precio es directamente días * precio por día para el ejemplo de Uruguay
         // Como asumimos que todas las fechas seleccionadas son válidas (el calendario no permite 
         // seleccionar fechas no disponibles), el total es simplemente:
         const totalPrice = instrument.pricePerDay * diffDays;
-        
+
         return totalPrice.toFixed(2);
     };
 
@@ -127,7 +168,7 @@ function CardDetails() {
     const handleRetryAvailability = () => {
         setLoadingAvailability(true);
         setAvailabilityError(null);
-        
+
         // Simular una nueva carga
         setTimeout(() => {
             const product = instruments.find((product) => product.id === parseInt(id));
@@ -143,7 +184,7 @@ function CardDetails() {
 
     console.log("Instrumento:", instrument);
     console.log("Error de disponibilidad:", availabilityError);
-    
+
     if (!instrument && !availabilityError) {
         return (
             <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-100">
@@ -187,31 +228,31 @@ function CardDetails() {
                 </h1>
                 <div className="flex items-center gap-3">
                     {/* Botón de Like */}
-                    {isAuthenticated ? ( 
-                        <button 
+                    {isAuthenticated ? (
+                        <button
                             className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
-                            onClick={handleToggleFavorite} 
+                            onClick={handleToggleFavorite}
                         >
                             <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
-                        </button> 
+                        </button>
                     ) : (
                         <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
                             <i className="far fa-heart disabled:text-gray-100"></i>
                         </button>
                     )}
-                    
+
                     {/* Botón de compartir */}
                     <button className="cursor-pointer" onClick={() => setSelectedProduct(instrument)}>
                         <i className="fas fa-share-alt text-(--color-secondary)"></i>
                     </button>
-                    
+
                     {/* Botón de volver */}
                     <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-(--color-secondary) cursor-pointer text-2xl">
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                 </div>
             </div>
-            
+
             {/* Vista principal - Solo 5 imágenes */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 {mainViewImages.length > 0 && (
@@ -222,8 +263,8 @@ function CardDetails() {
                                 <img key={index} src={img} alt={`Miniatura ${index}`} className="w-full h-47 object-cover rounded-lg" />
                             ))}
                             <div className="relative">
-                                <button 
-                                    onClick={() => setShowGallery(true)} 
+                                <button
+                                    onClick={() => setShowGallery(true)}
                                     className="absolute -right-40 md:-right-52 lg:-right-80 bottom-8 cursor-pointer border bg-white text-(--color-secondary) px-4 py-2 rounded-lg shadow-lg hover:bg-(--color-primary) hover:text-white transition"
                                 >
                                     Ver más 👁
@@ -234,10 +275,44 @@ function CardDetails() {
                 )}
             </div>
 
+
+            {/* Sección de Valoraciones */}
+            {instrument && (
+                <div className="mb-6">
+                    <RatingDisplay instrumentId={instrument.id} />
+
+                    {/* Mostrar botón para valorar solo si el usuario está autenticado y ha hecho una reserva */}
+                    {isAuthenticated && userHasReservation && !showRatingForm && (
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={() => setShowRatingForm(true)}
+                                className="bg-(--color-secondary) hover:bg-(--color-primary) text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors duration-200"
+                            >
+                                {userRating ? 'Editar mi valoración' : 'Valorar este instrumento'}
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Formulario de valoración */}
+                    {isAuthenticated && userHasReservation && showRatingForm && (
+                        <div className="mt-6">
+                            <RatingForm
+                                instrumentId={instrument.id}
+                                userId={user.id}
+                                onRatingSubmitted={handleRatingSubmitted}
+                                existingRating={userRating}
+                                onCancel={() => setShowRatingForm(false)}
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
+
+
             {/* Sección de Disponibilidad */}
             <div className="mt-6 p-6 bg-white rounded-lg shadow mb-6">
                 <h2 className="text-xl font-bold text-(--color-secondary) mb-4">Disponibilidad</h2>
-                
+
                 {loadingAvailability ? (
                     <div className="flex justify-center items-center p-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-(--color-primary)"></div>
@@ -245,7 +320,7 @@ function CardDetails() {
                 ) : availabilityError ? (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
                         <div className="text-red-500 mb-2">{availabilityError}</div>
-                        <button 
+                        <button
                             onClick={handleRetryAvailability}
                             className="bg-white text-(--color-secondary) border border-(--color-secondary) px-4 py-1 rounded-md hover:bg-(--color-sunset) transition"
                         >
@@ -253,8 +328,8 @@ function CardDetails() {
                         </button>
                     </div>
                 ) : (
-                    <AvailabilityCalendar 
-                        availability={instrument.availability || []} 
+                    <AvailabilityCalendar
+                        availability={instrument.availability || []}
                         onSelect={handleDateSelect}
                     />
                 )}
@@ -265,7 +340,7 @@ function CardDetails() {
                     <h2 className="text-xl font-bold text-(--color-secondary)">Características</h2>
                     <div className="mb-6 mt-3">
                         {instrument?.specifications && (
-                            <Characteristics specifications={instrument.specifications}/>
+                            <Characteristics specifications={instrument.specifications} />
                         )}
                     </div>
                     <div>
@@ -275,13 +350,13 @@ function CardDetails() {
                         </p>
                     </div>
                 </section>
-                
+
                 <div className="flex flex-col gap-4 md:w-[30%]">
                     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                        <p className="text-lg font-semibold">Precio por día: 
+                        <p className="text-lg font-semibold">Precio por día:
                             <span className="text-green-600 ml-2">${instrument?.pricePerDay?.toFixed(2)}</span>
                         </p>
-                        
+
                         {selectedDates && selectedDates.startDate && (
                             <div className="mt-4 bg-(--color-sunset) bg-opacity-30 p-3 rounded-lg">
                                 <h3 className="font-medium text-gray-700 mb-2">Resumen de reserva</h3>
@@ -300,41 +375,41 @@ function CardDetails() {
                                 </div>
                             </div>
                         )}
-                    
+
                         {isAuthenticated ? (
-                            <button 
-                            className={`w-full mt-4 py-2 px-4 rounded-lg text-white font-medium transition
-                                ${selectedDates && selectedDates.startDate 
-                                    ? 'bg-(--color-secondary) hover:bg-(--color-primary) cursor-pointer' 
-                                    : 'bg-gray-400 cursor-not-allowed'}`}
-                            disabled={!selectedDates || !selectedDates.startDate}
-                            onClick={() => {
-                                if (selectedDates && selectedDates.startDate) {
-                                    // Guardar las fechas seleccionadas en localStorage para usarlas en el componente de reserva
-                                    localStorage.setItem('reservationStartDate', selectedDates.startDate);
-                                    localStorage.setItem('reservationEndDate', selectedDates.endDate || selectedDates.startDate);
-                                    // Navegar a la página de reserva
-                                    navigate(`/reservation/${instrument.id}`);
-                                }
-                            }}
-                        >
-                            {selectedDates && selectedDates.startDate 
-                                ? 'Reservar ahora' 
-                                : 'Selecciona fechas para reservar'}
-                        </button>
+                            <button
+                                className={`w-full mt-4 py-2 px-4 rounded-lg text-white font-medium transition
+                                ${selectedDates && selectedDates.startDate
+                                        ? 'bg-(--color-secondary) hover:bg-(--color-primary) cursor-pointer'
+                                        : 'bg-gray-400 cursor-not-allowed'}`}
+                                disabled={!selectedDates || !selectedDates.startDate}
+                                onClick={() => {
+                                    if (selectedDates && selectedDates.startDate) {
+                                        // Guardar las fechas seleccionadas en localStorage para usarlas en el componente de reserva
+                                        localStorage.setItem('reservationStartDate', selectedDates.startDate);
+                                        localStorage.setItem('reservationEndDate', selectedDates.endDate || selectedDates.startDate);
+                                        // Navegar a la página de reserva
+                                        navigate(`/reservation/${instrument.id}`);
+                                    }
+                                }}
+                            >
+                                {selectedDates && selectedDates.startDate
+                                    ? 'Reservar ahora'
+                                    : 'Selecciona fechas para reservar'}
+                            </button>
                         ) : (
                             <div className="mt-4 text-center">
                                 <div className="flex flex-col items-center text-center">
                                     <span className="material-symbols-outlined text-3xl text-(--color-secondary) mb-2">lock</span>
                                     <h3 className="text-lg font-semibold text-(--color-secondary) mb-2">Accede a tu cuenta para reservar</h3>
-                                    
+
                                     <button
                                         onClick={() => window.location.href = '/login'}
                                         className="bg-(--color-secondary) hover:bg-(--color-primary) text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors duration-200 mb-3 w-full"
                                     >
                                         Iniciar sesión
                                     </button>
-                                    
+
                                     <p className="text-sm">
                                         ¿No tienes cuenta? <a href="/register" className="text-(--color-secondary) underline">Crea una aquí</a>
                                     </p>
@@ -344,7 +419,7 @@ function CardDetails() {
                     </div>
                 </div>
             </div>
-            
+
             <h2 className="mt-10 text-xl font-bold text-(--color-secondary)">Sugerencias</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 {suggestions.map((product) => (
@@ -378,10 +453,10 @@ function CardDetails() {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {allImages.map((img, index) => (
-                                <img 
-                                    key={index} 
-                                    src={img} 
-                                    alt={`Imagen ${index + 1}`} 
+                                <img
+                                    key={index}
+                                    src={img}
+                                    alt={`Imagen ${index + 1}`}
                                     className="w-full md:col-span-2 h-47 object-cover rounded-lg"
                                 />
                             ))}
