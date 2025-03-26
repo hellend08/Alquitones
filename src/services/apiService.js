@@ -115,11 +115,40 @@ export const apiService = {
     // Enviar o actualizar una valoración
     submitRating: async (ratingData) => {
         if (!(await checkBackendStatus())) {
-            return localDB.submitRating(ratingData);
+            // Simulación local, mantén igual
+            return { success: true, data: { id: Math.floor(Math.random() * 1000), ...ratingData, createdAt: new Date().toISOString() }};
         }
-
-        return axios.post(`${API_BASE_URL}/ratings`, ratingData)
-            .then(response => response.data);
+        
+        try {
+            // Formato corregido según API
+            const formattedData = {
+                instrumentId: ratingData.instrumentId,
+                userId: ratingData.userId,
+                stars: ratingData.stars,
+                comment: ratingData.comment || ""  // Asegura que nunca sea null
+            };
+            
+            console.log('Enviando valoración al servidor:', formattedData);
+            
+            const response = await axios.post(
+                `${API_BASE_URL}/ratings`, 
+                formattedData,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            
+            return response.data;
+        } catch (error) {
+            console.error('Error al enviar valoración:', error);
+            
+            // Mejor manejo de errores
+            if (error.response?.status === 500) {
+                throw new Error('Error interno del servidor. Intenta más tarde.');
+            } else if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            } else {
+                throw new Error('Error al enviar la valoración');
+            }
+        }
     },
 
     // Obtener valoraciones por instrumento
@@ -138,8 +167,7 @@ export const apiService = {
         const backendAvailable = await checkBackendStatus();
         
         if (!backendAvailable) {
-            // Simulación local si el backend no está disponible
-            console.log('Backend no disponible, usando datos simulados');
+            // Simulación local
             return { 
                 data: [
                     {
@@ -151,49 +179,42 @@ export const apiService = {
                         status: "Reservado",
                         startDate: "2025-03-23",
                         endDate: "2025-03-26"
-                    },
-                    // Más datos simulados basados en tu imagen
+                    }
                 ] 
             };
         }
         
         try {
-            console.log(`Obteniendo reservas para usuario ${userId}`);
+            // Nota que el endpoint correcto según Swagger es /api/reservations/user/{id}
             const response = await axios.get(`${API_BASE_URL}/reservations/user/${userId}`);
             
-            if (!response.data) return { data: [] };
-            
-            // Obtener los detalles de instrumentos para cada reserva
+            // Transformar los datos para que coincidan con lo esperado por el componente
             const reservationsWithDetails = await Promise.all(
-                response.data.map(async (reservation) => {
-                    let instrumentDetails = {};
-                    
+                (response.data || []).map(async (reservation) => {
                     try {
-                        // Intentar obtener detalles del instrumento
-                        if (reservation.instrumentId) {
-                            const instrument = await apiService.getInstrumentById(reservation.instrumentId);
-                            
-                            if (instrument) {
-                                instrumentDetails = {
-                                    instrumentName: instrument.name,
-                                    instrumentImage: instrument.mainImage || instrument.images?.[0],
-                                    category: instrument.category?.name || "Sin categoría"
-                                };
-                            }
-                        }
+                        // Obtener detalles del instrumento si es posible
+                        const instrument = await apiService.getInstrumentById(reservation.instrumentId);
+                        
+                        return {
+                            id: reservation.id,
+                            instrumentId: reservation.instrumentId,
+                            instrumentName: instrument?.name || `Instrumento ${reservation.instrumentId}`,
+                            instrumentImage: instrument?.mainImage || instrument?.images?.[0],
+                            category: instrument?.category?.name || "Sin categoría", 
+                            status: reservation.status || "Reservado",
+                            startDate: reservation.startDate,
+                            endDate: reservation.endDate
+                        };
                     } catch (err) {
-                        console.warn(`No se pudieron obtener detalles del instrumento ${reservation.instrumentId}`, err);
+                        // En caso de error, devolver datos mínimos
+                        return {
+                            id: reservation.id,
+                            instrumentId: reservation.instrumentId,
+                            status: reservation.status || "Reservado",
+                            startDate: reservation.startDate,
+                            endDate: reservation.endDate
+                        };
                     }
-                    
-                    return {
-                        id: reservation.id,
-                        instrumentId: reservation.instrumentId,
-                        status: reservation.status || "Reservado",
-                        startDate: reservation.startDate,
-                        endDate: reservation.endDate,
-                        quantity: reservation.quantity,
-                        ...instrumentDetails
-                    };
                 })
             );
             
@@ -201,6 +222,83 @@ export const apiService = {
         } catch (error) {
             console.error("Error al obtener reservas:", error);
             return { data: [] };
+        }
+    },
+
+    submitRating: async (ratingData) => {
+        if (!(await checkBackendStatus())) {
+            // Simulación local si no hay backend
+            return { 
+                success: true, 
+                data: { 
+                    id: Math.floor(Math.random() * 1000), 
+                    ...ratingData,
+                    createdAt: new Date().toISOString()
+                }
+            };
+        }
+        
+        try {
+            // Asegúrate de enviar exactamente este formato
+            const formattedData = {
+                instrumentId: Number(ratingData.instrumentId),
+                userId: Number(ratingData.userId),
+                stars: Number(ratingData.stars),
+                comment: ratingData.comment || ""
+            };
+            
+            console.log('Enviando valoración:', formattedData);
+            
+            // Usar axios.post con el formato correcto
+            const response = await axios.post(
+                `${API_BASE_URL}/ratings`, 
+                formattedData
+            );
+            
+            return response.data;
+        } catch (error) {
+            console.error('Error al enviar valoración:', error);
+            
+            // Capturar específicamente el error 500 
+            if (error.response?.status === 500) {
+                throw new Error('Error interno del servidor. Por favor, intenta más tarde.');
+            } else if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            } else {
+                throw new Error('Error al enviar la valoración');
+            }
+        }
+    },
+    
+    // Obtener valoraciones por instrumento
+    getRatingsByInstrument: async (instrumentId) => {
+        if (!(await checkBackendStatus())) {
+            // Datos de ejemplo para modo sin backend
+            console.log('Backend no disponible, usando valoraciones simuladas');
+            return [
+                {
+                    id: 1,
+                    instrumentId: instrumentId,
+                    userId: 1,
+                    stars: 4,
+                    comment: "Muy buen instrumento, suena excelente y estaba en perfecto estado."
+                },
+                {
+                    id: 2,
+                    instrumentId: instrumentId,
+                    userId: 2,
+                    stars: 5,
+                    comment: "Excelente calidad, lo volvería a alquilar."
+                }
+            ];
+        }
+        
+        try {
+            const response = await axios.get(`${API_BASE_URL}/ratings/instrument/${instrumentId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error al obtener valoraciones:', error);
+            return [];
         }
     },
 

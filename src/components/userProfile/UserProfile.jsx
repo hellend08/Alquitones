@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuthState } from "../../context/AuthContext";
 import { apiService } from "../../services/apiService";
 import RatingForm from "../ratings/RatingForm";
+import axios from "axios";
+
+const API_BASE_URL = (import.meta.env.VITE_URL || "http://localhost:8080") + "/api";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
@@ -81,61 +84,45 @@ const UserProfile = () => {
     };
 
     const openRatingModal = (reservation) => {
+        // Verificar si hay un ID de instrumento disponible
         if (!reservation.instrumentId) {
-            alert("Este instrumento no puede ser puntuado");
+            alert("No se puede puntuar este instrumento (ID no disponible)");
             return;
         }
 
+        // Configurar el instrumento seleccionado para el modal
         setSelectedInstrument({
             id: reservation.instrumentId,
             name: reservation.instrumentName || `Instrumento ${reservation.instrumentId}`
         });
+
+        // Mostrar el modal
         setShowRatingModal(true);
     };
 
     const handleRatingSubmit = async (ratingData) => {
         try {
-            await apiService.submitRating({
-                instrumentId: selectedInstrument.id,
-                userId: user.id,
-                stars: ratingData.stars,
-                comment: ratingData.comment.trim()
-            });
-
+            // Crea un objeto limpio con los datos esperados
+            const ratingPayload = {
+                instrumentId: Number(selectedInstrument.id),
+                userId: Number(user.id),
+                stars: Number(ratingData.stars),
+                comment: ratingData.comment || ""
+            };
+    
+            console.log("Enviando valoración:", ratingPayload);
+    
+            // Simplificamos la lógica y usamos directamente apiService
+            await apiService.submitRating(ratingPayload);
+    
+            // Actualizar reservas después de valoración exitosa
             await fetchUserReservations(user.id);
-            alert(`✅ Valoración enviada para ${selectedInstrument.name}`);
+            
+            alert(`✅ Valoración enviada correctamente para ${selectedInstrument.name}`);
             setShowRatingModal(false);
         } catch (error) {
+            console.error("Error al enviar valoración:", error);
             alert(`❌ Error: ${error.message || "No se pudo enviar la valoración"}`);
-        }
-    };
-
-
-    const handleCancelReservation = async (reservationId) => {
-        if (!reservationId) {
-            alert("No se puede cancelar esta reserva");
-            return;
-        }
-
-        const confirmCancel = window.confirm(
-            "¿Estás seguro de que deseas cancelar esta reserva? Esta acción no se puede deshacer."
-        );
-
-        if (!confirmCancel) return;
-
-        try {
-            setReservationsLoading(true);
-            await apiService.cancelReservation(reservationId);
-
-            // Actualiza las reservas después de cancelar
-            await fetchUserReservations(user.id);
-
-            alert("✅ Reserva cancelada exitosamente");
-        } catch (error) {
-            console.error("Error al cancelar la reserva:", error);
-            alert(`❌ Error: ${error.message || "No se pudo cancelar la reserva"}`);
-        } finally {
-            setReservationsLoading(false);
         }
     };
 
@@ -279,10 +266,10 @@ const UserProfile = () => {
                                             </td>
                                             <td className="px-4 py-2 text-center border-b border-gray-300">
                                                 <span className={`inline-block px-2 py-1 rounded-full text-xs ${(reservation.status || "").toLowerCase() === "reservado"
-                                                        ? "bg-blue-100 text-blue-800"
-                                                        : (reservation.status || "").toLowerCase() === "finalizado"
-                                                            ? "bg-green-100 text-green-800"
-                                                            : "bg-gray-100 text-gray-800"
+                                                    ? "bg-blue-100 text-blue-800"
+                                                    : (reservation.status || "").toLowerCase() === "finalizado"
+                                                        ? "bg-green-100 text-green-800"
+                                                        : "bg-gray-100 text-gray-800"
                                                     }`}>
                                                     {reservation.status || "Reservado"}
                                                 </span>
@@ -294,22 +281,12 @@ const UserProfile = () => {
                                                 {reservation.endDate ? formatDate(reservation.endDate) : "N/A"}
                                             </td>
                                             <td className="px-4 py-2 text-center border-b border-gray-300">
-                                                {(reservation.status || "").toLowerCase() === "finalizado" && (
-                                                    <button
-                                                        className="bg-(--color-secondary) text-white px-2 py-1 rounded-md text-xs hover:bg-(--color-primary)"
-                                                        onClick={() => openRatingModal(reservation)}
-                                                    >
-                                                        Puntuar
-                                                    </button>
-                                                )}
-                                                {(reservation.status || "").toLowerCase() === "reservado" && (
-                                                    <button
-                                                        className="bg-red-500 text-white px-2 py-1 rounded-md text-xs hover:bg-red-600"
-                                                        onClick={() => handleCancelReservation(reservation.id)}
-                                                    >
-                                                        Cancelar
-                                                    </button>
-                                                )}
+                                                <button
+                                                    className="bg-(--color-secondary) text-white px-2 py-1 rounded-md text-xs hover:bg-(--color-primary) transition"
+                                                    onClick={() => openRatingModal(reservation)}
+                                                >
+                                                    Puntuar
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -330,12 +307,22 @@ const UserProfile = () => {
                     </div>
                 )}
             </div>
-
             {/* Modal de puntuación */}
             {showRatingModal && selectedInstrument && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg max-w-md w-full">
-                        <h3 className="text-xl font-bold mb-4">Valorar {selectedInstrument.name}</h3>
+                    <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-xl">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold text-(--color-secondary)">
+                                Valorar {selectedInstrument.name}
+                            </h3>
+                            <button
+                                onClick={() => setShowRatingModal(false)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
                         <RatingForm
                             instrumentId={selectedInstrument.id}
                             userId={user.id}
