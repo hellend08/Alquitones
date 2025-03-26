@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useInstrumentState } from "../../context/InstrumentContext";
 import { useAuthState } from "../../context/AuthContext";
 import { apiService } from "../../services/apiService";
+import WhatsAppChat from '../crossSections/WhatsAppChat';
 
 function Reservation() {
     const { id } = useParams();
@@ -378,6 +379,7 @@ function Reservation() {
                     </div>
                 </div>
             </div>
+            <WhatsAppChat />
         </div>
     );
 }

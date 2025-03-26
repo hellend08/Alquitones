@@ -7,6 +7,7 @@ import { useCategoryState } from "../../context/CategoryContext";
 import { useAuthState } from "../../context/AuthContext";
 import AvailabilityCalendar from './AvailabilityCalendar';
 import ShareProduct from '../home/ShareProduct';
+import WhatsAppChat from '../crossSections/WhatsAppChat';
 import RatingDisplay from '../ratings/RatingDisplay';
 import RatingForm from '../ratings/RatingForm';
 import { apiService } from "../../services/apiService"; // Añadir esta importación
@@ -469,6 +470,7 @@ function CardDetails() {
             {selectedProduct && (
                 <ShareProduct product={selectedProduct} onClose={() => setSelectedProduct(null)} />
             )}
+            <WhatsAppChat />
         </div>
     );
 }

@@ -4,6 +4,7 @@ import Category from './categorias';
 import ProductCards from './productCards';
 import { useInstrumentState } from "../../context/InstrumentContext";
 import { useCategoryState } from "../../context/CategoryContext";
+import WhatsAppChat from '../crossSections/WhatsAppChat';
 
 const Home = () => {
     const { categories, loading: loadingCategories, error: errorCategories } = useCategoryState();
@@ -118,7 +119,7 @@ const Home = () => {
                     ) : (
     <ProductCards products={filteredProducts || instruments} categories={categories} isLoading={loading} />
 )}
-
+            <WhatsAppChat />
             </div>
         </main>
     );
