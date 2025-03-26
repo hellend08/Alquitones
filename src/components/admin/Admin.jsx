@@ -110,7 +110,6 @@ const Instruments = () => {
                 description: form['instrument-description'].value.trim() || currentInstrument?.description,
                 status: form['instrument-status'].value || currentInstrument?.status,
                 images: existingImages,
-                mainImage: existingImages[0].url || currentInstrument?.mainImage,
                 specifications: productSpecifications.length > 0 ? productSpecifications : currentInstrument?.specifications
             };
 
