@@ -3,9 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuthState } from "../../context/AuthContext";
 import { apiService } from "../../services/apiService";
 import RatingForm from "../ratings/RatingForm";
-import axios from "axios";
-
-const API_BASE_URL = (import.meta.env.VITE_URL || "http://localhost:8080") + "/api";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
@@ -49,9 +46,6 @@ const UserProfile = () => {
             setReservationsLoading(false);
         }
     };
-    const handleNavigation = (path) => {
-        navigate(path);
-    };
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('es-UY', {
@@ -64,7 +58,7 @@ const UserProfile = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <p className="text-xl">Cargando...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#9C6615]"></div>
             </div>
         );
     }
@@ -84,40 +78,34 @@ const UserProfile = () => {
     };
 
     const openRatingModal = (reservation) => {
-        // Verificar si hay un ID de instrumento disponible
         if (!reservation.instrumentId) {
             alert("No se puede puntuar este instrumento (ID no disponible)");
             return;
         }
 
-        // Configurar el instrumento seleccionado para el modal
         setSelectedInstrument({
             id: reservation.instrumentId,
             name: reservation.instrumentName || `Instrumento ${reservation.instrumentId}`
         });
 
-        // Mostrar el modal
         setShowRatingModal(true);
     };
 
     const handleRatingSubmit = async (ratingData) => {
         try {
-            // Crea un objeto limpio con los datos esperados
             const ratingPayload = {
                 instrumentId: Number(selectedInstrument.id),
                 userId: Number(user.id),
                 stars: Number(ratingData.stars),
                 comment: ratingData.comment || ""
             };
-    
+
             console.log("Enviando valoración:", ratingPayload);
-    
-            // Simplificamos la lógica y usamos directamente apiService
+
             await apiService.submitRating(ratingPayload);
-    
-            // Actualizar reservas después de valoración exitosa
+
             await fetchUserReservations(user.id);
-            
+
             alert(`✅ Valoración enviada correctamente para ${selectedInstrument.name}`);
             setShowRatingModal(false);
         } catch (error) {
@@ -130,162 +118,106 @@ const UserProfile = () => {
 
     return (
         <>
-            <div className="bg-(--color-primary) text-white text-center py-15">
-                <h1 className="text-4xl font-bold">Hola {firstName}, ¡buenas tardes!</h1>
-                <p className="text-lg mt-2">¡Te damos la bienvenida a tu perfil!</p>
+            {/* Header con bienvenida mejorado */}
+            <div className="bg-gradient-to-r from-[#9F7933] to-[#523E1A] text-white py-12 shadow-md">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold">
+                                Hola {firstName}
+                                <span className="inline-block animate-pulse mx-1">👋</span>
+                            </h1>
+                            <p className="text-lg mt-2 text-[#FFE8C0]">
+                                Bienvenido a tu espacio personal en AlquiTones
+                            </p>
+                        </div>
+                        <div className="mt-4 md:mt-0 flex items-center">
+                            <div className="bg-[#FDD85D] text-[#413620] px-4 py-3 rounded-lg shadow-lg flex items-center">
+                                <span className="material-symbols-outlined mr-2">person</span>
+                                <div>
+                                    <p className="text-sm font-semibold">{user.role || "Usuario"}</p>
+                                    <p className="text-xs opacity-75">ID: {user.id}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Información Personal */}
-            <table className="mt-8 container md:w-2/3 mx-auto px-6 py-8">
-                <thead>
-                    <tr>
-                        <th className="px-4 py-2 text-left font-bold text-2xl">Información Personal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Nombre:</td>
-                        <td className="px-4 py-2">{user.username || "No disponible"}</td>
-                    </tr>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Email:</td>
-                        <td className="px-4 py-2">{user.email || "No disponible"}</td>
-                    </tr>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Rol:</td>
-                        <td className="px-4 py-2">{user.role || "No disponible"}</td>
-                    </tr>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Te uniste el: </td>
-                        <td className="px-4 py-2">{user.createdAt ? formatDate(user.createdAt) : "No disponible"}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            {/* Botones principales */}
-            <div className="mt-8 flex justify-around container md:w-2/3 mx-auto">
-                <button
-                    onClick={() => handleNavigation('/')}
-                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-(--color-primary)"
-                >
-                    Agendar Arriendo
-                </button>
-                <button
-                    onClick={() => handleNavigation('/')}
-                    className="bg-(--color-secondary) text-white px-6 py-2 rounded-lg hover:bg-(--color-primary) flex items-center"
-                >
-                    Ver Catálogo
-                    <span className="material-symbols-outlined pl-4">arrow_forward</span>
-                </button>
-            </div>
-
-            {/* Favoritos */}
-            <div className="container mx-auto py-8 md:w-2/3">
-                <h3 className="text-xl font-semibold text-gray-800 text-center mt-8">Productos Favoritos</h3>
-                <div className="overflow-x-auto mt-8">
-                    <table className="min-w-full bg-white border-collapse border border-gray-300">
-                        <thead>
-                            <tr className="bg-(--color-primary) text-white">
-                                <th className="px-4 py-2 text-center">Imagen</th>
-                                <th className="px-4 py-2 text-center">Nombre</th>
-                                <th className="px-4 py-2 text-center">Precio por dia</th>
-                                <th className="px-4 py-2 text-center">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {favorites.length > 0 ? favorites.map((favorite) => (
-                                <tr key={`fav-${favorite.id || Math.random().toString(36).substr(2, 9)}`}>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">
-                                        <img
-                                            className="w-10 h-10 object-cover mx-auto"
-                                            src={favorite.mainImage || "/images/placeholder-instrument.jpg"}
-                                            alt={favorite.name || "Instrumento"}
-                                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src = "/images/placeholder-instrument.jpg";
-                                            }}
-                                        />
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">{favorite.name || "Instrumento sin nombre"}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">${favorite.pricePerDay || "N/A"}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">
-                                        <span className="material-symbols-outlined cursor-pointer" onClick={() => handleRemoveFavorite(favorite)}>delete</span>
-                                    </td>
-                                </tr>
-                            )) : (
-                                <tr>
-                                    <td colSpan="4" className="px-4 py-4 text-center text-gray-500">
-                                        No tienes instrumentos favoritos
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+            <div className="container mx-auto px-6 py-10">
+                {/* Información Personal con diseño mejorado */}
+                <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
+                    <div className="bg-[#523E1A] text-white py-3 px-6">
+                        <h2 className="text-xl font-semibold">Información Personal</h2>
+                    </div>
+                    <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Nombre</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.username || "No disponible"}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Email</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.email || "No disponible"}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Rol</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.role || "No disponible"}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Miembro desde</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.createdAt ? formatDate(user.createdAt) : "No disponible"}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Tabla de reservas mejorada */}
-                <h3 className="text-xl font-semibold text-gray-800 text-center mt-12">Tus Reservas</h3>
-                {reservationsLoading ? (
-                    <div className="flex justify-center items-center h-20">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-(--color-primary)"></div>
+                {/* Favoritos */}
+                <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
+                    <div className="bg-[#9C6615] text-white py-3 px-6 flex justify-between items-center">
+                        <h2 className="text-xl font-semibold">Productos Favoritos</h2>
+                        <span className="bg-white text-[#9C6615] text-sm px-2 py-1 rounded-full">
+                            {favorites.length} {favorites.length === 1 ? 'instrumento' : 'instrumentos'}
+                        </span>
                     </div>
-                ) : (
-                    <div className="overflow-x-auto mt-8">
-                        {userReservations?.length > 0 ? (
-                            <table className="min-w-full bg-white border-collapse border border-gray-300">
-                                <thead>
-                                    <tr className="bg-(--color-primary) text-white">
-                                        <th className="px-4 py-2 text-center">Imagen</th>
-                                        <th className="px-4 py-2 text-center">Nombre</th>
-                                        <th className="px-4 py-2 text-center">Categoría</th>
-                                        <th className="px-4 py-2 text-center">Estado</th>
-                                        <th className="px-4 py-2 text-center">Fecha Inicio</th>
-                                        <th className="px-4 py-2 text-center">Fecha Fin</th>
-                                        <th className="px-4 py-2 text-center">Acción</th>
+
+                    <div className="overflow-x-auto">
+                        {favorites.length > 0 ? (
+                            <table className="min-w-full">
+                                <thead className="bg-[#FFE8C0]">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Imagen</th>
+                                        <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Nombre</th>
+                                        <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Precio por día</th>
+                                        <th className="px-6 py-3 text-center text-[#413620] text-sm font-semibold">Eliminar</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {userReservations.map((reservation) => (
-                                        <tr key={`res-${reservation.id || Math.random().toString(36).substr(2, 9)}`}>
-                                            <td className="px-4 py-2 text-center border-b border-gray-300">
+                                <tbody className="divide-y divide-gray-200">
+                                    {favorites.map((favorite) => (
+                                        <tr key={`fav-${favorite.id || Math.random().toString(36).substr(2, 9)}`} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 <img
-                                                    className="w-10 h-10 object-cover mx-auto"
-                                                    src={reservation.instrumentImage || "/images/placeholder-instrument.jpg"}
-                                                    alt={reservation.instrumentName || "Instrumento"}
+                                                    className="w-12 h-12 object-cover rounded"
+                                                    src={favorite.mainImage || "/images/placeholder-instrument.jpg"}
+                                                    alt={favorite.name || "Instrumento"}
                                                     onError={(e) => {
-                                                        e.target.onerror = null; // Prevent infinite loop
+                                                        e.target.onerror = null;
                                                         e.target.src = "/images/placeholder-instrument.jpg";
                                                     }}
                                                 />
                                             </td>
-                                            <td className="px-4 py-2 text-center border-b border-gray-300">
-                                                {reservation.instrumentName || `Instrumento ${reservation.instrumentId || ""}`}
+                                            <td className="px-6 py-4 whitespace-nowrap text-[#413620]">
+                                                {favorite.name || "Instrumento sin nombre"}
                                             </td>
-                                            <td className="px-4 py-2 text-center border-b border-gray-300">
-                                                {reservation.category || "Sin categoría"}
+                                            <td className="px-6 py-4 whitespace-nowrap text-[#413620] font-semibold">
+                                                ${favorite.pricePerDay?.toFixed(2) || "N/A"}
                                             </td>
-                                            <td className="px-4 py-2 text-center border-b border-gray-300">
-                                                <span className={`inline-block px-2 py-1 rounded-full text-xs ${(reservation.status || "").toLowerCase() === "reservado"
-                                                    ? "bg-blue-100 text-blue-800"
-                                                    : (reservation.status || "").toLowerCase() === "finalizado"
-                                                        ? "bg-green-100 text-green-800"
-                                                        : "bg-gray-100 text-gray-800"
-                                                    }`}>
-                                                    {reservation.status || "Reservado"}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2 text-center border-b border-gray-300">
-                                                {reservation.startDate ? formatDate(reservation.startDate) : "N/A"}
-                                            </td>
-                                            <td className="px-4 py-2 text-center border-b border-gray-300">
-                                                {reservation.endDate ? formatDate(reservation.endDate) : "N/A"}
-                                            </td>
-                                            <td className="px-4 py-2 text-center border-b border-gray-300">
+                                            <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 <button
-                                                    className="bg-(--color-secondary) text-white px-2 py-1 rounded-md text-xs hover:bg-(--color-primary) transition"
-                                                    onClick={() => openRatingModal(reservation)}
+                                                    onClick={() => handleRemoveFavorite(favorite)}
+                                                    className="text-red-500 hover:text-red-700 transition-colors"
                                                 >
-                                                    Puntuar
+                                                    <span className="material-symbols-outlined">delete</span>
                                                 </button>
                                             </td>
                                         </tr>
@@ -293,26 +225,110 @@ const UserProfile = () => {
                                 </tbody>
                             </table>
                         ) : (
-                            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-                                <span className="material-symbols-outlined text-4xl text-gray-400 mb-2">calendar_today</span>
-                                <p className="text-gray-500">No tienes reservas actualmente</p>
-                                <button
-                                    onClick={() => navigate('/')}
-                                    className="mt-4 text-(--color-secondary) hover:underline"
-                                >
-                                    Explorar instrumentos disponibles
-                                </button>
+                            <div className="p-6 text-center text-gray-500">
+                                <span className="material-symbols-outlined text-4xl mb-2">favorite_border</span>
+                                <p>No tienes instrumentos favoritos</p>
                             </div>
                         )}
                     </div>
-                )}
+                </div>
+
+                {/* Tabla de reservas */}
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="bg-[#523E1A] text-white py-3 px-6 flex justify-between items-center">
+                        <h2 className="text-xl font-semibold">Historial de Reservas</h2>
+                        {!reservationsLoading && (
+                            <span className="bg-white text-[#523E1A] text-sm px-2 py-1 rounded-full">
+                                {userReservations.length} {userReservations.length === 1 ? 'reserva' : 'reservas'}
+                            </span>
+                        )}
+                    </div>
+
+                    {reservationsLoading ? (
+                        <div className="flex justify-center items-center h-32">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#9C6615]"></div>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            {userReservations?.length > 0 ? (
+                                <table className="min-w-full">
+                                    <thead className="bg-[#FFE8C0]">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Instrumento</th>
+                                            <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Categoría</th>
+                                            <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Estado</th>
+                                            <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Fecha Inicio</th>
+                                            <th className="px-6 py-3 text-left text-[#413620] text-sm font-semibold">Fecha Fin</th>
+                                            <th className="px-6 py-3 text-center text-[#413620] text-sm font-semibold">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {userReservations.map((reservation) => (
+                                            <tr key={`res-${reservation.id || Math.random().toString(36).substr(2, 9)}`} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <img
+                                                            className="w-10 h-10 object-cover rounded mr-3"
+                                                            src={reservation.instrumentImage || "/images/placeholder-instrument.jpg"}
+                                                            alt={reservation.instrumentName || "Instrumento"}
+                                                            onError={(e) => {
+                                                                e.target.onerror = null;
+                                                                e.target.src = "/images/placeholder-instrument.jpg";
+                                                            }}
+                                                        />
+                                                        <span className="text-[#413620] font-medium">
+                                                            {reservation.instrumentName || `Instrumento ${reservation.instrumentId || ""}`}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-[#413620]">
+                                                    {reservation.category || "Sin categoría"}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-block px-2 py-1 rounded-full text-xs ${(reservation.status || "").toLowerCase() === "reservado"
+                                                            ? "bg-blue-100 text-blue-800"
+                                                            : (reservation.status || "").toLowerCase() === "finalizado"
+                                                                ? "bg-green-100 text-green-800"
+                                                                : "bg-gray-100 text-gray-800"
+                                                        }`}>
+                                                        {reservation.status || "Reservado"}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-[#413620]">
+                                                    {reservation.startDate ? formatDate(reservation.startDate) : "N/A"}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-[#413620]">
+                                                    {reservation.endDate ? formatDate(reservation.endDate) : "N/A"}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                    <button
+                                                        className="bg-[#9C6615] text-white px-3 py-1 rounded-md text-sm hover:bg-[#9F7833] transition"
+                                                        onClick={() => openRatingModal(reservation)}
+                                                    >
+                                                        Puntuar
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <div className="p-8 text-center">
+                                    <span className="material-symbols-outlined text-4xl text-gray-400 mb-2">calendar_today</span>
+                                    <p className="text-gray-500">No tienes reservas actualmente</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
+
             {/* Modal de puntuación */}
             {showRatingModal && selectedInstrument && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-xl">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold text-(--color-secondary)">
+                            <h3 className="text-xl font-bold text-[#413620]">
                                 Valorar {selectedInstrument.name}
                             </h3>
                             <button
