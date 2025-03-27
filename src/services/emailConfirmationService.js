@@ -111,70 +111,68 @@ class EmailConfirmationService {
   * @returns {Promise<Object>} Resultado del envío de correo
   */
  static async sendReservationConfirmationEmail(reservationData, userData, instrumentData) {
-   try {
-     // Ajustar fechas para compensar el problema de zona horaria en EmailJS
-     const adjustedStartDate = this.adjustDateForEmail(reservationData.startDate);
-     const adjustedEndDate = this.adjustDateForEmail(reservationData.endDate || reservationData.startDate);
-     
-     console.log('Fechas originales:', reservationData.startDate, reservationData.endDate);
-     console.log('Fechas ajustadas para email:', adjustedStartDate, adjustedEndDate);
-     
-     // Calcular número total de días
-     const startDate = new Date(reservationData.startDate);
-     const endDate = new Date(reservationData.endDate || reservationData.startDate);
-     const oneDay = 24 * 60 * 60 * 1000; // milisegundos en un día
-     const totalDays = Math.round(Math.abs((endDate - startDate) / oneDay)) + 1;
-     
-     // Calcular precio total
-     const totalPrice = (instrumentData.pricePerDay * totalDays).toFixed(2);
+  try {
+    const startDate = reservationData.startDate;
+    const endDate = reservationData.endDate || reservationData.startDate;
+    
+    console.log('Fechas originales:', startDate, endDate);
+    
+    // Calcular número total de días
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
+    const oneDay = 24 * 60 * 60 * 1000; // milisegundos en un día
+    const totalDays = Math.round(Math.abs((endDateObj - startDateObj) / oneDay)) + 1;
+    
+    // Calcular precio total
+    const totalPrice = (instrumentData.pricePerDay * totalDays).toFixed(2);
 
-     // Usar las fechas ajustadas para formatear
-     const formattedStartDate = this.formatDateUY(adjustedStartDate);
-     const formattedEndDate = this.formatDateUY(adjustedEndDate);
+    // Formatear fechas directamente sin ajustarlas
+    const formattedStartDate = this.formatDateUY(startDate);
+    const formattedEndDate = this.formatDateUY(endDate);
 
-     // Generar un número de orden simple
-     const orderNumber = `R${Date.now().toString().substring(7)}`;
+    // Generar un número de orden simple
+    const orderNumber = `R${Date.now().toString().substring(7)}`;
 
-     // Preparar parámetros para el template de EmailJS
-     const templateParams = {
-       user_name: userData.firstName || userData.username || 'Usuario',
-       user_email: userData.email,
-       instrument_name: instrumentData.name,
-       start_date: formattedStartDate,
-       end_date: formattedEndDate,
-       total_days: totalDays,
-       price_per_day: instrumentData.pricePerDay.toFixed(2),
-       total_price: totalPrice,
-       reservation_notes: reservationData.notes || 'Sin notas adicionales',
-       provider_name: instrumentData.provider?.name || 'Proveedor',
-       provider_contact: instrumentData.provider?.contact || 'Sin información de contacto',
-       order_number: orderNumber || 'N/A'
-     };
+    // Preparar parámetros para el template de EmailJS
+    const templateParams = {
+      user_name: userData.firstName || userData.username || 'Usuario',
+      user_email: userData.email,
+      instrument_name: instrumentData.name,
+      start_date: formattedStartDate,
+      end_date: formattedEndDate,
+      total_days: totalDays,
+      price_per_day: instrumentData.pricePerDay.toFixed(2),
+      total_price: totalPrice,
+      reservation_notes: reservationData.notes || 'Sin notas adicionales',
+      provider_name: instrumentData.provider?.name || 'Proveedor',
+      provider_contact: instrumentData.provider?.contact || 'Sin información de contacto',
+      order_number: orderNumber || 'N/A'
+    };
 
-     // Enviar correo usando EmailJS
-     const result = await emailjs.send(
-       this.#config.SERVICE_ID, 
-       this.#config.RESERVATION_TEMPLATE_ID, 
-       templateParams,
-       this.#config.PUBLIC_KEY
-     );
+    // El resto del código permanece igual
+    const result = await emailjs.send(
+      this.#config.SERVICE_ID, 
+      this.#config.RESERVATION_TEMPLATE_ID, 
+      templateParams,
+      this.#config.PUBLIC_KEY
+    );
 
-     console.log('Correo de confirmación de reserva enviado:', result);
+    console.log('Correo de confirmación de reserva enviado:', result);
 
-     return {
-       success: true,
-       message: 'Correo de confirmación de reserva enviado exitosamente'
-     };
-   } catch (error) {
-     console.error('Error al enviar correo de confirmación:', error);
-     
-     return {
-       success: false,
-       message: 'Error al enviar correo de confirmación',
-       error: error.text
-     };
-   }
- }
+    return {
+      success: true,
+      message: 'Correo de confirmación de reserva enviado exitosamente'
+    };
+  } catch (error) {
+    console.error('Error al enviar correo de confirmación:', error);
+    
+    return {
+      success: false,
+      message: 'Error al enviar correo de confirmación',
+      error: error.text
+    };
+  }
+}
 }
 
 export default EmailConfirmationService;
