@@ -345,9 +345,9 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
             <form onSubmit={handleSubmit} className="flex flex-col mx-4 lg:mx-0 gap-3">
                 {/* Selector de rango de fechas con estilo AlquiTones */}
                 <div className="flex items-center relative">
-                    <div className="bg-gradient-to-r from-[#9F7933] to-[#523E1A] p-1 rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.18)] w-full transition-all duration-300 hover:shadow-[0_10px_28px_rgba(159,121,51,0.25)]">
+                    <div className="bg-white p-1 rounded-md shadow-sm w-full transition-all duration-300">
                         <div
-                            className="flex items-center justify-between w-full bg-white/95 backdrop-blur-sm rounded-xl border border-[#FFE8C0] cursor-pointer p-3 hover:bg-[#FFF8E8] transition-all shadow-inner"
+                            className="flex items-center justify-between w-full bg-white rounded-md border border-gray-300 cursor-pointer p-3 hover:bg-[#FFF8E8] transition-all"
                             onClick={toggleDatepicker}
                         >
                             <div className="flex items-center">
@@ -566,8 +566,8 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                 </div>
 
                 {/* Búsqueda de producto con estilo AlquiTones */}
-                <div className="bg-gradient-to-r from-[#9F7933] to-[#523E1A] p-1 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-                    <div className="flex bg-white/95 rounded-md border border-[#FFE8C0] overflow-hidden shadow-inner">
+                <div className="border border-gray-300 rounded-md overflow-hidden shadow-sm">
+                    <div className="flex bg-white overflow-hidden">
                         <input
                             type="search"
                             id="search-dropdown"

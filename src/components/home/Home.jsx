@@ -68,9 +68,9 @@ const Home = () => {
 
     return (
         <main className="max-w-5xl justify-center mx-auto">
-            <div className="bg-gradient-to-r from-[#523E1A] to-[#9F7933] py-8 mb-6 rounded-3xl shadow-[0_10px_30px_rgba(82,62,26,0.3)] mx-4 lg:mx-6">
-                <SearchBar onSearch={handleSearch} products={instruments} getAvailabilityById={getAvailabilityById} />
-            </div>
+<div className="bg-gradient-to-r from-[#C0A87F] to-[#D5BC8E] py-8 mb-6 rounded-lg shadow-[0_10px_30px_rgba(82,62,26,0.2)] mx-4 lg:mx-6">
+    <SearchBar onSearch={handleSearch} products={instruments} getAvailabilityById={getAvailabilityById} />
+</div>
             <Category
                 onFilterChange={handleCategoryFilter}
                 products={instruments}
