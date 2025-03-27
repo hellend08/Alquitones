@@ -4,7 +4,7 @@ const WhatsAppChat = () => {
   const [showButton, setShowButton] = useState(true);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
-  const whatsappNumber = '59895433742'; // Número de WhatsApp del proveedor
+  const whatsappNumber = '59895433666'; // Número de WhatsApp del proveedor
   
   // Controlar la visibilidad del botón al hacer scroll
   useEffect(() => {

@@ -25,7 +25,20 @@ const fetchData = async (endpoint, localFallback) => {
     return localFallback;
 };
 
+
+function adjustDateString(dateString, days) {
+    // Formato esperado: "YYYY-MM-DD"
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + days);
+    
+    // Devolver en formato YYYY-MM-DD
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 export const apiService = {
+
+    
     getInstruments: async () => {
         const instruments = await fetchData("/instruments", localDB.getAllProducts().sort(() => Math.random() - 0.5));
 
@@ -64,16 +77,23 @@ export const apiService = {
 
         if (backendAvailable) {
             try {
+                // Ajustar las fechas para compensar el problema del backend
+                // Agregamos un día a cada fecha
+                const adjustedStartDate = adjustDateString(reservationData.startDate, 1);
+                const adjustedEndDate = reservationData.endDate ?
+                    adjustDateString(reservationData.endDate, 1) :
+                    adjustDateString(reservationData.startDate, 1);
+
                 // Formato esperado por el backend según el swagger
                 const apiData = {
                     instrumentId: reservationData.instrumentId,
                     userId: reservationData.userId,
-                    startDate: reservationData.startDate,
-                    endDate: reservationData.endDate || reservationData.startDate,
+                    startDate: adjustedStartDate, // Fecha ajustada
+                    endDate: adjustedEndDate, // Fecha ajustada
                     quantity: reservationData.quantity || 1
                 };
 
-                console.log('Enviando reserva al backend:', apiData);
+                console.log('Enviando reserva al backend con fechas ajustadas:', apiData);
 
                 // Asegurarse de que las cabeceras sean correctas
                 const response = await axios.post(`${API_BASE_URL}/availability/reserve`, apiData, {
@@ -116,9 +136,9 @@ export const apiService = {
     submitRating: async (ratingData) => {
         if (!(await checkBackendStatus())) {
             // Simulación local, mantén igual
-            return { success: true, data: { id: Math.floor(Math.random() * 1000), ...ratingData, createdAt: new Date().toISOString() }};
+            return { success: true, data: { id: Math.floor(Math.random() * 1000), ...ratingData, createdAt: new Date().toISOString() } };
         }
-        
+
         try {
             // Formato corregido según API
             const formattedData = {
@@ -127,19 +147,19 @@ export const apiService = {
                 stars: ratingData.stars,
                 comment: ratingData.comment || ""  // Asegura que nunca sea null
             };
-            
+
             console.log('Enviando valoración al servidor:', formattedData);
-            
+
             const response = await axios.post(
-                `${API_BASE_URL}/ratings`, 
+                `${API_BASE_URL}/ratings`,
                 formattedData,
                 { headers: { 'Content-Type': 'application/json' } }
             );
-            
+
             return response.data;
         } catch (error) {
             console.error('Error al enviar valoración:', error);
-            
+
             // Mejor manejo de errores
             if (error.response?.status === 500) {
                 throw new Error('Error interno del servidor. Intenta más tarde.');
@@ -165,10 +185,10 @@ export const apiService = {
 
     getUserReservations: async (userId) => {
         const backendAvailable = await checkBackendStatus();
-        
+
         if (!backendAvailable) {
             // Simulación local
-            return { 
+            return {
                 data: [
                     {
                         id: 1,
@@ -180,27 +200,27 @@ export const apiService = {
                         startDate: "2025-03-23",
                         endDate: "2025-03-26"
                     }
-                ] 
+                ]
             };
         }
-        
+
         try {
             // Nota que el endpoint correcto según Swagger es /api/reservations/user/{id}
             const response = await axios.get(`${API_BASE_URL}/reservations/user/${userId}`);
-            
+
             // Transformar los datos para que coincidan con lo esperado por el componente
             const reservationsWithDetails = await Promise.all(
                 (response.data || []).map(async (reservation) => {
                     try {
                         // Obtener detalles del instrumento si es posible
                         const instrument = await apiService.getInstrumentById(reservation.instrumentId);
-                        
+
                         return {
                             id: reservation.id,
                             instrumentId: reservation.instrumentId,
                             instrumentName: instrument?.name || `Instrumento ${reservation.instrumentId}`,
                             instrumentImage: instrument?.mainImage || instrument?.images?.[0],
-                            category: instrument?.category?.name || "Sin categoría", 
+                            category: instrument?.category?.name || "Sin categoría",
                             status: reservation.status || "Reservado",
                             startDate: reservation.startDate,
                             endDate: reservation.endDate
@@ -217,7 +237,7 @@ export const apiService = {
                     }
                 })
             );
-            
+
             return { data: reservationsWithDetails };
         } catch (error) {
             console.error("Error al obtener reservas:", error);
@@ -228,16 +248,16 @@ export const apiService = {
     submitRating: async (ratingData) => {
         if (!(await checkBackendStatus())) {
             // Simulación local si no hay backend
-            return { 
-                success: true, 
-                data: { 
-                    id: Math.floor(Math.random() * 1000), 
+            return {
+                success: true,
+                data: {
+                    id: Math.floor(Math.random() * 1000),
                     ...ratingData,
                     createdAt: new Date().toISOString()
                 }
             };
         }
-        
+
         try {
             // Asegúrate de enviar exactamente este formato
             const formattedData = {
@@ -246,19 +266,19 @@ export const apiService = {
                 stars: Number(ratingData.stars),
                 comment: ratingData.comment || ""
             };
-            
+
             console.log('Enviando valoración:', formattedData);
-            
+
             // Usar axios.post con el formato correcto
             const response = await axios.post(
-                `${API_BASE_URL}/ratings`, 
+                `${API_BASE_URL}/ratings`,
                 formattedData
             );
-            
+
             return response.data;
         } catch (error) {
             console.error('Error al enviar valoración:', error);
-            
+
             // Capturar específicamente el error 500 
             if (error.response?.status === 500) {
                 throw new Error('Error interno del servidor. Por favor, intenta más tarde.');
@@ -269,7 +289,7 @@ export const apiService = {
             }
         }
     },
-    
+
     // Obtener valoraciones por instrumento
     getRatingsByInstrument: async (instrumentId) => {
         if (!(await checkBackendStatus())) {
@@ -292,7 +312,7 @@ export const apiService = {
                 }
             ];
         }
-        
+
         try {
             const response = await axios.get(`${API_BASE_URL}/ratings/instrument/${instrumentId}`);
             return response.data;
@@ -305,19 +325,19 @@ export const apiService = {
 
     cancelReservation: async (reservationId) => {
         const backendAvailable = await checkBackendStatus();
-        
+
         if (!backendAvailable) {
             // Simulación local para pruebas
             console.log(`Simulando cancelación de reserva ${reservationId}`);
             return { success: true, message: "Reserva cancelada (simulación)" };
         }
-        
+
         try {
             console.log(`Cancelando reserva ${reservationId}`);
             // Esta URL debe ajustarse según la documentación del swagger
             const response = await axios.put(
-                `${API_BASE_URL}/reservations/${reservationId}/cancel`, 
-                {}, 
+                `${API_BASE_URL}/reservations/${reservationId}/cancel`,
+                {},
                 {
                     headers: { 'Content-Type': 'application/json' }
                 }
