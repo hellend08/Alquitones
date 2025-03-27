@@ -345,9 +345,9 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
             <form onSubmit={handleSubmit} className="flex flex-col mx-4 lg:mx-0 gap-3">
                 {/* Selector de rango de fechas con estilo AlquiTones */}
                 <div className="flex items-center relative">
-                    <div className="bg-gradient-to-r from-[#9F7933] to-[#523E1A] p-1 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.15)] w-full">
+                    <div className="bg-gradient-to-r from-[#9F7933] to-[#523E1A] p-1 rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.18)] w-full transition-all duration-300 hover:shadow-[0_10px_28px_rgba(159,121,51,0.25)]">
                         <div
-                            className="flex items-center justify-between w-full bg-white/95 backdrop-blur-sm rounded-md border border-[#FFE8C0] cursor-pointer p-2.5 hover:bg-[#FFF8E8] transition-all shadow-inner"
+                            className="flex items-center justify-between w-full bg-white/95 backdrop-blur-sm rounded-xl border border-[#FFE8C0] cursor-pointer p-3 hover:bg-[#FFF8E8] transition-all shadow-inner"
                             onClick={toggleDatepicker}
                         >
                             <div className="flex items-center">
@@ -371,7 +371,7 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                     {showDatepicker && (
                         <div
                             ref={datePickerRef}
-                            className="absolute top-full left-0 z-10 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-full max-w-2xl"
+                            className="absolute top-full left-0 z-10 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-full max-w-2xl"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <button
