@@ -4,12 +4,48 @@ import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 import ShareProduct from "./ShareProduct";
 import { useAuthState } from "../../context/AuthContext";
+import { apiService } from "../../services/apiService";
 
 const ProductCards = ({ products: products, categories: categories, isLoading }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const { isAuthenticated, toggleFavorite, favorites } = useAuthState();
     const productsPerPage = 10;
+    const [productRatings, setProductRatings] = useState({});
+
+    useEffect(() => {
+        // Cargar ratings para cada producto
+        const loadRatings = async () => {
+            const ratingsMap = {};
+
+            // Solo intentamos cargar ratings si hay productos
+            if (products && products.length > 0) {
+                // Crear un array de promesas para cargar todos los ratings en paralelo
+                const ratingPromises = products.map(async (product) => {
+                    try {
+                        const ratings = await apiService.getRatingsByInstrument(product.id);
+                        if (ratings && ratings.length > 0) {
+                            // Calcular el promedio
+                            const sum = ratings.reduce((total, rating) => total + rating.stars, 0);
+                            const average = (sum / ratings.length).toFixed(1);
+                            ratingsMap[product.id] = {
+                                average,
+                                count: ratings.length
+                            };
+                        }
+                    } catch (error) {
+                        console.error(`Error al cargar ratings para producto ${product.id}:`, error);
+                    }
+                });
+
+                // Esperar a que todas las promesas se resuelvan
+                await Promise.all(ratingPromises);
+                setProductRatings(ratingsMap);
+            }
+        };
+
+        loadRatings();
+    }, [products]);
 
     const getCategoryName = (categoryId) => {
         const category = categories.find((category) => category.id === categoryId);
@@ -66,17 +102,17 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                 ) : currentProducts.length > 0 ? (
                     currentProducts.map((product) => {
                         const isLiked = favorites.some(fav => fav.id === product.id);
-                        
+
                         return (
                             <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
                                 <section className="p-3 border-b border-gray-300 flex justify-start gap-5">
-                                    {isAuthenticated ? ( 
-                                        <button 
+                                    {isAuthenticated ? (
+                                        <button
                                             className={`transition cursor-pointer ${isLiked ? "text-red-500" : "text-(--color-secondary)"}`}
-                                            onClick={() => handleToggleFavorite(product)} 
+                                            onClick={() => handleToggleFavorite(product)}
                                         >
                                             <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
-                                        </button> ) : (
+                                        </button>) : (
                                         <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
                                             <i className="far fa-heart disabled:text-gray-100" ></i>
                                         </button>
@@ -87,10 +123,10 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                 </section>
                                 <Link to={`/detail/${product.id}`}>
                                     <div className="h-48 overflow-hidden">
-                                        <img 
-                                            className="w-full h-full object-contain" 
-                                            src={product.mainImage || product.images?.[0].url} 
-                                            alt={product.name} 
+                                        <img
+                                            className="w-full h-full object-contain"
+                                            src={product.mainImage || product.images?.[0].url}
+                                            alt={product.name}
                                             onError={(e) => {
                                                 e.target.src = 'https://dummyimage.com/300x200/cccccc/000000&text=Imagen+no+disponible';
                                             }}
@@ -108,8 +144,24 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                         <p className="font-normal text-sm text-gray-500 line-clamp-2">
                                             {product.description}
                                         </p>
+                                        
+                                        {/* Mostrar valoración promedio si existe */}
+                                        {productRatings[product.id] && (
+                                            <div className="flex items-center mt-2">
+                                                <div className="flex text-yellow-400">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <span key={star}>
+                                                            {star <= Math.round(productRatings[product.id].average) ? "★" : "☆"}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <span className="ml-2 text-sm text-gray-600">
+                                                    {productRatings[product.id].average} ({productRatings[product.id].count})
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
-                                    
+
                                     {/* Tabla de disponibilidad */}
                                     {product.availabilityDetails && product.availabilityDetails.length > 0 ? (
                                         <div className="my-4 overflow-hidden border border-gray-200 rounded-md">
@@ -145,7 +197,7 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                             Disponible en fechas seleccionadas
                                         </div>
                                     ) : null}
-                                    
+
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <p className="text-xs text-gray-500">Precio por día</p>
@@ -153,8 +205,8 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                                 ${product.pricePerDay}
                                             </span>
                                         </div>
-                                        <Link 
-                                            to={`/detail/${product.id}`} 
+                                        <Link
+                                            to={`/detail/${product.id}`}
                                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-(--color-primary) rounded-lg hover:bg-(--color-secondary)"
                                         >
                                             Ver detalles
@@ -196,7 +248,7 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                     >
                         <span className="material-symbols-outlined text-sm">navigate_before</span>
                     </button>
-                    
+
                     <span className="px-4 py-1 text-sm font-medium text-gray-700">
                         Página {currentPage} de {totalPages || 1}
                     </span>

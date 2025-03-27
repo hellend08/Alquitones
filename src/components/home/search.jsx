@@ -88,7 +88,7 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
         const allProducts = products;
 
         // Filtrar por término de búsqueda
-        let filteredProducts = allProducts.filter(product => 
+        let filteredProducts = allProducts.filter(product =>
             product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             product.description.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -120,14 +120,14 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
             // Filtrar productos basados en la disponibilidad
             filteredProducts = productsWithAvailability
                 .filter(({ availability }) => {
-                    
+
                     if (!availability || availability.length === 0) return true;
 
-                return datesInRange.some(date => {
-                    const availItem = availability.find(a => a.date === date);
-                    return availItem && availItem.availableStock > 0;
+                    return datesInRange.some(date => {
+                        const availItem = availability.find(a => a.date === date);
+                        return availItem && availItem.availableStock > 0;
+                    });
                 });
-            });
 
             // Añadir detalles de disponibilidad para las fechas seleccionadas
             filteredProducts = filteredProducts.map(product => {
@@ -151,8 +151,8 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
         setSearchResults(filteredProducts);
         setShowResults(true);
         onSearch({
-            products: filteredProducts, 
-            dateRange: startDate ? { 
+            products: filteredProducts,
+            dateRange: startDate ? {
                 startDate: startDate, // Usar valor exacto
                 endDate: endDate || startDate // Usar valor exacto
             } : null
@@ -339,39 +339,39 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
         return testDate.getMonth() >= today.getMonth() || testDate.getFullYear() > today.getFullYear();
     };
     console.log("Results", searchResults);
-    
+
     return (
         <div className="max-w-lg mx-auto relative">
             <form onSubmit={handleSubmit} className="flex flex-col mx-4 lg:mx-0 gap-3">
-                {/* Selector de rango de fechas */}
+                {/* Selector de rango de fechas con estilo AlquiTones */}
                 <div className="flex items-center relative">
-                    <div
-                        className="flex items-center justify-between w-full bg-white rounded-lg border border-gray-300 cursor-pointer p-2.5"
-                        onClick={toggleDatepicker}
-                    >
-                        <div className="flex items-center">
-                            <svg className="w-4 h-4 text-gray-500 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                            </svg>
-                            <span className="text-sm text-gray-700">
-                                {startDate || 'Seleccionar fechas'}
-                            </span>
-                        </div>
-                        {startDate && (
+                    <div className="bg-gradient-to-r from-[#9F7933] to-[#523E1A] p-1 rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.18)] w-full transition-all duration-300 hover:shadow-[0_10px_28px_rgba(159,121,51,0.25)]">
+                        <div
+                            className="flex items-center justify-between w-full bg-white/95 backdrop-blur-sm rounded-xl border border-[#FFE8C0] cursor-pointer p-3 hover:bg-[#FFF8E8] transition-all shadow-inner"
+                            onClick={toggleDatepicker}
+                        >
                             <div className="flex items-center">
-                                <span className="mx-2 text-gray-500">hasta</span>
-                                <span className="text-sm text-gray-700">
-                                    {endDate || 'Seleccionar'}
+                                <span className="material-symbols-outlined text-[#9C6615] mr-2">calendar_month</span>
+                                <span className="text-sm text-[#413620] font-medium">
+                                    {startDate ? formatDateForDisplay(startDate) : 'Seleccionar fechas'}
                                 </span>
                             </div>
-                        )}
+                            {startDate && (
+                                <div className="flex items-center">
+                                    <span className="mx-2 text-[#9C6615]">→</span>
+                                    <span className="text-sm text-[#413620] font-medium">
+                                        {endDate ? formatDateForDisplay(endDate) : 'Seleccionar'}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Datepicker */}
+                    {/* Datepicker - mantener la misma estructura para preservar funcionalidad */}
                     {showDatepicker && (
                         <div
                             ref={datePickerRef}
-                            className="absolute top-full left-0 z-10 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-full max-w-2xl"
+                            className="absolute top-full left-0 z-10 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg p-4 w-full max-w-2xl"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <button
@@ -434,9 +434,9 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                                                 dayClass += " cursor-pointer";
 
                                                 if (isStart || isEnd) {
-                                                    dayClass += " bg-blue-600 text-white rounded-full";
+                                                    dayClass += " bg-[#9C6615] text-white rounded-full"; // Cambiado a color AlquiTones
                                                 } else if (isInRange || isHovered) {
-                                                    dayClass += " bg-blue-100";
+                                                    dayClass += " bg-[#FFE8C0]"; // Cambiado a color AlquiTones
                                                 } else {
                                                     dayClass += " hover:bg-gray-100";
                                                 }
@@ -444,7 +444,7 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                                                 // Si es hoy
                                                 if (date.toDateString() === today.toDateString()) {
                                                     if (!isStart && !isEnd) {
-                                                        dayClass += " border border-blue-600";
+                                                        dayClass += " border border-[#9C6615]"; // Cambiado a color AlquiTones
                                                     }
                                                 }
                                             }
@@ -501,9 +501,9 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                                                 dayClass += " cursor-pointer";
 
                                                 if (isStart || isEnd) {
-                                                    dayClass += " bg-blue-600 text-white rounded-full";
+                                                    dayClass += " bg-[#9C6615] text-white rounded-full"; // Cambiado a color AlquiTones
                                                 } else if (isInRange || isHovered) {
-                                                    dayClass += " bg-blue-100";
+                                                    dayClass += " bg-[#FFE8C0]"; // Cambiado a color AlquiTones
                                                 } else {
                                                     dayClass += " hover:bg-gray-100";
                                                 }
@@ -511,7 +511,7 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                                                 // Si es hoy
                                                 if (date.toDateString() === today.toDateString()) {
                                                     if (!isStart && !isEnd) {
-                                                        dayClass += " border border-blue-600";
+                                                        dayClass += " border border-[#9C6615]"; // Cambiado a color AlquiTones
                                                     }
                                                 }
                                             }
@@ -533,7 +533,7 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
 
                             {/* Leyenda y botones */}
                             <div className="mt-4 flex justify-between items-center border-t pt-3">
-                                <div className="text-sm">
+                                <div className="text-sm text-[#413620]"> {/* Color actualizado */}
                                     {startDate && (
                                         <span>
                                             {formatDateForDisplay(startDate)}
@@ -544,7 +544,7 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                                 <div className="space-x-2">
                                     <button
                                         type="button"
-                                        className="px-3 py-1 text-sm bg-white text-gray-800 border border-gray-300 rounded-md hover:bg-gray-100"
+                                        className="px-3 py-1 text-sm bg-white text-[#413620] border border-[#9C6615] rounded-md hover:bg-[#FFE8C0]" // Colores AlquiTones
                                         onClick={() => {
                                             setStartDate('');
                                             setEndDate('');
@@ -554,7 +554,7 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                                     </button>
                                     <button
                                         type="button"
-                                        className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                        className="px-3 py-1 text-sm bg-[#9C6615] text-white rounded-md hover:bg-[#9F7933]" // Colores AlquiTones
                                         onClick={() => setShowDatepicker(false)}
                                     >
                                         Aplicar
@@ -565,27 +565,29 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                     )}
                 </div>
 
-                {/* Búsqueda de producto */}
-                <div className="flex">
-                    <input
-                        type="search"
-                        id="search-dropdown"
-                        className="p-2.5 w-full text-sm text-gray-900 border-s-2 border border-white bg-white rounded-s-lg"
-                        placeholder="Busca tu instrumento"
-                        value={searchTerm}
-                        onChange={handleSearchInputChange}
-                    />
-                    <button
-                        type="submit"
-                        className="top-0 end-0 p-2.5 text-sm font-medium h-full bg-gray-100 hover:bg-gray-200 
-                            border border-gray-300 rounded-r-lg"
-                    >
-                        <span className="material-symbols-outlined text-gray-600">search</span>
-                        <span className="sr-only">Search</span>
-                    </button>
+                {/* Búsqueda de producto con estilo AlquiTones */}
+                <div className="bg-gradient-to-r from-[#9F7933] to-[#523E1A] p-1 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+                    <div className="flex bg-white/95 rounded-md border border-[#FFE8C0] overflow-hidden shadow-inner">
+                        <input
+                            type="search"
+                            id="search-dropdown"
+                            className="p-2.5 w-full text-sm text-[#413620] bg-transparent outline-none"
+                            placeholder="Busca tu instrumento"
+                            value={searchTerm}
+                            onChange={handleSearchInputChange}
+                        />
+                        <button
+                            type="submit"
+                            className="p-2.5 text-sm font-medium h-full bg-[#FDD85D] hover:bg-[#FFE8C0] transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-[#413620]">search</span>
+                            <span className="sr-only">Search</span>
+                        </button>
+                    </div>
                 </div>
             </form>
 
+            {/* Resultados de búsqueda */}
             <SearchResults
                 results={searchResults}
                 isVisible={showResults && searchResults !== null && searchResults.length > 0}
