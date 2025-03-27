@@ -10,6 +10,7 @@ import ShareProduct from '../home/ShareProduct';
 import WhatsAppChat from '../crossSections/WhatsAppChat';
 import RatingDisplay from '../ratings/RatingDisplay';
 import RatingForm from '../ratings/RatingForm';
+import ProductPolicies from './ProductPolicies';
 import { apiService } from "../../services/apiService"; // Añadir esta importación
 
 function CardDetails() {
@@ -70,7 +71,7 @@ function CardDetails() {
         };
 
         fetchData();
-        
+
         // Mover este código fuera de fetchData para evitar problemas de dependencia
         if (isAuthenticated && user) {
             checkUserReservation(parseInt(id), user.id);
@@ -419,6 +420,11 @@ function CardDetails() {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* Sección de Políticas - AÑADIR AQUÍ */}
+            <div className="mt-6 p-6 bg-white rounded-lg shadow">
+                <ProductPolicies />
             </div>
 
             <h2 className="mt-10 text-xl font-bold text-(--color-secondary)">Sugerencias</h2>
