@@ -9,6 +9,7 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
     const [selectedEndDate, setSelectedEndDate] = useState(null);
     const [calendarError, setCalendarError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    
 
     useEffect(() => {
         // Actualizar el mes siguiente cuando cambia el mes actual
@@ -42,11 +43,13 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
     };
 
     // Verificar si una fecha está disponible
-    const isDateAvailable = (date) => {
+    const isDateAvailable = (date, quantity = 1) => {
         if (!availability || availability.length === 0) return false;
         const formattedDate = formatDateForComparison(date);
         const availabilityEntry = availability.find(a => a.date === formattedDate);
-        return availabilityEntry ? availabilityEntry.availableStock > 0 : false;
+        
+        // Verificar si la disponibilidad es suficiente para la cantidad solicitada
+        return availabilityEntry ? availabilityEntry.availableStock >= quantity : false;
     };
 
     // Obtener la cantidad disponible para una fecha
@@ -66,12 +69,13 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
 
 
 // Verificar si todas las fechas en un rango están disponibles
-const isRangeAvailable = (startDate, endDate) => {
+const isRangeAvailable = (startDate, endDate, quantity = 1) => {
     if (!startDate || !endDate) return true;
     
     const currentDate = new Date(startDate);
     while (currentDate <= endDate) {
-        if (!isDateAvailable(currentDate)) {
+        // Verificar disponibilidad con la cantidad solicitada
+        if (!isDateAvailable(currentDate, quantity)) {
             return false;
         }
         currentDate.setDate(currentDate.getDate() + 1);
@@ -80,15 +84,15 @@ const isRangeAvailable = (startDate, endDate) => {
 };
 
 // Manejar la selección de fechas
-const handleDateClick = (date) => {
+const handleDateClick = (date, quantity = 1) => {
     setCalendarError(null);
     
     if (!isDateSelectable(date)) {
         return; // No permitir seleccionar fechas pasadas
     }
     
-    if (!isDateAvailable(date)) {
-        setCalendarError("Esta fecha no está disponible para reserva");
+    if (!isDateAvailable(date, quantity)) {
+        setCalendarError(`Esta fecha no tiene suficiente stock disponible (${quantity} unidades)`);
         return;
     }
     
@@ -104,9 +108,9 @@ const handleDateClick = (date) => {
             const newStart = date;
             const newEnd = selectedStartDate;
             
-            // Verificar si todo el rango está disponible
-            if (!isRangeAvailable(newStart, newEnd)) {
-                setCalendarError("El rango seleccionado contiene fechas no disponibles");
+            // Verificar si todo el rango está disponible con la cantidad solicitada
+            if (!isRangeAvailable(newStart, newEnd, quantity)) {
+                setCalendarError(`El rango seleccionado no tiene suficiente stock disponible (${quantity} unidades)`);
                 setSelectedStartDate(null);
                 setSelectedEndDate(null);
                 return;
@@ -115,9 +119,9 @@ const handleDateClick = (date) => {
             setSelectedStartDate(newStart);
             setSelectedEndDate(newEnd);
         } else {
-            // Verificar si todo el rango está disponible
-            if (!isRangeAvailable(selectedStartDate, date)) {
-                setCalendarError("El rango seleccionado contiene fechas no disponibles");
+            // Verificar si todo el rango está disponible con la cantidad solicitada
+            if (!isRangeAvailable(selectedStartDate, date, quantity)) {
+                setCalendarError(`El rango seleccionado no tiene suficiente stock disponible (${quantity} unidades)`);
                 setSelectedStartDate(null);
                 setSelectedEndDate(null);
                 return;

@@ -31,14 +31,14 @@ function adjustDateString(dateString, days) {
     const [year, month, day] = dateString.split('-').map(Number);
     const date = new Date(year, month - 1, day);
     date.setDate(date.getDate() + days);
-    
+
     // Devolver en formato YYYY-MM-DD
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 export const apiService = {
 
-    
+
     getInstruments: async () => {
         const instruments = await fetchData("/instruments", localDB.getAllProducts().sort(() => Math.random() - 0.5));
 
@@ -69,39 +69,31 @@ export const apiService = {
         return instrument;
     },
 
-    // Método para crear reservas en apiService.js
-    // Agregar en el objeto exportado apiService
-
     createReservation: async (reservationData) => {
         const backendAvailable = await checkBackendStatus();
-
         if (backendAvailable) {
             try {
                 // Ajustar las fechas para compensar el problema del backend
-                // Agregamos un día a cada fecha
-                const adjustedStartDate = adjustDateString(reservationData.startDate, 1);
+                // Restamos un día a cada fecha antes de enviarlas al backend
+                const adjustedStartDate = adjustDateString(reservationData.startDate, -1);
                 const adjustedEndDate = reservationData.endDate ?
-                    adjustDateString(reservationData.endDate, 1) :
-                    adjustDateString(reservationData.startDate, 1);
-
+                    adjustDateString(reservationData.endDate, -1) :
+                    adjustDateString(reservationData.startDate, -1);
                 // Formato esperado por el backend según el swagger
                 const apiData = {
                     instrumentId: reservationData.instrumentId,
                     userId: reservationData.userId,
-                    startDate: adjustedStartDate, // Fecha ajustada
-                    endDate: adjustedEndDate, // Fecha ajustada
-                    quantity: reservationData.quantity || 1
+                    startDate: adjustedStartDate, // Fecha ajustada restando 1 día
+                    endDate: adjustedEndDate, // Fecha ajustada restando 1 día
+                    quantity: reservationData.quantity || 1 // Asegurar que siempre haya una cantidad
                 };
-
-                console.log('Enviando reserva al backend con fechas ajustadas:', apiData);
-
+                console.log('Enviando reserva al backend con fechas ajustadas (-1 día):', apiData);
                 // Asegurarse de que las cabeceras sean correctas
                 const response = await axios.post(`${API_BASE_URL}/availability/reserve`, apiData, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 });
-
                 console.log('Respuesta de reserva del backend:', response.data);
                 return response.data;
             } catch (error) {
@@ -109,25 +101,9 @@ export const apiService = {
                 throw error;
             }
         } else {
-            console.log('Backend no disponible, utilizando simulación local');
-            // Implementación de respaldo usando localDB
-            // Esta es una simulación, ya que actualmente localDB no tiene
-            // un método específico para reservas
-            const mockReservation = {
-                id: Math.floor(Math.random() * 10000),
-                instrumentId: reservationData.instrumentId,
-                userId: reservationData.userId,
-                startDate: reservationData.startDate,
-                endDate: reservationData.endDate || reservationData.startDate,
-                quantity: reservationData.quantity || 1,
-                status: 'CONFIRMED',
-                createdAt: new Date().toISOString()
-            };
-
-            console.log('Reserva simulada creada:', mockReservation);
-            return mockReservation;
+            throw new Error('Backend no disponible. La reserva no pudo ser procesada.');
         }
-    },
+     },
 
 
 

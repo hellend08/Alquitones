@@ -59,6 +59,31 @@ const UserReservations = () => {
         });
     };
 
+    // Función para traducir el estado de la reserva a un texto más amigable
+    const getStatusLabel = (status) => {
+        if (!status) return "Desconocido";
+        
+        switch(status.toUpperCase()) {
+            case 'ACTIVE':
+                return "En curso";
+            case 'ENDED':
+                return "Finalizada";
+            case 'CANCELLED':
+                return "Cancelada";
+            case 'CONFIRMED':
+                return "Confirmada";
+            case 'PENDING':
+                return "Pendiente";
+            default:
+                return status;
+        }
+    };
+
+    // Función para determinar si una reserva se puede valorar
+    const canRateReservation = (reservation) => {
+        return reservation.status && reservation.status.toUpperCase() === 'ENDED';
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -75,6 +100,11 @@ const UserReservations = () => {
     const openRatingModal = (reservation) => {
         if (!reservation.instrumentId) {
             alert("No se puede puntuar este instrumento (ID no disponible)");
+            return;
+        }
+
+        if (!canRateReservation(reservation)) {
+            alert("Solo puedes valorar reservas finalizadas");
             return;
         }
 
@@ -113,13 +143,13 @@ const UserReservations = () => {
     const handleSearch = (e) => {
         const searchValue = e.target.value.toLowerCase();
         setSearchTerm(searchValue);
-        
+
         if (!searchValue.trim()) {
             // Si la búsqueda está vacía, mostrar todas las reservas
             setFilteredReservations(userReservations);
             return;
         }
-        
+
         // Filtrar reservas que coincidan con el término de búsqueda
         const filtered = userReservations.filter(reservation => {
             // Buscar en el nombre del instrumento
@@ -131,14 +161,14 @@ const UserReservations = () => {
             // Buscar en fechas (formato dd/mm/yyyy)
             const startDate = reservation.startDate ? formatDate(reservation.startDate).toLowerCase() : '';
             const endDate = reservation.endDate ? formatDate(reservation.endDate).toLowerCase() : '';
-            
-            return instrumentName.includes(searchValue) || 
-                   status.includes(searchValue) || 
-                   category.includes(searchValue) || 
-                   startDate.includes(searchValue) || 
-                   endDate.includes(searchValue);
+
+            return instrumentName.includes(searchValue) ||
+                status.includes(searchValue) ||
+                category.includes(searchValue) ||
+                startDate.includes(searchValue) ||
+                endDate.includes(searchValue);
         });
-        
+
         setFilteredReservations(filtered);
     };
 
@@ -152,7 +182,7 @@ const UserReservations = () => {
             const day = date.getDate();
             const year = date.getFullYear();
             const dateKey = `${day} de ${month}`;
-            
+
             if (!groups[dateKey]) {
                 groups[dateKey] = [];
             }
@@ -187,9 +217,9 @@ const UserReservations = () => {
                 {/* Barra de búsqueda y total */}
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
                     <div className="relative w-full sm:w-80 mb-4 sm:mb-0">
-                        <input 
-                            type="text" 
-                            placeholder="Buscar" 
+                        <input
+                            type="text"
+                            placeholder="Buscar"
                             className="bg-gray-100 rounded-full py-2 px-4 pl-10 w-full text-gray-700 focus:outline-none"
                             value={searchTerm}
                             onChange={handleSearch}
@@ -197,8 +227,8 @@ const UserReservations = () => {
                         <span className="material-symbols-outlined absolute left-3 top-2 text-gray-500">search</span>
                     </div>
                     <div className="text-gray-500 text-sm">
-                        {searchTerm ? 
-                            `${filteredTotal} de ${totalReservations} ${totalReservations === 1 ? 'reserva' : 'reservas'}` : 
+                        {searchTerm ?
+                            `${filteredTotal} de ${totalReservations} ${totalReservations === 1 ? 'reserva' : 'reservas'}` :
                             `${totalReservations} ${totalReservations === 1 ? 'reserva' : 'reservas'}`}
                     </div>
                 </div>
@@ -216,52 +246,71 @@ const UserReservations = () => {
                                     <div className="mb-3">
                                         <h2 className="text-lg font-medium text-[#413620]">{date}</h2>
                                     </div>
-                                    
+
                                     <div className="space-y-4">
-                                        {reservations.map((reservation) => (
-                                            <div key={reservation.id} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
-                                                <div className="flex flex-col md:flex-row md:items-center">
-                                                    <div className="flex-shrink-0 md:w-1/6 mb-3 md:mb-0">
-                                                        <div className="text-xs text-gray-500 mb-1">
-                                                            {reservation.status || "Entregado"}
+                                        {reservations.map((reservation) => {
+                                            const isRatable = canRateReservation(reservation);
+                                            const statusClass = isRatable ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800";
+                                            
+                                            return (
+                                                <div key={reservation.id || `reservation-${Math.random()}`} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+                                                    <div className="flex flex-col md:flex-row md:items-center">
+                                                        <div className="flex-shrink-0 md:w-1/6 mb-3 md:mb-0">
+                                                            <div className={`text-xs px-2 py-1 rounded-full inline-block ${statusClass}`}>
+                                                                {getStatusLabel(reservation.status)}
+                                                            </div>
+                                                            <img
+                                                                src={reservation.instrumentImage || "/images/placeholder-instrument.jpg"}
+                                                                alt={reservation.instrumentName || "Instrumento"}
+                                                                className="w-20 h-20 mt-2 object-cover rounded"
+                                                                onError={(e) => {
+                                                                    e.target.onerror = null;
+                                                                    e.target.src = "/images/placeholder-instrument.jpg";
+                                                                }}
+                                                            />
                                                         </div>
-                                                        <img 
-                                                            src={reservation.instrumentImage || "/images/placeholder-instrument.jpg"} 
-                                                            alt={reservation.instrumentName || "Instrumento"} 
-                                                            className="w-20 h-20 object-cover rounded"
-                                                            onError={(e) => {
-                                                                e.target.onerror = null;
-                                                                e.target.src = "/images/placeholder-instrument.jpg";
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    
-                                                    <div className="md:w-3/6 md:px-4">
-                                                        <div className="text-gray-500 text-sm">
-                                                            {reservation.provider || "ALQUITONES"}
+
+                                                        <div className="md:w-3/6 md:px-4">
+                                                            <div className="text-gray-500 text-sm">
+                                                                {reservation.provider || "ALQUITONES"}
+                                                            </div>
+                                                            <div className="font-medium text-gray-800 my-1">
+                                                                {`Período: ${formatDate(reservation.startDate)} al ${formatDate(reservation.endDate)}`}
+                                                            </div>
+                                                            <div className="text-gray-700 font-semibold">
+                                                                {reservation.instrumentName || `Instrumento ${reservation.instrumentId || ""}`}
+                                                            </div>
+                                                            <div className="text-sm text-gray-500 mt-1">
+                                                                {reservation.category || "Sin categoría"} | Días: {reservation.days || 
+                                                                (reservation.startDate && reservation.endDate ? 
+                                                                    Math.round((new Date(reservation.endDate) - new Date(reservation.startDate)) / (1000 * 60 * 60 * 24)) + 1 : "7"
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="font-medium text-gray-800 my-1">
-                                                            {`Llegó el ${reservation.endDate ? formatDate(reservation.endDate) : "N/A"}`}
+
+                                                        <div className="flex flex-col md:w-2/6 mt-3 md:mt-0 justify-center items-center">
+                                                            <button
+                                                                onClick={() => openRatingModal(reservation)}
+                                                                className={`text-white text-center px-6 py-2 rounded-md transition-colors w-full max-w-xs
+                                                                    ${isRatable ? 
+                                                                        "bg-[#9C6615] hover:bg-[#9F7833] cursor-pointer" : 
+                                                                        "bg-gray-400 cursor-not-allowed opacity-70"
+                                                                    }`}
+                                                                disabled={!isRatable}
+                                                            >
+                                                                {isRatable ? "Valorar" : "Reserva en curso"}
+                                                            </button>
+                                                            
+                                                            {!isRatable && (
+                                                                <p className="text-xs text-gray-500 mt-1 text-center">
+                                                                    Solo puedes valorar reservas finalizadas
+                                                                </p>
+                                                            )}
                                                         </div>
-                                                        <div className="text-gray-700">
-                                                            {reservation.instrumentName || `Instrumento ${reservation.instrumentId || ""}`}
-                                                        </div>
-                                                        <div className="text-sm text-gray-500 mt-1">
-                                                            {reservation.category || "Sin categoría"} | Días: {reservation.days || "7"}
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div className="flex flex-col md:w-2/6 mt-3 md:mt-0 justify-center items-center">
-                                                        <button 
-                                                            onClick={() => openRatingModal(reservation)}
-                                                            className="bg-[#9C6615] text-white text-center px-6 py-2 rounded-md hover:bg-[#9F7833] transition-colors w-full max-w-xs"
-                                                        >
-                                                            Valorar
-                                                        </button>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))
@@ -272,7 +321,7 @@ const UserReservations = () => {
                                 </span>
                                 <h3 className="text-xl font-medium text-[#413620] mb-2">No tienes reservas actualmente</h3>
                                 <p className="text-gray-500 mb-6">Explora nuestra colección de instrumentos y reserva uno hoy</p>
-                                <button 
+                                <button
                                     onClick={() => navigate('/')}
                                     className="bg-[#9C6615] text-white px-6 py-2 rounded-md hover:bg-[#9F7833] transition-colors"
                                 >
@@ -286,11 +335,11 @@ const UserReservations = () => {
                                 </span>
                                 <h3 className="text-xl font-medium text-[#413620] mb-2">No se encontraron resultados</h3>
                                 <p className="text-gray-500 mb-4">No hay reservas que coincidan con "{searchTerm}"</p>
-                                <button 
+                                <button
                                     onClick={() => {
                                         setSearchTerm("");
                                         setFilteredReservations(userReservations);
-                                    }} 
+                                    }}
                                     className="bg-[#9C6615] text-white px-6 py-2 rounded-md hover:bg-[#9F7833] transition-colors"
                                 >
                                     Ver todas las reservas
