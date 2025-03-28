@@ -77,8 +77,8 @@ export const apiService = {
                 // Restamos un día a cada fecha antes de enviarlas al backend
                 const adjustedStartDate = adjustDateString(reservationData.startDate, -1);
                 const adjustedEndDate = reservationData.endDate ?
-                    adjustDateString(reservationData.endDate, -1) :
-                    adjustDateString(reservationData.startDate, -1);
+                    adjustDateString(reservationData.endDate, 0) :
+                    adjustDateString(reservationData.startDate, 0);
                 // Formato esperado por el backend según el swagger
                 const apiData = {
                     instrumentId: reservationData.instrumentId,
