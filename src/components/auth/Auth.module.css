@@ -51,6 +51,15 @@
     gap: 1.25rem;
 }
 
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+  }
+
+
+  
 .inputGroup {
     display: flex;
     flex-direction: column;
