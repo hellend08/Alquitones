@@ -51,19 +51,36 @@ const UserReservations = () => {
         }
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('es-UY', {
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+        // Crea una nueva fecha en la zona horaria del usuario
+        const date = new Date(dateString);
+        
+        // Verifica que la fecha sea válida
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+        
+        // Usar toLocaleDateString para formatear según la zona horaria local
+        return date.toLocaleDateString('es-UY', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric'
+            year: 'numeric',
+            timeZone: 'UTC' // Importante: usar UTC para evitar desfases
         });
-    };
+    } catch (error) {
+        console.error('Error al formatear fecha:', error);
+        return dateString;
+    }
+};
 
     // Función para traducir el estado de la reserva a un texto más amigable
     const getStatusLabel = (status) => {
         if (!status) return "Desconocido";
-        
-        switch(status.toUpperCase()) {
+
+        switch (status.toUpperCase()) {
             case 'ACTIVE':
                 return "En curso";
             case 'ENDED':
@@ -195,6 +212,19 @@ const UserReservations = () => {
     const totalReservations = userReservations.length;
     const filteredTotal = filteredReservations.length;
 
+    function calcularDias(fechaInicio, fechaFin) {
+        // Crear objetos Date con las fechas
+        const inicio = new Date(fechaInicio);
+        const fin = new Date(fechaFin);
+        
+        // Convertir a UTC para evitar problemas con horario de verano
+        const inicioUTC = Date.UTC(inicio.getFullYear(), inicio.getMonth(), inicio.getDate());
+        const finUTC = Date.UTC(fin.getFullYear(), fin.getMonth(), fin.getDate());
+        
+        // Calcular la diferencia en milisegundos y convertir a días
+        return Math.floor((finUTC - inicioUTC) / (1000 * 60 * 60 * 24));
+      }
+
     return (
         <>
             {/* Header con bienvenida */}
@@ -251,7 +281,7 @@ const UserReservations = () => {
                                         {reservations.map((reservation) => {
                                             const isRatable = canRateReservation(reservation);
                                             const statusClass = isRatable ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800";
-                                            
+
                                             return (
                                                 <div key={reservation.id || `reservation-${Math.random()}`} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
                                                     <div className="flex flex-col md:flex-row md:items-center">
@@ -281,10 +311,10 @@ const UserReservations = () => {
                                                                 {reservation.instrumentName || `Instrumento ${reservation.instrumentId || ""}`}
                                                             </div>
                                                             <div className="text-sm text-gray-500 mt-1">
-                                                                {reservation.category || "Sin categoría"} | Días: {reservation.days || 
-                                                                (reservation.startDate && reservation.endDate ? 
-                                                                    Math.round((new Date(reservation.endDate) - new Date(reservation.startDate)) / (1000 * 60 * 60 * 24)) + 1 : "7"
-                                                                )}
+                                                                {reservation.category || "Sin categoría"} | Días: {reservation.days ||
+                                                                    (reservation.startDate && reservation.endDate ?
+                                                                        calcularDias(reservation.startDate, reservation.endDate) : "7"
+                                                                    )}
                                                             </div>
                                                         </div>
 
@@ -292,15 +322,15 @@ const UserReservations = () => {
                                                             <button
                                                                 onClick={() => openRatingModal(reservation)}
                                                                 className={`text-white text-center px-6 py-2 rounded-md transition-colors w-full max-w-xs
-                                                                    ${isRatable ? 
-                                                                        "bg-[#9C6615] hover:bg-[#9F7833] cursor-pointer" : 
+                                                                    ${isRatable ?
+                                                                        "bg-[#9C6615] hover:bg-[#9F7833] cursor-pointer" :
                                                                         "bg-gray-400 cursor-not-allowed opacity-70"
                                                                     }`}
                                                                 disabled={!isRatable}
                                                             >
                                                                 {isRatable ? "Valorar" : "Reserva en curso"}
                                                             </button>
-                                                            
+
                                                             {!isRatable && (
                                                                 <p className="text-xs text-gray-500 mt-1 text-center">
                                                                     Solo puedes valorar reservas finalizadas

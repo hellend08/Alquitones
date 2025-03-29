@@ -73,9 +73,7 @@ export const apiService = {
         const backendAvailable = await checkBackendStatus();
         if (backendAvailable) {
             try {
-                // Ajustar las fechas para compensar el problema del backend
-                // Restamos un día a cada fecha antes de enviarlas al backend
-                const adjustedStartDate = adjustDateString(reservationData.startDate, -1);
+                const adjustedStartDate = adjustDateString(reservationData.startDate, 0);
                 const adjustedEndDate = reservationData.endDate ?
                     adjustDateString(reservationData.endDate, 0) :
                     adjustDateString(reservationData.startDate, 0);
@@ -337,7 +335,6 @@ export const apiService = {
             category: { id: instrumentData.categoryId },
             stock: 5,
             createdAt: new Date(),
-            mainImage: "url",
         };
         delete processedInstrument.categoryId;
         delete processedInstrument.status;

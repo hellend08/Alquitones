@@ -71,13 +71,13 @@
 
 /* Media query para móviles */
 @media (max-width: 760px) {
-    .adminContainer {
+    /* .adminContainer {
         display: none;
     }
-    
-    .responsiveMessage {
+     */
+    /* .responsiveMessage {
         display: flex;
-    }
+    } */
     
     .responsiveTitle {
         font-size: 1.3rem;
@@ -498,9 +498,9 @@
 
 /* Media query para mostrar/ocultar contenido */
 @media (max-width: 760px) {
-    .adminContainer {
+    /* .adminContainer {
         display: none;
-    }
+    } */
     
 }
 
