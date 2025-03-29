@@ -426,8 +426,7 @@ function Reservation() {
                             Volver al inicio
                         </button>
                         <button
-                            onClick={() => navigate('/profile/reservations')} // Cambiar a la ruta correcta
-                            className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
+                            onClick={() => navigate('/reservas')} className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
                         >
                             Ver mis reservas
                         </button>
