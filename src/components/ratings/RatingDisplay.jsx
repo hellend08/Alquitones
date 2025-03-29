@@ -93,7 +93,7 @@ const RatingsDisplay = ({ instrumentId }) => {
             {ratings.length > 0 ? (
                 <div className="space-y-6">
                     {ratings.map((rating) => (
-                        <div key={rating.id} className="border-b border-gray-200 pb-4">
+                        <div key={rating.id || `rating-${rating.userId}-${Math.random().toString(36).substring(2)}`} className="border-b border-gray-200 pb-4">
                             <div className="flex justify-between items-start mb-2">
                                 <div>
                                     <StarDisplay rating={rating.stars} />
