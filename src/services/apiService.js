@@ -37,7 +37,51 @@ function adjustDateString(dateString, days) {
 }
 
 export const apiService = {
+// Añadir este método al objeto apiService en apiService.js
 
+// Para apiService.js - Actualiza el método getAllReservations:
+
+getAllReservations: async () => {
+  
+    try {
+      // Configurar un tiempo límite para la solicitud usando AbortController
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos de timeout
+      
+      // Hacer la llamada al endpoint con el controlador de aborto
+      const response = await axios.get(`${API_BASE_URL}/reservations/all`, {
+        signal: controller.signal
+      });
+      
+      // Limpiar el timeout ya que la solicitud se completó
+      clearTimeout(timeoutId);
+      return { data: response.data };
+    } catch (error) {
+      // Manejar específicamente el error de tiempo de espera
+      if (error.name === 'AbortError') {
+        console.error("La solicitud se ha cancelado por tiempo de espera");
+        return { data: [] };
+      }
+      
+      // Manejar otros errores
+      console.error("Error al obtener todas las reservas:", error);
+      return { data: [] };
+    }
+  },
+
+// Actualiza el método getUserById con mejor manejo de errores:
+getUserById: async (userId) => {
+    // Usa el método getUsers() que ya tienes implementado para evitar duplicar lógica
+    try {
+        const users = await apiService.getUsers();
+        // Buscar el usuario por ID en el array de usuarios
+        return users.find(user => user.id === userId) || null;
+    } catch (error) {
+        console.error(`Error al obtener usuario ${userId}:`, error);
+        // Devolver objeto vacío en lugar de null para evitar errores
+        return { username: `Usuario ${userId}`, email: 'No disponible' };
+    }
+},
 
     getInstruments: async () => {
         const instruments = await fetchData("/instruments", localDB.getAllProducts().sort(() => Math.random() - 0.5));
