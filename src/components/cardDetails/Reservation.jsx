@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useInstrumentState } from "../../context/InstrumentContext";
 import { useAuthState } from "../../context/AuthContext";
 import { apiService } from "../../services/apiService";
+import EmailConfirmationService from "../../services/emailConfirmationService";
+import WhatsAppChat from '../crossSections/WhatsAppChat';
 
 function Reservation() {
     const { id } = useParams();
@@ -20,7 +22,52 @@ function Reservation() {
     const [currentUser, setCurrentUser] = useState(null);
     const [reservationNote, setReservationNote] = useState('');
     const [reservationSuccess, setReservationSuccess] = useState(false);
+    const [emailSent, setEmailSent] = useState(false);
+    const [emailError, setEmailError] = useState(null);
+    const [showDateConfirmation, setShowDateConfirmation] = useState(false);
+    const [quantity, setQuantity] = useState(1); // Añadir estado para la cantidad
 
+    // Función mejorada para formatear fechas con validación adicional
+    const formatDateUY = (dateString) => {
+        if (!dateString) return '';
+
+        try {
+            // Asegurar que la fecha tenga el formato correcto (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                console.warn('Formato de fecha incorrecto:', dateString);
+                return dateString; // Devolver la fecha original si no tiene el formato esperado
+            }
+
+            const [year, month, day] = dateString.split('-').map(Number);
+
+            // Verificar que los componentes sean números válidos
+            if (isNaN(year) || isNaN(month) || isNaN(day)) {
+                console.warn('Componentes de fecha inválidos:', year, month, day);
+                return dateString;
+            }
+
+            // Los meses en JavaScript van de 0-11
+            const date = new Date(year, month - 1, day);
+
+            // Verificar que la fecha sea válida después de crear el objeto Date
+            if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+                console.warn('Fecha inválida después de la conversión:', date);
+                return dateString;
+            }
+
+            // Formatear la fecha en formato uruguayo (DD/MM/YYYY)
+            return date.toLocaleDateString('es-UY', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (err) {
+            console.error('Error al formatear fecha:', err);
+            return dateString;
+        }
+    };
+
+    // En el useEffect donde cargas el instrumento, añade esta llamada para obtener la disponibilidad
     useEffect(() => {
         // Comprobar si el usuario está autenticado
         const user = getCurrentUser();
@@ -34,11 +81,52 @@ function Reservation() {
         const fetchData = async () => {
             setLoading(true);
             try {
+                // Primero, obtenemos el instrumento
                 const product = await getInstrumentById(parseInt(id));
+                console.log("Instrumento cargado:", product);
+
+                // Ahora, obtenemos la disponibilidad si tenemos fechas seleccionadas
+                if (selectedDates.startDate) {
+                    // Establecer un rango de fechas para consultar la disponibilidad
+                    // Si no hay fecha de fin, usamos la fecha de inicio como fin también
+                    const endDate = selectedDates.endDate || selectedDates.startDate;
+
+                    // Llamar a la API para obtener la disponibilidad
+                    const availabilityData = await apiService.getAvailabilityById(
+                        parseInt(id),
+                        selectedDates.startDate,
+                        endDate
+                    );
+
+                    console.log("Disponibilidad obtenida:", availabilityData);
+
+                    // Asignar la disponibilidad al producto
+                    product.availability = availabilityData;
+                } else {
+                    console.warn("No hay fechas seleccionadas para consultar disponibilidad");
+                }
+
                 setInstrument(product);
+
+                // Si hay disponibilidad, ajustar la cantidad inicial
+                if (product.availability && product.availability.length > 0 && selectedDates.startDate) {
+                    const startAvailability = product.availability.find(
+                        avail => avail.date === selectedDates.startDate
+                    );
+
+                    if (startAvailability) {
+                        console.log("Disponibilidad en fecha inicio:", startAvailability);
+                        // Establecer la cantidad inicial al máximo disponible si es menor que el valor actual
+                        const maxAvailable = startAvailability.availableStock;
+                        if (maxAvailable > 0 && quantity > maxAvailable) {
+                            setQuantity(maxAvailable);
+                        }
+                    }
+                }
+
                 setLoading(false);
             } catch (err) {
-                console.error('Error al cargar instrumento:', err);
+                console.error('Error al cargar instrumento o disponibilidad:', err);
                 setError('No se pudo cargar la información del producto');
                 setLoading(false);
             }
@@ -50,7 +138,7 @@ function Reservation() {
         if (!localStorage.getItem('reservationStartDate')) {
             setError('No se han seleccionado fechas para la reserva');
         }
-    }, [id, navigate, getCurrentUser, getInstrumentById]);
+    }, [id, navigate, getCurrentUser, getInstrumentById, selectedDates.startDate, selectedDates.endDate]);
 
     // Calcular el número total de días
     const calculateTotalDays = () => {
@@ -66,15 +154,120 @@ function Reservation() {
         return Math.round(Math.abs((end - start) / oneDay)) + 1; // +1 para incluir ambos días
     };
 
-    // Calcular precio total
+    // Calcular precio total con la cantidad
     const calculateTotalPrice = () => {
         if (!instrument) return 0;
         const totalDays = calculateTotalDays();
-        return (instrument.pricePerDay * totalDays).toFixed(2);
+        return (instrument.pricePerDay * totalDays * quantity).toFixed(2);
     };
+
+    // Componente QuantitySelector mejorado
+    const QuantitySelector = () => {
+        // Función para obtener el stock disponible en la fecha de inicio
+        const getMaxStock = () => {
+            // Verificamos que tengamos datos de disponibilidad y una fecha de inicio
+            if (!instrument || !instrument.availability || !selectedDates.startDate) {
+                console.log("Datos insuficientes para calcular stock máximo");
+                return 1; // Valor por defecto
+            }
+
+            // Buscamos la disponibilidad para la fecha de inicio seleccionada
+            const startDateAvailability = instrument.availability.find(
+                avail => avail.date === selectedDates.startDate
+            );
+
+            // Registramos para depuración
+            console.log("Fecha de inicio:", selectedDates.startDate);
+            console.log("Datos de disponibilidad:", instrument.availability);
+            console.log("Disponibilidad para fecha inicio:", startDateAvailability);
+
+            // Si encontramos datos de disponibilidad, devolvemos el stock disponible
+            if (startDateAvailability && typeof startDateAvailability.availableStock === 'number') {
+                return startDateAvailability.availableStock;
+            }
+
+            // Si no encontramos datos o el formato es incorrecto, devolvemos 1 como valor por defecto
+            console.log("No se encontró disponibilidad válida para la fecha seleccionada");
+            return 1;
+        };
+
+        // Calculamos el stock máximo
+        const maxStock = getMaxStock();
+
+        return (
+            <div className="mb-4">
+                <label htmlFor="quantity" className="block text-gray-600 mb-2">
+                    Cantidad: (Máx: {maxStock})
+                </label>
+                <div className="flex items-center">
+                    <button
+                        type="button"
+                        className="px-3 py-1 bg-gray-200 rounded-l-md border border-gray-300"
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    >
+                        <span className="material-symbols-outlined text-sm">remove</span>
+                    </button>
+                    <input
+                        id="quantity"
+                        type="number"
+                        min="1"
+                        max={maxStock}
+                        value={quantity}
+                        onChange={(e) => {
+                            const value = parseInt(e.target.value) || 1;
+                            setQuantity(Math.min(maxStock, Math.max(1, value)));
+                        }}
+                        className="w-16 text-center border-t border-b border-gray-300 py-1"
+                    />
+                    <button
+                        type="button"
+                        className={`px-3 py-1 bg-gray-200 rounded-r-md border border-gray-300 ${quantity >= maxStock ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                        onClick={() => {
+                            if (quantity < maxStock) {
+                                setQuantity(quantity + 1);
+                            }
+                        }}
+                        disabled={quantity >= maxStock}
+                    >
+                        <span className="material-symbols-outlined text-sm">add</span>
+                    </button>
+                </div>
+                {maxStock <= 0 && (
+                    <p className="text-red-500 text-sm mt-1">
+                        No hay stock disponible para la fecha seleccionada.
+                    </p>
+                )}
+            </div>
+        );
+    };
+
+    // Añade este efecto para actualizar la cantidad cuando cambia el instrumento o las fechas
+    useEffect(() => {
+        if (instrument?.availability && selectedDates.startDate) {
+            const startDateAvailability = instrument.availability.find(
+                avail => avail.date === selectedDates.startDate
+            );
+
+            if (startDateAvailability) {
+                // Asegurar que la cantidad inicial no exceda el stock disponible
+                const maxStock = startDateAvailability.availableStock;
+                if (quantity > maxStock) {
+                    setQuantity(Math.max(1, maxStock));
+                }
+            }
+        }
+    }, [instrument, selectedDates.startDate]);
 
     const handleReservationSubmit = async (e) => {
         e.preventDefault();
+
+        // Mostrar diálogo de confirmación de fechas antes de procesar
+        if (!showDateConfirmation) {
+            setShowDateConfirmation(true);
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -91,13 +284,30 @@ function Reservation() {
                 throw new Error('Información de usuario no disponible');
             }
 
+            // Validar que la cantidad sea un número válido mayor a 0
+            const reservationQuantity = parseInt(quantity);
+            if (isNaN(reservationQuantity) || reservationQuantity <= 0) {
+                throw new Error('La cantidad debe ser un número mayor a 0');
+            }
+
+            // Validar que la cantidad no supere el stock disponible en la fecha de inicio
+            if (instrument?.availability && instrument.availability.length > 0) {
+                const startDateAvailability = instrument.availability.find(
+                    avail => avail.date === selectedDates.startDate
+                );
+
+                if (startDateAvailability && reservationQuantity > startDateAvailability.availableStock) {
+                    throw new Error(`La cantidad seleccionada (${reservationQuantity}) supera el stock disponible (${startDateAvailability.availableStock}) para la fecha de inicio.`);
+                }
+            }
+
             // Construir el objeto de reserva
             const reservationData = {
                 instrumentId: instrument.id,
                 userId: currentUser.id,
                 startDate: selectedDates.startDate,
                 endDate: selectedDates.endDate,
-                quantity: 1, // Por defecto 1 unidad
+                quantity: reservationQuantity, // Usar la cantidad seleccionada
                 notes: reservationNote
             };
 
@@ -106,6 +316,20 @@ function Reservation() {
             // Llamar a la API para crear la reserva
             const result = await apiService.createReservation(reservationData);
             console.log('Reserva creada exitosamente:', result);
+
+            // Enviar correo de confirmación
+            const emailResult = await EmailConfirmationService.sendReservationConfirmationEmail(
+                reservationData,
+                currentUser,
+                instrument
+            );
+
+            // Almacenar resultado del envío de correo
+            if (emailResult.success) {
+                setEmailSent(true);
+            } else {
+                setEmailError('No se pudo enviar el correo de confirmación, pero tu reserva se ha completado correctamente.');
+            }
 
             // Limpiar localStorage después de hacer la reserva
             localStorage.removeItem('reservationStartDate');
@@ -159,7 +383,41 @@ function Reservation() {
                         <span className="material-symbols-outlined text-5xl text-green-500">check_circle</span>
                     </div>
                     <h2 className="text-2xl font-bold text-green-700 mb-2">¡Reserva completada con éxito!</h2>
-                    <p className="text-gray-700 mb-6">Hemos enviado un correo electrónico con los detalles de tu reserva.</p>
+
+                    {emailSent ? (
+                        <p className="text-gray-700 mb-6">
+                            Hemos enviado un correo electrónico a <strong>{currentUser.email}</strong> con los detalles de tu reserva.
+                        </p>
+                    ) : (
+                        <div className="mb-6">
+                            <p className="text-gray-700">Tu reserva se ha completado correctamente.</p>
+                            {emailError && (
+                                <p className="text-yellow-600 mt-2 text-sm">{emailError}</p>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="bg-white p-4 rounded-lg border border-gray-100 mb-6 text-left">
+                        <h3 className="font-medium text-gray-800 mb-2">Resumen de la reserva:</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <div>
+                                <span className="text-gray-600">Instrumento:</span> {instrument.name}
+                            </div>
+                            <div>
+                                <span className="text-gray-600">Período:</span> {formatDateUY(selectedDates.startDate)} al {formatDateUY(selectedDates.endDate)}
+                            </div>
+                            <div>
+                                <span className="text-gray-600">Días totales:</span> {calculateTotalDays()}
+                            </div>
+                            <div>
+                                <span className="text-gray-600">Cantidad:</span> {quantity}
+                            </div>
+                            <div>
+                                <span className="text-gray-600">Precio total:</span> ${calculateTotalPrice()}
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="flex justify-center gap-4">
                         <button
                             onClick={() => navigate('/')}
@@ -168,7 +426,7 @@ function Reservation() {
                             Volver al inicio
                         </button>
                         <button
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate('/profile/reservations')} // Cambiar a la ruta correcta
                             className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
                         >
                             Ver mis reservas
@@ -239,12 +497,12 @@ function Reservation() {
                                             <div className="text-sm text-gray-500 mb-1 sm:mb-0">Período de reserva:</div>
                                             <div className="font-medium bg-gray-50 border border-gray-100 px-3 py-1 rounded-md inline-flex items-center">
                                                 <span className="material-symbols-outlined text-xs text-gray-500 mr-1">calendar_today</span>
-                                                {selectedDates.startDate}
+                                                {formatDateUY(selectedDates.startDate)}
                                                 {selectedDates.endDate && (
                                                     <>
                                                         <span className="mx-2 text-gray-400">→</span>
                                                         <span className="material-symbols-outlined text-xs text-gray-500 mr-1">calendar_today</span>
-                                                        {selectedDates.endDate}
+                                                        {formatDateUY(selectedDates.endDate)}
                                                     </>
                                                 )}
                                             </div>
@@ -332,10 +590,53 @@ function Reservation() {
                     <div className="bg-white p-6 rounded-lg shadow sticky top-24">
                         <h2 className="text-xl font-bold text-(--color-secondary) mb-4">Resumen de reserva</h2>
 
+                        {showDateConfirmation && (
+                            <div className="mb-6 p-3 border-2 border-(--color-primary) bg-(--color-sunset) bg-opacity-20 rounded-lg">
+                                <h3 className="font-bold text-center mb-2">Por favor, confirma las fechas de tu reserva:</h3>
+                                <div className="flex flex-col gap-1 mb-3">
+                                    <div className="flex justify-between">
+                                        <span className="font-medium">Fecha de inicio:</span>
+                                        <span className="underline">{formatDateUY(selectedDates.startDate)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-medium">Fecha de fin:</span>
+                                        <span className="underline">{formatDateUY(selectedDates.endDate)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-medium">Total días:</span>
+                                        <span>{calculateTotalDays()}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-medium">Cantidad:</span>
+                                        <span>{quantity}</span>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2 justify-end">
+                                    <button
+                                        type="button"
+                                        className="px-3 py-1 bg-gray-200 text-gray-800 rounded-md text-sm"
+                                        onClick={() => setShowDateConfirmation(false)}
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                                <div className="text-xs text-gray-600 mt-2 text-center">
+                                    Nota: Al confirmar, estas fechas exactas se enviarán al servidor.
+                                </div>
+                            </div>
+                        )}
+
                         <div className="border-b border-gray-200 pb-4 mb-4">
                             <div className="flex justify-between mb-2">
                                 <span className="text-gray-600">Precio por día:</span>
                                 <span className="font-medium">${instrument?.pricePerDay?.toFixed(2)}</span>
+                            </div>
+
+                            <QuantitySelector />
+
+                            <div className="flex justify-between mb-2">
+                                <span className="text-gray-600">Cantidad:</span>
+                                <span className="font-medium">{quantity}</span>
                             </div>
 
                             <div className="flex justify-between mb-2">
@@ -364,10 +665,15 @@ function Reservation() {
                                     <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                                     <span>Procesando...</span>
                                 </>
-                            ) : (
+                            ) : showDateConfirmation ? (
                                 <>
                                     <span className="material-symbols-outlined text-sm">check_circle</span>
-                                    <span>Confirmar reserva</span>
+                                    <span>Confirmar fechas y reservar</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="material-symbols-outlined text-sm">calendar_today</span>
+                                    <span>Revisar fechas seleccionadas</span>
                                 </>
                             )}
                         </button>
@@ -378,6 +684,7 @@ function Reservation() {
                     </div>
                 </div>
             </div>
+            <WhatsAppChat />
         </div>
     );
 }

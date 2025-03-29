@@ -25,7 +25,20 @@ const fetchData = async (endpoint, localFallback) => {
     return localFallback;
 };
 
+
+function adjustDateString(dateString, days) {
+    // Formato esperado: "YYYY-MM-DD"
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + days);
+
+    // Devolver en formato YYYY-MM-DD
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 export const apiService = {
+
+
     getInstruments: async () => {
         const instruments = await fetchData("/instruments", localDB.getAllProducts().sort(() => Math.random() - 0.5));
 
@@ -56,32 +69,29 @@ export const apiService = {
         return instrument;
     },
 
-    // Método para crear reservas en apiService.js
-    // Agregar en el objeto exportado apiService
-
     createReservation: async (reservationData) => {
         const backendAvailable = await checkBackendStatus();
-
         if (backendAvailable) {
             try {
+                const adjustedStartDate = adjustDateString(reservationData.startDate, 0);
+                const adjustedEndDate = reservationData.endDate ?
+                    adjustDateString(reservationData.endDate, 0) :
+                    adjustDateString(reservationData.startDate, 0);
                 // Formato esperado por el backend según el swagger
                 const apiData = {
                     instrumentId: reservationData.instrumentId,
                     userId: reservationData.userId,
-                    startDate: reservationData.startDate,
-                    endDate: reservationData.endDate || reservationData.startDate,
-                    quantity: reservationData.quantity || 1
+                    startDate: adjustedStartDate, // Fecha ajustada restando 1 día
+                    endDate: adjustedEndDate, // Fecha ajustada restando 1 día
+                    quantity: reservationData.quantity || 1 // Asegurar que siempre haya una cantidad
                 };
-
-                console.log('Enviando reserva al backend:', apiData);
-                
+                console.log('Enviando reserva al backend con fechas ajustadas (-1 día):', apiData);
                 // Asegurarse de que las cabeceras sean correctas
                 const response = await axios.post(`${API_BASE_URL}/availability/reserve`, apiData, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 });
-                
                 console.log('Respuesta de reserva del backend:', response.data);
                 return response.data;
             } catch (error) {
@@ -89,27 +99,229 @@ export const apiService = {
                 throw error;
             }
         } else {
-            console.log('Backend no disponible, utilizando simulación local');
-            // Implementación de respaldo usando localDB
-            // Esta es una simulación, ya que actualmente localDB no tiene
-            // un método específico para reservas
-            const mockReservation = {
-                id: Math.floor(Math.random() * 10000),
-                instrumentId: reservationData.instrumentId,
-                userId: reservationData.userId,
-                startDate: reservationData.startDate,
-                endDate: reservationData.endDate || reservationData.startDate,
-                quantity: reservationData.quantity || 1,
-                status: 'CONFIRMED',
-                createdAt: new Date().toISOString()
+            throw new Error('Backend no disponible. La reserva no pudo ser procesada.');
+        }
+     },
+
+
+
+    // Agregar estos métodos a apiService.js
+    // Enviar o actualizar una valoración
+    submitRating: async (ratingData) => {
+        if (!(await checkBackendStatus())) {
+            // Simulación local, mantén igual
+            return { success: true, data: { id: Math.floor(Math.random() * 1000), ...ratingData, createdAt: new Date().toISOString() } };
+        }
+
+        try {
+            // Formato corregido según API
+            const formattedData = {
+                instrumentId: ratingData.instrumentId,
+                userId: ratingData.userId,
+                stars: ratingData.stars,
+                comment: ratingData.comment || ""  // Asegura que nunca sea null
             };
-            
-            console.log('Reserva simulada creada:', mockReservation);
-            return mockReservation;
+
+            console.log('Enviando valoración al servidor:', formattedData);
+
+            const response = await axios.post(
+                `${API_BASE_URL}/ratings`,
+                formattedData,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+
+            return response.data;
+        } catch (error) {
+            console.error('Error al enviar valoración:', error);
+
+            // Mejor manejo de errores
+            if (error.response?.status === 500) {
+                throw new Error('Error interno del servidor. Intenta más tarde.');
+            } else if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            } else {
+                throw new Error('Error al enviar la valoración');
+            }
+        }
+    },
+
+    // Obtener valoraciones por instrumento
+    getRatingsByInstrument: async (instrumentId) => {
+        if (!(await checkBackendStatus())) {
+            return localDB.getRatingsByInstrument(instrumentId);
+        }
+
+        return axios.get(`${API_BASE_URL}/ratings/instrument/${instrumentId}`)
+            .then(response => response.data);
+    },
+
+    // Corrección de la función getUserReservations en apiService.js
+
+    getUserReservations: async (userId) => {
+        const backendAvailable = await checkBackendStatus();
+
+        if (!backendAvailable) {
+            // Simulación local
+            return {
+                data: [
+                    {
+                        id: 1,
+                        instrumentId: 4,
+                        instrumentName: "Saxofón Alto Selmer Series III",
+                        instrumentImage: "https://alquitones.s3.us-east-2.amazonaws.com/24.PNG",
+                        category: "Viento",
+                        status: "Reservado",
+                        startDate: "2025-03-23",
+                        endDate: "2025-03-26"
+                    }
+                ]
+            };
+        }
+
+        try {
+            // Nota que el endpoint correcto según Swagger es /api/reservations/user/{id}
+            const response = await axios.get(`${API_BASE_URL}/reservations/user/${userId}`);
+
+            // Transformar los datos para que coincidan con lo esperado por el componente
+            const reservationsWithDetails = await Promise.all(
+                (response.data || []).map(async (reservation) => {
+                    try {
+                        // Obtener detalles del instrumento si es posible
+                        const instrument = await apiService.getInstrumentById(reservation.instrumentId);
+
+                        return {
+                            id: reservation.id,
+                            instrumentId: reservation.instrumentId,
+                            instrumentName: instrument?.name || `Instrumento ${reservation.instrumentId}`,
+                            instrumentImage: instrument?.mainImage || instrument?.images?.[0],
+                            category: instrument?.category?.name || "Sin categoría",
+                            status: reservation.status || "Reservado",
+                            startDate: reservation.startDate,
+                            endDate: reservation.endDate
+                        };
+                    } catch (err) {
+                        // En caso de error, devolver datos mínimos
+                        return {
+                            id: reservation.id,
+                            instrumentId: reservation.instrumentId,
+                            status: reservation.status || "Reservado",
+                            startDate: reservation.startDate,
+                            endDate: reservation.endDate
+                        };
+                    }
+                })
+            );
+
+            return { data: reservationsWithDetails };
+        } catch (error) {
+            console.error("Error al obtener reservas:", error);
+            return { data: [] };
+        }
+    },
+
+    submitRating: async (ratingData) => {
+        if (!(await checkBackendStatus())) {
+            // Simulación local si no hay backend
+            return {
+                success: true,
+                data: {
+                    id: Math.floor(Math.random() * 1000),
+                    ...ratingData,
+                    createdAt: new Date().toISOString()
+                }
+            };
+        }
+
+        try {
+            // Asegúrate de enviar exactamente este formato
+            const formattedData = {
+                instrumentId: Number(ratingData.instrumentId),
+                userId: Number(ratingData.userId),
+                stars: Number(ratingData.stars),
+                comment: ratingData.comment || ""
+            };
+
+            console.log('Enviando valoración:', formattedData);
+
+            // Usar axios.post con el formato correcto
+            const response = await axios.post(
+                `${API_BASE_URL}/ratings`,
+                formattedData
+            );
+
+            return response.data;
+        } catch (error) {
+            console.error('Error al enviar valoración:', error);
+
+            // Capturar específicamente el error 500 
+            if (error.response?.status === 500) {
+                throw new Error('Error interno del servidor. Por favor, intenta más tarde.');
+            } else if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            } else {
+                throw new Error('Error al enviar la valoración');
+            }
+        }
+    },
+
+    // Obtener valoraciones por instrumento
+    getRatingsByInstrument: async (instrumentId) => {
+        if (!(await checkBackendStatus())) {
+            // Datos de ejemplo para modo sin backend
+            console.log('Backend no disponible, usando valoraciones simuladas');
+            return [
+                {
+                    id: 1,
+                    instrumentId: instrumentId,
+                    userId: 1,
+                    stars: 4,
+                    comment: "Muy buen instrumento, suena excelente y estaba en perfecto estado."
+                },
+                {
+                    id: 2,
+                    instrumentId: instrumentId,
+                    userId: 2,
+                    stars: 5,
+                    comment: "Excelente calidad, lo volvería a alquilar."
+                }
+            ];
+        }
+
+        try {
+            const response = await axios.get(`${API_BASE_URL}/ratings/instrument/${instrumentId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error al obtener valoraciones:', error);
+            return [];
         }
     },
 
 
+    cancelReservation: async (reservationId) => {
+        const backendAvailable = await checkBackendStatus();
+
+        if (!backendAvailable) {
+            // Simulación local para pruebas
+            console.log(`Simulando cancelación de reserva ${reservationId}`);
+            return { success: true, message: "Reserva cancelada (simulación)" };
+        }
+
+        try {
+            console.log(`Cancelando reserva ${reservationId}`);
+            // Esta URL debe ajustarse según la documentación del swagger
+            const response = await axios.put(
+                `${API_BASE_URL}/reservations/${reservationId}/cancel`,
+                {},
+                {
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Error cancelando reserva:", error);
+            throw new Error(error.response?.data?.message || "No se pudo cancelar la reserva");
+        }
+    },
 
     addInstrument: async (instrumentData, imagesAdj) => {
         if (!(await checkBackendStatus())) {
@@ -123,7 +335,6 @@ export const apiService = {
             category: { id: instrumentData.categoryId },
             stock: 5,
             createdAt: new Date(),
-            mainImage: "url",
         };
         delete processedInstrument.categoryId;
         delete processedInstrument.status;

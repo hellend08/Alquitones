@@ -4,53 +4,9 @@ import { useAuthState } from "../../context/AuthContext";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
-    const { getCurrentUser, favorites, toggleFavorite } = useAuthState();
+    const { getCurrentUser } = useAuthState();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-
-    // Datos de ejemplo para arriendos (en una aplicación real, estos vendrían de una API o base de datos)
-    const arriendosEjemplo = [
-        {
-            "ID": 1,
-            "Imagen": "https://example.com/images/guitar.jpg",
-            "Nombre": "Guitarra Eléctrica",
-            "Categoria": "Cuerda",
-            "Estado": "Disponible",
-            "Duracion": "7 días"
-        },
-        {
-            "ID": 2,
-            "Imagen": "https://example.com/images/piano.jpg",
-            "Nombre": "Piano Acústico",
-            "Categoria": "Teclado",
-            "Estado": "En uso",
-            "Duracion": "10 días"
-        },
-        {
-            "ID": 3,
-            "Imagen": "https://example.com/images/drum.jpg",
-            "Nombre": "Batería",
-            "Categoria": "Percusión",
-            "Estado": "Disponible",
-            "Duracion": "5 días"
-        },
-        {
-            "ID": 4,
-            "Imagen": "https://example.com/images/violin.jpg",
-            "Nombre": "Violín",
-            "Categoria": "Cuerda",
-            "Estado": "En reparación",
-            "Duracion": "3 días"
-        },
-        {
-            "ID": 5,
-            "Imagen": "https://example.com/images/trumpet.jpg",
-            "Nombre": "Trompeta",
-            "Categoria": "Viento",
-            "Estado": "Disponible",
-            "Duracion": "7 dias"
-        }
-    ];
 
     useEffect(() => {
         const checkUser = () => {
@@ -62,16 +18,20 @@ const UserProfile = () => {
         };
 
         checkUser();
-    }, []);
+    }, [getCurrentUser]);
 
-    const handleNavigation = (path) => {
-        navigate(path);
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
     };
 
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <p className="text-xl">Cargando...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#9C6615]"></div>
             </div>
         );
     }
@@ -81,121 +41,90 @@ const UserProfile = () => {
         return null;
     }
 
-    const handleRemoveFavorite = async (favorite) => {
-        try {
-            await toggleFavorite(favorite);
-        }
-        catch (error) {
-            alert(error.message);
-        }
-    };
-    // Obtener el primer nombre para el saludo
     const firstName = user.username ? user.username.split(" ")[0] : "";
 
     return (
         <>
-            <div className="bg-(--color-primary) text-white text-center py-15">
-                <h1 className="text-4xl font-bold">Hola {firstName}, ¡buenas tardes!</h1>
-                <p className="text-lg mt-2">¡Te damos la bienvenida a tu perfil!</p>
-            </div>
-            <table className="mt-8 container md:w-2/3 mx-auto px-6 py-8">
-                <thead>
-                    <tr>
-                        <th className="px-4 py-2 text-left font-bold text-2xl">Información Personal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Nombre:</td>
-                        <td className="px-4 py-2">{user.username || "No disponible"}</td>
-                    </tr>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Email:</td>
-                        <td className="px-4 py-2">{user.email || "No disponible"}</td>
-                    </tr>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Rol:</td>
-                        <td className="px-4 py-2">{user.role || "No disponible"}</td>
-                    </tr>
-                    <tr>
-                        <td className="px-4 py-2 font-semibold">Te uniste el: </td>
-                        <td className="px-4 py-2">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "No disponible"}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div className="mt-8 flex justify-around container md:w-2/3 mx-auto">
-                <button
-                    onClick={() => handleNavigation('/')}
-                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-(--color-primary)"
-                >
-                    Agendar Arriendo
-                </button>
-                <button
-                    onClick={() => handleNavigation('/')}
-                    className="bg-(--color-secondary) text-white px-6 py-2 rounded-lg hover:bg-(--color-primary) flex items-center"
-                >
-                    Ver Catálogo
-                    <span className="material-symbols-outlined pl-4">arrow_forward</span>
-                </button>
-            </div>
-
-            <div className="container mx-auto py-8 md:w-2/3">
-                <h3 className="text-xl font-semibold text-gray-800 text-center mt-8">Productos Favoritos</h3>
-                <div className="overflow-x-auto mt-8">
-                    <table className="min-w-full bg-white border-collapse border border-gray-300">
-                        <thead>
-                            <tr className="bg-(--color-primary) text-white">
-                                <th className="px-4 py-2 text-center">ID</th>
-                                <th className="px-4 py-2 text-center">Imagen</th>
-                                <th className="px-4 py-2 text-center">Nombre</th>
-                                <th className="px-4 py-2 text-center">Precio por dia</th>
-                                <th className="px-4 py-2 text-center">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {favorites.map((favorite) => (
-                                <tr key={favorite.id}>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300">{favorite.id}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">
-                                        <img className="w-10" src={favorite.mainImage} alt={favorite.name} />
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">{favorite.name}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">${favorite.pricePerDay}</td>
-                                    <td className="px-4 py-2 border-b border-gray-300 text-center">
-                                        <span className="material-symbols-outlined cursor-pointer" onClick={() => handleRemoveFavorite(favorite)}>delete</span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {/* Header con bienvenida y dropdown - Color más claro */}
+            <div className="bg-gradient-to-r from-[#9F7933] to-[#B89347] text-white py-12 shadow-md">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold">
+                                Hola {firstName}
+                                <span className="inline-block animate-pulse mx-1">👋</span>
+                            </h1>
+                            <p className="text-lg mt-2 text-white">
+                                Bienvenido a tu espacio personal en AlquiTones
+                            </p>
+                        </div>
+                        <div className="mt-4 md:mt-0 flex items-center">
+                        </div>
+                    </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 text-center mt-12">Últimos 5 Arriendos</h3>
-                <div className="overflow-x-auto mt-8">
-                    <table className="min-w-full bg-white border-collapse border border-gray-300">
-                        <thead>
-                            <tr className="bg-(--color-primary) text-white  ">
-                                <th className="px-4 py-2 text-center">ID</th>
-                                <th className="px-4 py-2 text-center">Imagen</th>
-                                <th className="px-4 py-2 text-center">Nombre</th>
-                                <th className="px-4 py-2 text-center">Categoria</th>
-                                <th className="px-4 py-2 text-center">Estado</th>
-                                <th className="px-4 py-2 text-center">Duracion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {arriendosEjemplo.map((arriendo, index) => (
-                                <tr key={arriendo.ID || index}>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300">{index + 1}</td>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300"><img className="w-10" src={arriendo.Imagen} /></td>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300">{arriendo.Nombre}</td>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300">{arriendo.Categoria}</td>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300">{arriendo.Estado}</td>
-                                    <td className="px-4 py-2 text-center border-b border-gray-300">{arriendo.Duracion}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            </div>
+
+            <div className="container mx-auto px-6 py-10">
+                {/* Información Personal */}
+                <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
+                    <div className="bg-[#B89347] text-white py-3 px-6">
+                        <h2 className="text-xl font-semibold">Información Personal</h2>
+                    </div>
+                    <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Nombre</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.username || "No disponible"}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Email</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.email || "No disponible"}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Rol</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.role || "No disponible"}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-gray-500 text-sm">Miembro desde</span>
+                                <span className="text-[#413620] font-medium text-lg">{user.createdAt ? formatDate(user.createdAt) : "No disponible"}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Accesos rápidos */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div className="bg-[#B89347] text-white py-3 px-6">
+                            <h2 className="text-xl font-semibold">Mis Favoritos</h2>
+                        </div>
+                        <div className="p-6 flex flex-col items-center justify-center">
+                            <span className="material-symbols-outlined text-5xl text-[#B89347] mb-3">favorite</span>
+                            <p className="text-[#413620] text-lg mb-4">Accede a tus instrumentos favoritos</p>
+                            <button
+                                onClick={() => navigate('/favoritos')}
+                                className="bg-[#B89347] text-white px-4 py-2 rounded-md hover:bg-[#9F7933] transition-colors"
+                            >
+                                Ver Favoritos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div className="bg-[#B89347] text-white py-3 px-6">
+                            <h2 className="text-xl font-semibold">Mis Reservas</h2>
+                        </div>
+                        <div className="p-6 flex flex-col items-center justify-center">
+                            <span className="material-symbols-outlined text-5xl text-[#B89347] mb-3">calendar_month</span>
+                            <p className="text-[#413620] text-lg mb-4">Gestiona tus reservas de instrumentos</p>
+                            <button
+                                onClick={() => navigate('/reservas')} // Cambiado a /reservas para coincidir con la ruta en el componente de perfil
+                                className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
+                            >
+                                Ver mis reservas
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
