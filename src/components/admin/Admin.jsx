@@ -1337,9 +1337,6 @@ const Rentals = () => (
     </div>
 );
 
-// Users component
-// Actualizar el componente Users en Admin.jsx
-// Users component con popup de confirmación
 const Users = () => {
     const { users, loading, error, updateUserRole} = useUserState();
     const dispatch = useUserDispatch();
@@ -1347,6 +1344,8 @@ const Users = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [paginatedUsers, setPaginatedUsers] = useState([]);
     const itemsPerPage = 10;
 
     // Estados para el popup de confirmación
@@ -1354,39 +1353,56 @@ const Users = () => {
     const [pendingRoleChange, setPendingRoleChange] = useState(null);
 
     useEffect(() => {
-        loadUsers();
+        // Al iniciar o cambiar users
+        if (users.length > 0) {
+            filterAndPaginateUsers();
+        }
+    }, [users]);
+
+    useEffect(() => {
+        // Al cambiar filtros o página
+        filterAndPaginateUsers();
     }, [searchTerm, currentPage]);
 
-    const loadUsers = async () => {
+    const filterAndPaginateUsers = () => {
         try {
-            const allUsers = users;
-            console.log('Todos los usuarios:', allUsers);
-
-            let filteredUsers = allUsers;
-
+            // Aplicar filtro de búsqueda
+            let filtered = users;
             if (searchTerm) {
-                filteredUsers = allUsers.filter(user =>
+                filtered = users.filter(user =>
                     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     user.email.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-
+            
+            // Guardar usuarios filtrados completos
+            setFilteredUsers(filtered);
+            
             // Calcular paginación
-            const startIndex = (currentPage - 1) * itemsPerPage;
+            const total = Math.ceil(filtered.length / itemsPerPage);
+            setTotalPages(total > 0 ? total : 1);
+            
+            // Asegurarse de que la página actual no exceda el total de páginas
+            const validCurrentPage = Math.min(currentPage, total);
+            if (validCurrentPage !== currentPage) {
+                setCurrentPage(validCurrentPage);
+            }
+            
+            // Calcular índices para la paginación
+            const startIndex = (validCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-            dispatch({ type: "SET_USERS", payload: paginatedUsers });
-            setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
+            
+            // Obtener usuarios paginados
+            const paginated = filtered.slice(startIndex, endIndex);
+            setPaginatedUsers(paginated);
         } catch (error) {
-            console.error('Error al cargar usuarios:', error);
-            alert('Error al cargar los usuarios');
+            console.error('Error al filtrar y paginar usuarios:', error);
         }
     };
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1);
+        setCurrentPage(1); // Resetear a primera página al buscar
     };
 
     // Modificado para mostrar la confirmación
@@ -1424,8 +1440,7 @@ const Users = () => {
             }
 
             await updateUserRole(pendingRoleChange.userId, pendingRoleChange.newRole);
-
-            loadUsers();
+            filterAndPaginateUsers(); // Actualizar la lista después del cambio
             alert(`Permisos actualizados correctamente`);
         } catch (error) {
             console.error('Error al cambiar permisos:', error);
@@ -1441,8 +1456,6 @@ const Users = () => {
     const cancelRoleChange = () => {
         setShowConfirmation(false);
         setPendingRoleChange(null);
-        // Recargar los usuarios para restaurar los selectores
-        loadUsers();
     };
 
     const handlePreviousPage = () => {
@@ -1498,7 +1511,7 @@ const Users = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => (
+                        {paginatedUsers.map(user => (
                             <tr key={user.id}>
                                 <td>{user.id}</td>
                                 <td>{user.username}</td>
