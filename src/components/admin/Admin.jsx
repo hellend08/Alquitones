@@ -33,20 +33,53 @@ const Instruments = () => {
     const dispatch = useInstrumentDispatch();
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
     
+    // Estados para paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [filteredInstruments, setFilteredInstruments] = useState([]);
+    const [paginatedInstruments, setPaginatedInstruments] = useState([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 10;
 
+    // Filtrar y ordenar instrumentos cuando cambia searchTerm o instruments
     useEffect(() => {
+        let filtered = [...instruments];
+        
+        // Filtrar por término de búsqueda
         if (searchTerm) {
-            const filteredInstruments = instruments.filter(instrument =>
+            filtered = filtered.filter(instrument =>
                 instrument.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
-            dispatch({ type: "SET_INSTRUMENTS", payload: filteredInstruments });
-        } else {
-            dispatch({ type: "SET_INSTRUMENTS", payload: instruments });
+        }
+        
+        // Ordenar por ID de menor a mayor
+        filtered.sort((a, b) => a.id - b.id);
+        
+        setFilteredInstruments(filtered);
+        
+        // Calcular total de páginas
+        const total = Math.ceil(filtered.length / itemsPerPage);
+        setTotalPages(total > 0 ? total : 1);
+        
+        // Asegurar que la página actual no exceda el total
+        if (currentPage > total && total > 0) {
+            setCurrentPage(1);
         }
     }, [searchTerm, instruments]);
 
+    // Actualizar instrumentos paginados cuando cambia la página actual o los filtrados
+    useEffect(() => {
+        // Calcular índices para la paginación
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        
+        // Obtener instrumentos paginados
+        const paginated = filteredInstruments.slice(startIndex, endIndex);
+        setPaginatedInstruments(paginated);
+    }, [currentPage, filteredInstruments]);
+
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
+        setCurrentPage(1); // Resetear a la primera página al buscar
     };
 
     const handleAddInstrument = () => {
@@ -110,7 +143,7 @@ const Instruments = () => {
                 description: form['instrument-description'].value.trim() || currentInstrument?.description,
                 status: form['instrument-status'].value || currentInstrument?.status,
                 images: existingImages,
-                mainImage: existingImages[0].url || currentInstrument?.mainImage,
+                mainImage: existingImages[0]?.url || currentInstrument?.mainImage,
                 specifications: productSpecifications.length > 0 ? productSpecifications : currentInstrument?.specifications
             };
 
@@ -150,6 +183,19 @@ const Instruments = () => {
     const getProductCategory = (categoryId) => {
         const category = categories.find(cat => cat.id === categoryId);
         return category ? category.name : 'Sin categoría';
+    };
+
+    // Manejadores de paginación
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
     };
 
     return (
@@ -193,14 +239,14 @@ const Instruments = () => {
                             <th>ID</th>
                             <th>Imagen</th>
                             <th>Nombre</th>
-                            <th>categoria</th>
+                            <th>Categoría</th>
                             <th>Estado</th>
                             <th>Precio/Día</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {instruments.map(instrument => {
+                        {paginatedInstruments.map(instrument => {
                             const status = (instrument.stock > 0 || instrument.status =='Disponible') ? 'Disponible' : 'No disponible';
                             return (
                             <tr key={instrument.id}>
@@ -241,6 +287,41 @@ const Instruments = () => {
                 </table>
             </div>
 
+            {/* Componente de paginación */}
+            <div className={styles.pagination}>
+                <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Primero
+                </button>
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Anterior
+                </button>
+                <span className="mx-2">
+                    Página {currentPage} de {totalPages}
+                </span>
+                <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Siguiente
+                </button>
+                <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Último
+                </button>
+            </div>
+
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
@@ -267,13 +348,13 @@ const Instruments = () => {
                             </div>
                             <section className="flex flex-row justify-between">
                                 <div className="flex flex-col gap-2">
-                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">categoria</label>
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">Categoría</label>
                                     <select
                                         id="instrument-category"
                                         defaultValue={currentInstrument?.categoryId || ''}
                                         className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     >
-                                        <option value="">Seleccionar categoria</option>
+                                        <option value="">Seleccionar categoría</option>
                                         {categories.map(category => (
                                             <option className="text-gray-900" key={category.id} value={category.id}>
                                                 {category.name}
