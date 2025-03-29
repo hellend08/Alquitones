@@ -7,6 +7,7 @@ import { useInstrumentState, useInstrumentDispatch } from "../../context/Instrum
 import { useCategoryState, useCategoryDispatch } from "../../context/CategoryContext";
 import { useUserState, useUserDispatch } from "../../context/UserContext"; // Asegúrate de tener este context
 import { useAuthState } from "../../context/AuthContext"; // Asegúrate de tener este context
+import ReservationsModal from './ReservationsModal';
 
 // Dashboard component
 const Dashboard = () => (
@@ -1405,18 +1406,6 @@ const Specifications = ( { instruments, specifications, addSpecification, update
     );
 };
 
-// Rentals component
-const Rentals = () => (
-    <div className={styles.rentalsContent}>
-        <div className={styles.placeholderContainer}>
-            <img
-                src="https://alquitones.s3.us-east-2.amazonaws.com/no-disponible.jpg"
-                alt="No disponible"
-                className={styles.placeholderImage}
-            />
-        </div>
-    </div>
-);
 
 const Users = () => {
     const { users, loading, error, updateUserRole} = useUserState();
@@ -1784,7 +1773,7 @@ const Admin = () => {
                             </li>
                             <li>
                                 <Link to="/administracion/rentals">
-                                    <i className="fas fa-calendar-alt"></i> Alquileres
+                                    <i className="fas fa-calendar-alt"></i> Reservas
                                 </Link>
                             </li>
                             <li>
@@ -1807,7 +1796,7 @@ const Admin = () => {
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
                             <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
-                            <Route path="rentals" element={<Rentals />} />
+                            <Route path="rentals" element={<ReservationsModal />} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />
                             <Route path="" element={<Navigate to="dashboard" replace />} />
