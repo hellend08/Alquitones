@@ -67,78 +67,78 @@ function Reservation() {
         }
     };
 
-// En el useEffect donde cargas el instrumento, añade esta llamada para obtener la disponibilidad
-useEffect(() => {
-    // Comprobar si el usuario está autenticado
-    const user = getCurrentUser();
-    if (!user) {
-        navigate('/login', { state: { from: `/reservation/${id}` } });
-        return;
-    }
-    setCurrentUser(user);
+    // En el useEffect donde cargas el instrumento, añade esta llamada para obtener la disponibilidad
+    useEffect(() => {
+        // Comprobar si el usuario está autenticado
+        const user = getCurrentUser();
+        if (!user) {
+            navigate('/login', { state: { from: `/reservation/${id}` } });
+            return;
+        }
+        setCurrentUser(user);
 
-    // Obtener los datos del instrumento
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            // Primero, obtenemos el instrumento
-            const product = await getInstrumentById(parseInt(id));
-            console.log("Instrumento cargado:", product);
+        // Obtener los datos del instrumento
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                // Primero, obtenemos el instrumento
+                const product = await getInstrumentById(parseInt(id));
+                console.log("Instrumento cargado:", product);
 
-            // Ahora, obtenemos la disponibilidad si tenemos fechas seleccionadas
-            if (selectedDates.startDate) {
-                // Establecer un rango de fechas para consultar la disponibilidad
-                // Si no hay fecha de fin, usamos la fecha de inicio como fin también
-                const endDate = selectedDates.endDate || selectedDates.startDate;
-                
-                // Llamar a la API para obtener la disponibilidad
-                const availabilityData = await apiService.getAvailabilityById(
-                    parseInt(id),
-                    selectedDates.startDate,
-                    endDate
-                );
-                
-                console.log("Disponibilidad obtenida:", availabilityData);
-                
-                // Asignar la disponibilidad al producto
-                product.availability = availabilityData;
-            } else {
-                console.warn("No hay fechas seleccionadas para consultar disponibilidad");
-            }
-            
-            setInstrument(product);
-            
-            // Si hay disponibilidad, ajustar la cantidad inicial
-            if (product.availability && product.availability.length > 0 && selectedDates.startDate) {
-                const startAvailability = product.availability.find(
-                    avail => avail.date === selectedDates.startDate
-                );
+                // Ahora, obtenemos la disponibilidad si tenemos fechas seleccionadas
+                if (selectedDates.startDate) {
+                    // Establecer un rango de fechas para consultar la disponibilidad
+                    // Si no hay fecha de fin, usamos la fecha de inicio como fin también
+                    const endDate = selectedDates.endDate || selectedDates.startDate;
 
-                if (startAvailability) {
-                    console.log("Disponibilidad en fecha inicio:", startAvailability);
-                    // Establecer la cantidad inicial al máximo disponible si es menor que el valor actual
-                    const maxAvailable = startAvailability.availableStock;
-                    if (maxAvailable > 0 && quantity > maxAvailable) {
-                        setQuantity(maxAvailable);
+                    // Llamar a la API para obtener la disponibilidad
+                    const availabilityData = await apiService.getAvailabilityById(
+                        parseInt(id),
+                        selectedDates.startDate,
+                        endDate
+                    );
+
+                    console.log("Disponibilidad obtenida:", availabilityData);
+
+                    // Asignar la disponibilidad al producto
+                    product.availability = availabilityData;
+                } else {
+                    console.warn("No hay fechas seleccionadas para consultar disponibilidad");
+                }
+
+                setInstrument(product);
+
+                // Si hay disponibilidad, ajustar la cantidad inicial
+                if (product.availability && product.availability.length > 0 && selectedDates.startDate) {
+                    const startAvailability = product.availability.find(
+                        avail => avail.date === selectedDates.startDate
+                    );
+
+                    if (startAvailability) {
+                        console.log("Disponibilidad en fecha inicio:", startAvailability);
+                        // Establecer la cantidad inicial al máximo disponible si es menor que el valor actual
+                        const maxAvailable = startAvailability.availableStock;
+                        if (maxAvailable > 0 && quantity > maxAvailable) {
+                            setQuantity(maxAvailable);
+                        }
                     }
                 }
+
+                setLoading(false);
+            } catch (err) {
+                console.error('Error al cargar instrumento o disponibilidad:', err);
+                setError('No se pudo cargar la información del producto');
+                setLoading(false);
             }
+        };
 
-            setLoading(false);
-        } catch (err) {
-            console.error('Error al cargar instrumento o disponibilidad:', err);
-            setError('No se pudo cargar la información del producto');
-            setLoading(false);
+        fetchData();
+
+        // Comprobar si hay fechas seleccionadas en localStorage
+        if (!localStorage.getItem('reservationStartDate')) {
+            setError('No se han seleccionado fechas para la reserva');
         }
-    };
-
-    fetchData();
-
-    // Comprobar si hay fechas seleccionadas en localStorage
-    if (!localStorage.getItem('reservationStartDate')) {
-        setError('No se han seleccionado fechas para la reserva');
-    }
-}, [id, navigate, getCurrentUser, getInstrumentById, selectedDates.startDate, selectedDates.endDate]);
+    }, [id, navigate, getCurrentUser, getInstrumentById, selectedDates.startDate, selectedDates.endDate]);
 
     // Calcular el número total de días
     const calculateTotalDays = () => {
@@ -161,87 +161,86 @@ useEffect(() => {
         return (instrument.pricePerDay * totalDays * quantity).toFixed(2);
     };
 
-// Componente QuantitySelector mejorado
-const QuantitySelector = () => {
-    // Función para obtener el stock disponible en la fecha de inicio
-    const getMaxStock = () => {
-        // Verificamos que tengamos datos de disponibilidad y una fecha de inicio
-        if (!instrument || !instrument.availability || !selectedDates.startDate) {
-            console.log("Datos insuficientes para calcular stock máximo");
-            return 1; // Valor por defecto
-        }
+    // Componente QuantitySelector mejorado
+    const QuantitySelector = () => {
+        // Función para obtener el stock disponible en la fecha de inicio
+        const getMaxStock = () => {
+            // Verificamos que tengamos datos de disponibilidad y una fecha de inicio
+            if (!instrument || !instrument.availability || !selectedDates.startDate) {
+                console.log("Datos insuficientes para calcular stock máximo");
+                return 1; // Valor por defecto
+            }
 
-        // Buscamos la disponibilidad para la fecha de inicio seleccionada
-        const startDateAvailability = instrument.availability.find(
-            avail => avail.date === selectedDates.startDate
-        );
+            // Buscamos la disponibilidad para la fecha de inicio seleccionada
+            const startDateAvailability = instrument.availability.find(
+                avail => avail.date === selectedDates.startDate
+            );
 
-        // Registramos para depuración
-        console.log("Fecha de inicio:", selectedDates.startDate);
-        console.log("Datos de disponibilidad:", instrument.availability);
-        console.log("Disponibilidad para fecha inicio:", startDateAvailability);
+            // Registramos para depuración
+            console.log("Fecha de inicio:", selectedDates.startDate);
+            console.log("Datos de disponibilidad:", instrument.availability);
+            console.log("Disponibilidad para fecha inicio:", startDateAvailability);
 
-        // Si encontramos datos de disponibilidad, devolvemos el stock disponible
-        if (startDateAvailability && typeof startDateAvailability.availableStock === 'number') {
-            return startDateAvailability.availableStock;
-        }
+            // Si encontramos datos de disponibilidad, devolvemos el stock disponible
+            if (startDateAvailability && typeof startDateAvailability.availableStock === 'number') {
+                return startDateAvailability.availableStock;
+            }
 
-        // Si no encontramos datos o el formato es incorrecto, devolvemos 1 como valor por defecto
-        console.log("No se encontró disponibilidad válida para la fecha seleccionada");
-        return 1;
-    };
+            // Si no encontramos datos o el formato es incorrecto, devolvemos 1 como valor por defecto
+            console.log("No se encontró disponibilidad válida para la fecha seleccionada");
+            return 1;
+        };
 
-    // Calculamos el stock máximo
-    const maxStock = getMaxStock();
+        // Calculamos el stock máximo
+        const maxStock = getMaxStock();
 
-    return (
-        <div className="mb-4">
-            <label htmlFor="quantity" className="block text-gray-600 mb-2">
-                Cantidad: (Máx: {maxStock})
-            </label>
-            <div className="flex items-center">
-                <button
-                    type="button"
-                    className="px-3 py-1 bg-gray-200 rounded-l-md border border-gray-300"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
-                    <span className="material-symbols-outlined text-sm">remove</span>
-                </button>
-                <input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    max={maxStock}
-                    value={quantity}
-                    onChange={(e) => {
-                        const value = parseInt(e.target.value) || 1;
-                        setQuantity(Math.min(maxStock, Math.max(1, value)));
-                    }}
-                    className="w-16 text-center border-t border-b border-gray-300 py-1"
-                />
-                <button
-                    type="button"
-                    className={`px-3 py-1 bg-gray-200 rounded-r-md border border-gray-300 ${
-                        quantity >= maxStock ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                    onClick={() => {
-                        if (quantity < maxStock) {
-                            setQuantity(quantity + 1);
-                        }
-                    }}
-                    disabled={quantity >= maxStock}
-                >
-                    <span className="material-symbols-outlined text-sm">add</span>
-                </button>
+        return (
+            <div className="mb-4">
+                <label htmlFor="quantity" className="block text-gray-600 mb-2">
+                    Cantidad: (Máx: {maxStock})
+                </label>
+                <div className="flex items-center">
+                    <button
+                        type="button"
+                        className="px-3 py-1 bg-gray-200 rounded-l-md border border-gray-300"
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    >
+                        <span className="material-symbols-outlined text-sm">remove</span>
+                    </button>
+                    <input
+                        id="quantity"
+                        type="number"
+                        min="1"
+                        max={maxStock}
+                        value={quantity}
+                        onChange={(e) => {
+                            const value = parseInt(e.target.value) || 1;
+                            setQuantity(Math.min(maxStock, Math.max(1, value)));
+                        }}
+                        className="w-16 text-center border-t border-b border-gray-300 py-1"
+                    />
+                    <button
+                        type="button"
+                        className={`px-3 py-1 bg-gray-200 rounded-r-md border border-gray-300 ${quantity >= maxStock ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                        onClick={() => {
+                            if (quantity < maxStock) {
+                                setQuantity(quantity + 1);
+                            }
+                        }}
+                        disabled={quantity >= maxStock}
+                    >
+                        <span className="material-symbols-outlined text-sm">add</span>
+                    </button>
+                </div>
+                {maxStock <= 0 && (
+                    <p className="text-red-500 text-sm mt-1">
+                        No hay stock disponible para la fecha seleccionada.
+                    </p>
+                )}
             </div>
-            {maxStock <= 0 && (
-                <p className="text-red-500 text-sm mt-1">
-                    No hay stock disponible para la fecha seleccionada.
-                </p>
-            )}
-        </div>
-    );
-};
+        );
+    };
 
     // Añade este efecto para actualizar la cantidad cuando cambia el instrumento o las fechas
     useEffect(() => {
@@ -427,8 +426,7 @@ const QuantitySelector = () => {
                             Volver al inicio
                         </button>
                         <button
-                            onClick={() => navigate('/profile')}
-                            className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
+                            onClick={() => navigate('/reservas')} className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
                         >
                             Ver mis reservas
                         </button>

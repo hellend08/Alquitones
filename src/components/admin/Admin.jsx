@@ -7,6 +7,7 @@ import { useInstrumentState, useInstrumentDispatch } from "../../context/Instrum
 import { useCategoryState, useCategoryDispatch } from "../../context/CategoryContext";
 import { useUserState, useUserDispatch } from "../../context/UserContext"; // Asegúrate de tener este context
 import { useAuthState } from "../../context/AuthContext"; // Asegúrate de tener este context
+import ReservationsModal from './ReservationsModal';
 
 // Dashboard component
 const Dashboard = () => (
@@ -33,20 +34,53 @@ const Instruments = () => {
     const dispatch = useInstrumentDispatch();
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
     
+    // Estados para paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [filteredInstruments, setFilteredInstruments] = useState([]);
+    const [paginatedInstruments, setPaginatedInstruments] = useState([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 10;
 
+    // Filtrar y ordenar instrumentos cuando cambia searchTerm o instruments
     useEffect(() => {
+        let filtered = [...instruments];
+        
+        // Filtrar por término de búsqueda
         if (searchTerm) {
-            const filteredInstruments = instruments.filter(instrument =>
+            filtered = filtered.filter(instrument =>
                 instrument.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
-            dispatch({ type: "SET_INSTRUMENTS", payload: filteredInstruments });
-        } else {
-            dispatch({ type: "SET_INSTRUMENTS", payload: instruments });
+        }
+        
+        // Ordenar por ID de menor a mayor
+        filtered.sort((a, b) => a.id - b.id);
+        
+        setFilteredInstruments(filtered);
+        
+        // Calcular total de páginas
+        const total = Math.ceil(filtered.length / itemsPerPage);
+        setTotalPages(total > 0 ? total : 1);
+        
+        // Asegurar que la página actual no exceda el total
+        if (currentPage > total && total > 0) {
+            setCurrentPage(1);
         }
     }, [searchTerm, instruments]);
 
+    // Actualizar instrumentos paginados cuando cambia la página actual o los filtrados
+    useEffect(() => {
+        // Calcular índices para la paginación
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        
+        // Obtener instrumentos paginados
+        const paginated = filteredInstruments.slice(startIndex, endIndex);
+        setPaginatedInstruments(paginated);
+    }, [currentPage, filteredInstruments]);
+
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
+        setCurrentPage(1); // Resetear a la primera página al buscar
     };
 
     const handleAddInstrument = () => {
@@ -110,6 +144,7 @@ const Instruments = () => {
                 description: form['instrument-description'].value.trim() || currentInstrument?.description,
                 status: form['instrument-status'].value || currentInstrument?.status,
                 images: existingImages,
+                mainImage: existingImages[0]?.url || currentInstrument?.mainImage,
                 specifications: productSpecifications.length > 0 ? productSpecifications : currentInstrument?.specifications
             };
 
@@ -149,6 +184,19 @@ const Instruments = () => {
     const getProductCategory = (categoryId) => {
         const category = categories.find(cat => cat.id === categoryId);
         return category ? category.name : 'Sin categoría';
+    };
+
+    // Manejadores de paginación
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
     };
 
     return (
@@ -192,14 +240,14 @@ const Instruments = () => {
                             <th>ID</th>
                             <th>Imagen</th>
                             <th>Nombre</th>
-                            <th>categoria</th>
+                            <th>Categoría</th>
                             <th>Estado</th>
                             <th>Precio/Día</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {instruments.map(instrument => {
+                        {paginatedInstruments.map(instrument => {
                             const status = (instrument.stock > 0 || instrument.status =='Disponible') ? 'Disponible' : 'No disponible';
                             return (
                             <tr key={instrument.id}>
@@ -240,6 +288,41 @@ const Instruments = () => {
                 </table>
             </div>
 
+            {/* Componente de paginación */}
+            <div className={styles.pagination}>
+                <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Primero
+                </button>
+                <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className={styles.pageButton}
+                >
+                    Anterior
+                </button>
+                <span className="mx-2">
+                    Página {currentPage} de {totalPages}
+                </span>
+                <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Siguiente
+                </button>
+                <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className={styles.pageButton}
+                >
+                    Último
+                </button>
+            </div>
+
             {modalOpen && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
@@ -266,13 +349,13 @@ const Instruments = () => {
                             </div>
                             <section className="flex flex-row justify-between">
                                 <div className="flex flex-col gap-2">
-                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">categoria</label>
+                                    <label className="font-semibold text-sm text-(--color-secondary)" htmlFor="instrument-category">Categoría</label>
                                     <select
                                         id="instrument-category"
                                         defaultValue={currentInstrument?.categoryId || ''}
                                         className="border-r-[8px] border-transparent h-[36px] rounded-md py-1.5 px-3 text-base text-gray-400 sm:text-sm/6 outline-[1.5px] -outline-offset-1 outline-[#CDD1DE] focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-(--color-primary)"
                                     >
-                                        <option value="">Seleccionar categoria</option>
+                                        <option value="">Seleccionar categoría</option>
                                         {categories.map(category => (
                                             <option className="text-gray-900" key={category.id} value={category.id}>
                                                 {category.name}
@@ -1323,22 +1406,7 @@ const Specifications = ( { instruments, specifications, addSpecification, update
     );
 };
 
-// Rentals component
-const Rentals = () => (
-    <div className={styles.rentalsContent}>
-        <div className={styles.placeholderContainer}>
-            <img
-                src="https://alquitones.s3.us-east-2.amazonaws.com/no-disponible.jpg"
-                alt="No disponible"
-                className={styles.placeholderImage}
-            />
-        </div>
-    </div>
-);
 
-// Users component
-// Actualizar el componente Users en Admin.jsx
-// Users component con popup de confirmación
 const Users = () => {
     const { users, loading, error, updateUserRole} = useUserState();
     const dispatch = useUserDispatch();
@@ -1346,6 +1414,8 @@ const Users = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [paginatedUsers, setPaginatedUsers] = useState([]);
     const itemsPerPage = 10;
 
     // Estados para el popup de confirmación
@@ -1353,39 +1423,56 @@ const Users = () => {
     const [pendingRoleChange, setPendingRoleChange] = useState(null);
 
     useEffect(() => {
-        loadUsers();
+        // Al iniciar o cambiar users
+        if (users.length > 0) {
+            filterAndPaginateUsers();
+        }
+    }, [users]);
+
+    useEffect(() => {
+        // Al cambiar filtros o página
+        filterAndPaginateUsers();
     }, [searchTerm, currentPage]);
 
-    const loadUsers = async () => {
+    const filterAndPaginateUsers = () => {
         try {
-            const allUsers = users;
-            console.log('Todos los usuarios:', allUsers);
-
-            let filteredUsers = allUsers;
-
+            // Aplicar filtro de búsqueda
+            let filtered = users;
             if (searchTerm) {
-                filteredUsers = allUsers.filter(user =>
+                filtered = users.filter(user =>
                     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     user.email.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-
+            
+            // Guardar usuarios filtrados completos
+            setFilteredUsers(filtered);
+            
             // Calcular paginación
-            const startIndex = (currentPage - 1) * itemsPerPage;
+            const total = Math.ceil(filtered.length / itemsPerPage);
+            setTotalPages(total > 0 ? total : 1);
+            
+            // Asegurarse de que la página actual no exceda el total de páginas
+            const validCurrentPage = Math.min(currentPage, total);
+            if (validCurrentPage !== currentPage) {
+                setCurrentPage(validCurrentPage);
+            }
+            
+            // Calcular índices para la paginación
+            const startIndex = (validCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-            dispatch({ type: "SET_USERS", payload: paginatedUsers });
-            setTotalPages(Math.ceil(filteredUsers.length / itemsPerPage));
+            
+            // Obtener usuarios paginados
+            const paginated = filtered.slice(startIndex, endIndex);
+            setPaginatedUsers(paginated);
         } catch (error) {
-            console.error('Error al cargar usuarios:', error);
-            alert('Error al cargar los usuarios');
+            console.error('Error al filtrar y paginar usuarios:', error);
         }
     };
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1);
+        setCurrentPage(1); // Resetear a primera página al buscar
     };
 
     // Modificado para mostrar la confirmación
@@ -1423,8 +1510,7 @@ const Users = () => {
             }
 
             await updateUserRole(pendingRoleChange.userId, pendingRoleChange.newRole);
-
-            loadUsers();
+            filterAndPaginateUsers(); // Actualizar la lista después del cambio
             alert(`Permisos actualizados correctamente`);
         } catch (error) {
             console.error('Error al cambiar permisos:', error);
@@ -1440,8 +1526,6 @@ const Users = () => {
     const cancelRoleChange = () => {
         setShowConfirmation(false);
         setPendingRoleChange(null);
-        // Recargar los usuarios para restaurar los selectores
-        loadUsers();
     };
 
     const handlePreviousPage = () => {
@@ -1497,7 +1581,7 @@ const Users = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => (
+                        {paginatedUsers.map(user => (
                             <tr key={user.id}>
                                 <td>{user.id}</td>
                                 <td>{user.username}</td>
@@ -1668,21 +1752,6 @@ const Admin = () => {
         <div>
 
             {/* Agregar el div del mensaje responsive */}
-            <div className={styles.responsiveMessage}>
-                <Header />
-                <div className={styles.responsiveContent}>
-                    <div className="w-[90%]">
-                        {/* <img 
-                src="/src/assets/no-disponible.jpg" 
-                alt="Vista no disponible en móviles" 
-                className={styles.responsiveImage}
-            /> */}
-                        <h3 className="pt-3 text-3xl font-semibold">Esta modalidad no esta disponible en móviles.</h3>
-                    </div>
-                </div>
-                <Footer />
-            </div>
-
             <div className={styles.adminContainer}>
                 <aside className={styles.sidebar}>
                     <nav className={styles.sidebarNav}>
@@ -1704,7 +1773,7 @@ const Admin = () => {
                             </li>
                             <li>
                                 <Link to="/administracion/rentals">
-                                    <i className="fas fa-calendar-alt"></i> Alquileres
+                                    <i className="fas fa-calendar-alt"></i> Reservas
                                 </Link>
                             </li>
                             <li>
@@ -1727,7 +1796,7 @@ const Admin = () => {
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
                             <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
-                            <Route path="rentals" element={<Rentals />} />
+                            <Route path="rentals" element={<ReservationsModal />} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />
                             <Route path="" element={<Navigate to="dashboard" replace />} />

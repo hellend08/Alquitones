@@ -101,7 +101,7 @@ const UserProfile = () => {
                         <div className="p-6 flex flex-col items-center justify-center">
                             <span className="material-symbols-outlined text-5xl text-[#B89347] mb-3">favorite</span>
                             <p className="text-[#413620] text-lg mb-4">Accede a tus instrumentos favoritos</p>
-                            <button 
+                            <button
                                 onClick={() => navigate('/favoritos')}
                                 className="bg-[#B89347] text-white px-4 py-2 rounded-md hover:bg-[#9F7933] transition-colors"
                             >
@@ -117,11 +117,11 @@ const UserProfile = () => {
                         <div className="p-6 flex flex-col items-center justify-center">
                             <span className="material-symbols-outlined text-5xl text-[#B89347] mb-3">calendar_month</span>
                             <p className="text-[#413620] text-lg mb-4">Gestiona tus reservas de instrumentos</p>
-                            <button 
-                                onClick={() => navigate('/reservas')}
-                                className="bg-[#B89347] text-white px-4 py-2 rounded-md hover:bg-[#9F7933] transition-colors"
+                            <button
+                                onClick={() => navigate('/reservas')} // Cambiado a /reservas para coincidir con la ruta en el componente de perfil
+                                className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
                             >
-                                Ver Reservas
+                                Ver mis reservas
                             </button>
                         </div>
                     </div>
