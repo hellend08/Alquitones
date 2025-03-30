@@ -47,7 +47,7 @@ const UserProfile = () => {
         <>
             {/* Header con bienvenida y dropdown - Color más claro */}
             <div className="bg-gradient-to-r from-[#9F7933] to-[#B89347] text-white py-12 shadow-md">
-                <div className="container mx-auto px-6">
+                <div className="max-w-7xl mx-auto px-4">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold">
@@ -64,7 +64,7 @@ const UserProfile = () => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-6 py-10">
+            <div className="max-w-7xl mx-auto px-4 py-10">
                 {/* Información Personal */}
                 <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
                     <div className="bg-[#B89347] text-white py-3 px-6">
@@ -119,7 +119,7 @@ const UserProfile = () => {
                             <p className="text-[#413620] text-lg mb-4">Gestiona tus reservas de instrumentos</p>
                             <button
                                 onClick={() => navigate('/reservas')} // Cambiado a /reservas para coincidir con la ruta en el componente de perfil
-                                className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary) transition"
+                                className="bg-[#B89347] text-white px-4 py-2 rounded-md hover:bg-[#9F7933] transition-colors"
                             >
                                 Ver mis reservas
                             </button>
