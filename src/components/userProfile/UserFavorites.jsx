@@ -32,10 +32,10 @@ const Favorites = () => {
             try {
                 // Obtener los favoritos del localStorage o contexto
                 const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-                
+
                 // Añadimos logs para depuración
                 console.log("Estructura de favoritos cargados:", storedFavorites);
-                
+
                 // Intentar normalizar la estructura de los favoritos
                 const normalizedFavorites = storedFavorites.map(instrument => {
                     // Si el instrumento tiene objeto category pero no categoryId
@@ -44,10 +44,10 @@ const Favorites = () => {
                             return { ...instrument, categoryId: instrument.category.id };
                         }
                     }
-                    
+
                     return instrument;
                 });
-                
+
                 setFavorites(normalizedFavorites);
                 setFilteredFavorites(normalizedFavorites);
                 setLoading(false);
@@ -63,7 +63,7 @@ const Favorites = () => {
     // Filtrar favoritos cuando cambia el término de búsqueda
     useEffect(() => {
         if (searchTerm) {
-            const filtered = favorites.filter(item => 
+            const filtered = favorites.filter(item =>
                 item.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
             setFilteredFavorites(filtered);
@@ -103,18 +103,21 @@ const Favorites = () => {
     return (
         <div className="container mx-auto p-4 md:p-6 bg-[#f4f4f4]">
             {/* Encabezado de la página */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                <h1 className="text-2xl font-bold text-[#001F3F]">Favoritos</h1>
-            </div>
-
-            {/* Pestañas de navegación */}
-            <div className="border-b border-gray-200 mb-6">
-                <div className="flex">
-                    <div className="border-b-2 border-[#9F7933] text-[#001F3F] py-2 px-4 font-medium">
-                        Mis favoritos
+            <div className="bg-gradient-to-r from-[#9F7933] to-[#B89347] text-white py-12 shadow-md">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold">
+                                Mis Favoritos
+                            </h1>
+                            <p className="text-lg mt-2 text-white">
+                                Gestiona tus instrumentos favoritos en AlquiTones
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
+
 
             {/* Barra de búsqueda con contador */}
             <div className="mb-6">
@@ -158,13 +161,13 @@ const Favorites = () => {
                         <div className="flex flex-col md:flex-row">
                             {/* Imagen del producto */}
                             <div className="md:w-48 h-48 p-4 flex items-center justify-center bg-white">
-                                <img 
-                                    src={instrument.mainImage} 
-                                    alt={instrument.name} 
+                                <img
+                                    src={instrument.mainImage}
+                                    alt={instrument.name}
                                     className="max-h-full max-w-full object-contain"
                                 />
                             </div>
-                            
+
                             {/* Información del producto */}
                             <div className="flex-1 p-4 border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
                                 <div className="flex flex-col flex-grow">
@@ -184,22 +187,22 @@ const Favorites = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <p className="text-[#523E1A] my-3 text-sm line-clamp-2">
                                         {instrument.description}
                                     </p>
                                 </div>
-                                
+
                                 <div className="flex flex-col md:flex-row gap-2 mt-4">
-                                    <Link 
+                                    <Link
                                         to={`/detail/${instrument.id}`}
                                         className="flex items-center justify-center px-4 py-2 bg-[#9F7933] text-white rounded hover:bg-[#523E1A] transition"
                                     >
                                         <span className="material-symbols-outlined text-sm mr-1">visibility</span>
                                         Ver instrumento
                                     </Link>
-                                    
-                                    <button 
+
+                                    <button
                                         onClick={() => handleRemoveFavorite(instrument)}
                                         className="flex items-center justify-center px-4 py-2 border border-gray-300 text-[#001F3F] rounded hover:bg-[#FFE8C0] transition ml-auto"
                                     >
