@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuthState } from '../../context/AuthContext';
+import UserDropdown from '../userProfile/UserDropdown';
 
 const AuthButtons = () => {
-
-    const { getCurrentUser, logout } = useAuthState();
+    const { getCurrentUser } = useAuthState();
     const [user, setUser] = useState(null);
-    const [isOpen, setIsOpen] = useState(false);
-
-    const handleClick = () => {
-        setIsOpen(!isOpen)
-    }
 
     // Efecto para mantener sincronizado el estado del usuario
     useEffect(() => {
@@ -26,68 +21,27 @@ const AuthButtons = () => {
 
         // Limpiar intervalo al desmontar
         return () => clearInterval(interval);
-    }, []);
-
-    const handleLogout = () => {
-        logout();
-        setUser(null); // Actualizar estado local inmediatamente
-        window.location.href = '/login';
-    };
+    }, [getCurrentUser]);
 
     const handleAuth = (type) => {
         window.location.href = `/${type}`;
     };
 
-    const avatarName = () => {
-        const firstName = user.username ? user.username[0].toUpperCase() : "";
-        const lastName = user.lastname ? user.lastname[0].toUpperCase() : "";
-        return `${firstName}${lastName ? lastName : ""}`;
-    }
-
-
-
     if (user) {
-        return (
-            <div className="flex items-center ">
-                <div className="flex items-center min-w-32" onClick={handleClick}>
-                    <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-(--color-primary) rounded-full ">
-                        <span className="text-xl text-white">{avatarName()}</span>
-                    </div>
-                    <span className="text-(--color-secundary) font-medium pl-2">
-                        {user.username.split(" ")[0]}
-                    </span>
-                </div>
-
-                {isOpen && (
-                    <div className={`absolute z-10 bg-white sm:border sm:border-gray-200 rounded-lg sm:shadow-lg sm:max-h-60 overflow-y-auto text-sm mx-1 p-2 font-normal text-(--color-secondary) w-full md:w-auto ${user.role === 'ADMIN' ? 'mt-45' : 'mt-35'}`}>
-                        {user.role === 'ADMIN' && (
-                            <a className='relative block rounded-lg p-2 px-4' href="/administracion/dashboard">Dashboard</a>
-                        )}
-                        <a className='relative block rounded-lg p-2 px-4' href="/profile">Mi Perfil</a>
-                        <button
-                            onClick={handleLogout}
-                            className="p-2 px-4 text-red-800">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                )}
-
-
-            </div>
-        );
+        return <UserDropdown />;
     }
 
     return (
         <div className="flex gap-4">
             <button
                 onClick={() => handleAuth('register')}
-                className="border-2 border-(--color-secondary) text-(--color-secondary) hover:bg-(--color-secondary) hover:text-white font-semibold sm:text-xs md:text-sm py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                className="border-2 border-[#9C6615] text-[#9C6615] hover:bg-[#9C6615] hover:text-white font-semibold sm:text-xs md:text-sm py-2 px-4 rounded shadow-sm transition-colors duration-200"
             >
                 Crear Cuenta
             </button>
             <button
                 onClick={() => handleAuth('login')}
-                className="bg-(--color-primary) hover:bg-(--color-secondary) text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
+                className="bg-[#9F7933] hover:bg-[#523E1A] text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors duration-200"
             >
                 Iniciar Sesión
             </button>

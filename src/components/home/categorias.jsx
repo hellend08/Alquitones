@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 
-const Category = ({ onFilterChange = () => {}, products: instruments, categories: categories, loadingCategories }) => {
+const Category = ({ onFilterChange = () => {}, products: instruments, filteredProducts: externalFilteredProducts, categories: categories, loadingCategories }) => {
     // const { instruments } = useInstrumentState();
 
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -92,15 +92,29 @@ const Category = ({ onFilterChange = () => {}, products: instruments, categories
         }
     };
 
+    // Determine the correct product count to display
+    const getProductCountDisplay = () => {
+        // If we have external filtered products (from date range or search)
+        if (externalFilteredProducts) {
+            return `Mostrando ${externalFilteredProducts.length} de ${instruments.length} productos`;
+        }
+        
+        // If we have category filters active
+        if (selectedCategories.length > 0) {
+            return `Mostrando ${filteredProducts === null ? 0 : filteredProducts.length || 0} de ${instruments.length} productos`;
+        }
+        
+        // Default case - no filters
+        return `Total: ${instruments.length} productos`;
+    };
+
     return (
         <div className="mb-12 py-4 relative max-w-6xl mx-3 lg:mx-auto">
             <section className="flex items-center mb-6 gap-2 justify-between">
                 <div className="flex flex-col md:flex-row md:items-center md:gap-2">
                     <h2 className="text-sm md:text-lg font-semibold text-(--color-primary)">Categorías</h2>
                     <span className="text-sm md:text-base text-gray-500">
-                        {selectedCategories.length > 0
-                            ? `Mostrando ${filteredProducts === null ? 0 : filteredProducts.length || 0 } de ${instruments.length} productos`
-                            : `Total: ${instruments.length} productos`}
+                        {getProductCountDisplay()}
                     </span>
                 </div>
 
@@ -201,7 +215,8 @@ const Category = ({ onFilterChange = () => {}, products: instruments, categories
 };
 
 Category.propTypes = {
-    onFilterChange: PropTypes.func
+    onFilterChange: PropTypes.func,
+    filteredProducts: PropTypes.array
 };
 
 export default Category;

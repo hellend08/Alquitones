@@ -7,7 +7,10 @@ import Home from './components/home/Home';
 import Admin from './components/admin/Admin';
 import MainLayout from './Layaouts/MainLayout';
 import CardDetails from './components/cardDetails/CardDetails';
+import Reservation from './components/cardDetails/Reservation';
 import UserProfile from './components/userProfile/UserProfile';
+import UserFavorites from './components/userProfile/UserFavorites';
+import UserReservations from './components/userProfile/UserReservations';
 import { CategoryProvider } from "./context/CategoryContext";
 import { InstrumentProvider } from "./context/InstrumentContext";
 import { UserProvider } from "./context/UserContext";
@@ -16,7 +19,7 @@ import { AuthProvider, useAuthState } from "./context/AuthContext";
 // Protected Route Component solo para rutas que requieren autenticación
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { getCurrentUser } = useAuthState();
-  const user =  getCurrentUser();
+  const user = getCurrentUser();
   console.log("user", user);
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -44,6 +47,16 @@ function App() {
                   <Route path="/login" element={<Auth />} />
                   <Route path="/register" element={<Auth />} />
                   
+                  {/* Ruta de Reserva (protegida) */}
+                  <Route 
+                    path="/reservation/:id" 
+                    element={
+                      <ProtectedRoute>
+                        <Reservation />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
                   <Route 
                     path="/administracion/*" 
                     element={
@@ -60,7 +73,25 @@ function App() {
                     path="/profile" 
                     element={
                       <ProtectedRoute>
-                        <UserProfile/>
+                        <UserProfile />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  <Route 
+                    path="/favoritos" 
+                    element={
+                      <ProtectedRoute>
+                        <UserFavorites />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  
+                  <Route 
+                    path="/reservas" 
+                    element={
+                      <ProtectedRoute>
+                        <UserReservations />
                       </ProtectedRoute>
                     } 
                   />

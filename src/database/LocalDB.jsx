@@ -182,6 +182,8 @@ class LocalDB {
                 }
             ],
 
+            ratings: [],
+
             // En el constructor de LocalDB, actualiza el array specifications:
             specifications: [
                 { id: 1, label: 'Marca', description: 'Marca del instrumento', icon: 'fa-trademark' },
@@ -794,6 +796,9 @@ class LocalDB {
     saveToStorage() {
         localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
     }
+
+
+    
 
 
     // Añadir estos métodos en LocalDB.jsx, dentro de la clase LocalDB
