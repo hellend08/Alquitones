@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../../services/apiService';
 import styles from './Admin.module.css';
 
-const ReservationsModal = () => {
+const ReservationsModal = ({ instruments }) => {
     const [reservations, setReservations] = useState([]);
     const [filteredReservations, setFilteredReservations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ const ReservationsModal = () => {
                             instrument = instrumentCache.get(reservation.instrumentId);
                         } else {
                             try {
-                                instrument = await apiService.getInstrumentById(reservation.instrumentId);
+                                instrument = instruments.find(i => i.id === reservation.instrumentId) || null;
                                 // Guardar en caché para futuras referencias
                                 instrumentCache.set(reservation.instrumentId, instrument);
                             } catch (err) {

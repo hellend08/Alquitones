@@ -1749,7 +1749,8 @@ const Admin = () => {
     // // };
 
     return (
-        <div>
+        <>
+          <div>
 
             {/* Agregar el div del mensaje responsive */}
             <div className={styles.adminContainer}>
@@ -1792,19 +1793,31 @@ const Admin = () => {
 
                 <main className={styles.mainContent}>
                     <div className={styles.contentArea}>
-                        <Routes>
+                        {instrumentsLoading ? (
+                            <div className="flex justify-center items-center p-10">
+                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-(--color-primary)"></div>
+                            </div>
+                        ) : 
+                        (<Routes>
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
                             <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
-                            <Route path="rentals" element={<ReservationsModal />} />
+                            <Route path="rentals" element={<ReservationsModal instruments={instruments}/>} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />
                             <Route path="" element={<Navigate to="dashboard" replace />} />
-                        </Routes>
+                        </Routes>)
+                        }
                     </div>
                 </main>
             </div>
-        </div>
+        </div> 
+
+        {/* Agregar el div del mensaje responsive */}
+
+        
+        </>
+        
     );
 };
 

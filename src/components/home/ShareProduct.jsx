@@ -56,7 +56,7 @@ const ShareProduct = ({ product, onClose }) => {
                 </div>
                 <div className="flex items-center gap-3 my-4">
                     <img
-                        src={product.images?.[0] || product.mainImage || 'https://via.placeholder.com/100'}
+                        src={product.mainImage || product.images?.[0].url || 'https://via.placeholder.com/100'}
                         alt={product.name}
                         className="w-16 h-16 rounded-md object-cover"
                     />
