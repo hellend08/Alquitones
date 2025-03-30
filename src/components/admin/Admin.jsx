@@ -1749,7 +1749,15 @@ const Admin = () => {
     // // };
 
     return (
-        <div>
+        <>
+        {instrumentsLoading ? (
+            <div className={styles.loadingContainer}>
+                <div className={styles.loadingSpinner}></div>
+                <p className={styles.loadingText}>Cargando...</p>
+            </div>
+        ) : 
+        (
+           <div>
 
             {/* Agregar el div del mensaje responsive */}
             <div className={styles.adminContainer}>
@@ -1804,7 +1812,14 @@ const Admin = () => {
                     </div>
                 </main>
             </div>
-        </div>
+        </div> 
+        )}
+
+        {/* Agregar el div del mensaje responsive */}
+
+        
+        </>
+        
     );
 };
 
