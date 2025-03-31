@@ -1,26 +1,13 @@
 import { useState, useEffect } from 'react';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
-import Header from '../crossSections/header';
-import Footer from '../crossSections/footer';
 import { useInstrumentState, useInstrumentDispatch } from "../../context/InstrumentContext";
 import { useCategoryState, useCategoryDispatch } from "../../context/CategoryContext";
-import { useUserState, useUserDispatch } from "../../context/UserContext"; // Asegúrate de tener este context
-import { useAuthState } from "../../context/AuthContext"; // Asegúrate de tener este context
+import { useUserState, useUserDispatch } from "../../context/UserContext";
+import { useAuthState } from "../../context/AuthContext";
 import ReservationsModal from './ReservationsModal';
+import Dashboard from './Dashboard';
 
-// Dashboard component
-const Dashboard = () => (
-    <div className={styles.dashboardContent}>
-        <div className={styles.placeholderContainer}>
-            <img
-                src="https://alquitones.s3.us-east-2.amazonaws.com/no-disponible.jpg"
-                alt="No disponible"
-                className={styles.placeholderImage}
-            />
-        </div>
-    </div>
-);
 
 // Instruments component (moved from main Admin component)
 const Instruments = () => {
