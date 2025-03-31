@@ -31,7 +31,7 @@ const Header = () => {
               : 'bg-gradient-to-r from-gray-100 to-gray-200'
         }`}>
             {/* Desktop */}
-            <div className='max-w-7xl mx-auto px-4 py-3'>
+            <div className='mx-auto px-4 py-3'>
                 <div className='justify-between items-center hidden md:flex'>
                     <Link to="/" className="flex flex-col">
                         <img src="https://alquitones.s3.us-east-2.amazonaws.com/logo-light.png" alt="logo" className="h-12" />

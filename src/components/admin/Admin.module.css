@@ -719,3 +719,142 @@
 .roleSelector option {
     padding: 0.5rem;
 }
+
+/* Dashboard Styles */
+.dashboardContent {
+    padding: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboardHeader {
+    margin-bottom: 2rem;
+}
+
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpiCard {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.kpiIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpiIcon i {
+    font-size: 1.5rem;
+}
+
+.kpiInfo {
+    flex: 1;
+}
+
+.kpiTitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.kpiValue {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.kpiTrend {
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.trendUp {
+    color: #4CAF50;
+}
+
+.trendDown {
+    color: #f44336;
+}
+
+.dashboardCharts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.chartCard {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chartContainer {
+    height: 300px;
+    width: 100%;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .dashboardContent {
+        padding: 1rem;
+    }
+
+    .kpiGrid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .dashboardCharts {
+        grid-template-columns: 1fr;
+    }
+
+    .chartCard {
+        padding: 1rem;
+    }
+
+    .chartContainer {
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpiGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .kpiCard {
+        padding: 1rem;
+    }
+
+    .kpiIcon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .kpiIcon i {
+        font-size: 1.25rem;
+    }
+
+    .kpiValue {
+        font-size: 1.25rem;
+    }
+}
