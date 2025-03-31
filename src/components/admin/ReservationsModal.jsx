@@ -9,9 +9,9 @@ const ReservationsModal = ({ instruments }) => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('ACTIVE'); // 'ACTIVE' o 'ENDED'
-    const [confirmCancelModal, setConfirmCancelModal] = useState(false);
-    const [reservationToCancel, setReservationToCancel] = useState(null);
-    const [processingCancel, setProcessingCancel] = useState(false);
+    const [confirmFinalizeModal, setConfirmFinalizeModal] = useState(false);
+    const [reservationToFinalize, setReservationToFinalize] = useState(null);
+    const [processingFinalize, setProcessingFinalize] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [isLoadingData, setIsLoadingData] = useState(false);
 
@@ -62,6 +62,49 @@ const ReservationsModal = ({ instruments }) => {
         } finally {
             setLoading(false);
             setIsLoadingData(false);
+        }
+    };
+
+
+    const handleInitiateFinalize = (reservation) => {
+        setReservationToFinalize(reservation);
+        setConfirmFinalizeModal(true);
+    };
+
+    const handleConfirmFinalize = async () => {
+        if (!reservationToFinalize) return;
+
+        setProcessingFinalize(true);
+        setError(null);
+
+        try {
+            await apiService.finalizeReservation(reservationToFinalize.id);
+
+            // Actualizar el estado local
+            const updatedReservations = reservations.map(res =>
+                res.id === reservationToFinalize.id
+                    ? { ...res, status: 'ENDED' }
+                    : res
+            );
+
+            setReservations(updatedReservations);
+            setSuccessMessage(`La reserva #${reservationToFinalize.id} ha sido finalizada exitosamente.`);
+
+            // Cerrar modal de confirmación
+            setConfirmFinalizeModal(false);
+
+            // Recargar reservas para asegurar datos actualizados
+            setTimeout(() => {
+                loadReservations();
+                setSuccessMessage('');
+            }, 3000);
+
+        } catch (error) {
+            console.error('Error al finalizar reserva:', error);
+            setError(`Error al finalizar la reserva: ${error.message || 'Intente nuevamente'}`);
+        } finally {
+            setProcessingFinalize(false);
+            setReservationToFinalize(null);
         }
     };
 
@@ -237,49 +280,7 @@ const ReservationsModal = ({ instruments }) => {
         }
     };
 
-    // Iniciar proceso de cancelación de reserva
-    const handleInitiateCancel = (reservation) => {
-        setReservationToCancel(reservation);
-        setConfirmCancelModal(true);
-    };
 
-    // Confirmar y ejecutar cancelación de reserva
-    const handleConfirmCancel = async () => {
-        if (!reservationToCancel) return;
-
-        setProcessingCancel(true);
-        setError(null);
-
-        try {
-            await apiService.cancelReservation(reservationToCancel.id);
-
-            // Actualizar el estado local
-            const updatedReservations = reservations.map(res =>
-                res.id === reservationToCancel.id
-                    ? { ...res, status: 'CANCELLED' }
-                    : res
-            );
-
-            setReservations(updatedReservations);
-            setSuccessMessage(`La reserva #${reservationToCancel.id} ha sido cancelada exitosamente.`);
-
-            // Cerrar modal de confirmación
-            setConfirmCancelModal(false);
-
-            // Recargar reservas para asegurar datos actualizados
-            setTimeout(() => {
-                loadReservations();
-                setSuccessMessage('');
-            }, 3000);
-
-        } catch (error) {
-            console.error('Error al cancelar reserva:', error);
-            setError(`Error al cancelar la reserva: ${error.message || 'Intente nuevamente'}`);
-        } finally {
-            setProcessingCancel(false);
-            setReservationToCancel(null);
-        }
-    };
 
     // Renderizar estado de reserva con estilo apropiado
     const renderReservationStatus = (status) => {
@@ -559,10 +560,11 @@ const ReservationsModal = ({ instruments }) => {
                                                 {activeTab === 'ACTIVE' && (
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                         <button
-                                                            onClick={() => handleInitiateCancel(reservation)}
-                                                            className="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-md transition"
+                                                            onClick={() => handleInitiateFinalize(reservation)}
+                                                            className={styles.addButton}
+                                                            style={{ backgroundColor: 'var(--color-golden)', color: 'white' }}
                                                         >
-                                                            Cancelar
+                                                            <i className="fas fa-check-circle mr-2"></i> Finalizar reserva
                                                         </button>
                                                     </td>
                                                 )}
@@ -576,72 +578,72 @@ const ReservationsModal = ({ instruments }) => {
                 </div>
             )}
 
-            {/* Modal de confirmación para cancelar reserva */}
-            {confirmCancelModal && reservationToCancel && (
+            {/* Modal de confirmación para finalizar reserva */}
+            {confirmFinalizeModal && reservationToFinalize && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent} style={{ maxWidth: '500px' }}>
                         <button
                             onClick={() => {
-                                setConfirmCancelModal(false);
-                                setReservationToCancel(null);
+                                setConfirmFinalizeModal(false);
+                                setReservationToFinalize(null);
                             }}
                             className={styles.modalClose}
-                            disabled={processingCancel}
+                            disabled={processingFinalize}
                         >
                             &times;
                         </button>
-                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                            Confirmar Cancelación
+                        <h3 className="text-xl text-center font-bold mb-4 text-[#001F3F]">
+                            Confirmar Finalización
                         </h3>
 
                         <div className="p-4">
                             <div className="flex justify-center mb-4">
-                                <div className="h-16 w-16 rounded-full bg-yellow-100 flex items-center justify-center">
-                                    <i className="fas fa-exclamation-triangle text-yellow-500 text-2xl"></i>
+                                <div className="h-16 w-16 rounded-full bg-[#FFE8C0] flex items-center justify-center">
+                                    <i className="fas fa-check-circle text-[#9F7933] text-2xl"></i>
                                 </div>
                             </div>
 
-                            <p className="text-center text-gray-700 mb-4">
-                                ¿Estás seguro que deseas cancelar la siguiente reserva?
+                            <p className="text-center text-[#413620] mb-4">
+                                ¿Confirmas que deseas finalizar la siguiente reserva?
                             </p>
 
-                            <div className="bg-gray-50 p-3 rounded-md mb-4">
-                                <p className="font-medium">Detalles de la reserva:</p>
-                                <ul className="mt-2 space-y-1 text-sm">
-                                    <li><span className="font-medium">Reserva ID:</span> #{reservationToCancel.id}</li>
-                                    <li><span className="font-medium">Instrumento:</span> {reservationToCancel.instrumentName}</li>
-                                    <li><span className="font-medium">Usuario:</span> {reservationToCancel.userName}</li>
-                                    <li><span className="font-medium">Período:</span> {formatDate(reservationToCancel.startDate)} al {formatDate(reservationToCancel.endDate)}</li>
+                            <div className="bg-[#f4f4f4] p-4 rounded-md mb-4 border border-[#CDD1DE]">
+                                <p className="font-medium text-[#001F3F]">Detalles de la reserva:</p>
+                                <ul className="mt-2 space-y-2 text-sm">
+                                    <li><span className="font-medium">Reserva ID:</span> #{reservationToFinalize.id}</li>
+                                    <li><span className="font-medium">Instrumento:</span> {reservationToFinalize.instrumentName}</li>
+                                    <li><span className="font-medium">Usuario:</span> {reservationToFinalize.userName}</li>
+                                    <li><span className="font-medium">Período:</span> {formatDate(reservationToFinalize.startDate)} al {formatDate(reservationToFinalize.endDate)}</li>
                                 </ul>
                             </div>
 
-                            <p className="text-sm text-red-600 italic mb-4">
-                                Esta acción no se puede deshacer. El cliente será notificado sobre la cancelación.
+                            <p className="text-sm text-[#523E1A] italic mb-4">
+                                Al finalizar la reserva, se marcará como completada y el instrumento quedará disponible.
                             </p>
 
                             <div className="flex justify-end gap-3 mt-6">
                                 <button
                                     onClick={() => {
-                                        setConfirmCancelModal(false);
-                                        setReservationToCancel(null);
+                                        setConfirmFinalizeModal(false);
+                                        setReservationToFinalize(null);
                                     }}
-                                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-                                    disabled={processingCancel}
+                                    className="px-4 py-2 border border-[#CDD1DE] rounded-md text-[#001F3F] bg-white hover:bg-[#f4f4f4] transition-colors"
+                                    disabled={processingFinalize}
                                 >
                                     Cancelar
                                 </button>
                                 <button
-                                    onClick={handleConfirmCancel}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
-                                    disabled={processingCancel}
+                                    onClick={handleConfirmFinalize}
+                                    className="px-4 py-2 bg-[#9F7933] text-white rounded-md hover:bg-[#523E1A] transition-colors flex items-center"
+                                    disabled={processingFinalize}
                                 >
-                                    {processingCancel ? (
+                                    {processingFinalize ? (
                                         <>
                                             <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                                             Procesando...
                                         </>
                                     ) : (
-                                        'Confirmar Cancelación'
+                                        'Confirmar Finalización'
                                     )}
                                 </button>
                             </div>
