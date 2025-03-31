@@ -11,7 +11,7 @@ function Footer() {
 
     return (
         <footer className="inset-x-0 bottom-0 bg-gradient-to-r from-gray-100 to-gray-200 p-6 lg:py-12 lg:px-16 text-left text-[#001F3F] mt-10 border-t border-gray-300">
-            <div className="max-w-7xl mx-auto">
+            <div className="mx-auto">
                 <div className="w-full flex flex-col md:flex-row md:justify-between lg:gap-20">
                     {/* Logo y descripción */}
                     <div className="md:w-1/3 mb-8 md:mb-0">
