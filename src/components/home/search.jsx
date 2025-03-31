@@ -358,7 +358,6 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                             </div>
                             {startDate && (
                                 <div className="flex items-center">
-                                    <span className="mx-2 text-[#9C6615]">→</span>
                                     <span className="text-sm text-[#413620] font-medium">
                                         {endDate ? formatDateForDisplay(endDate) : 'Seleccionar'}
                                     </span>
