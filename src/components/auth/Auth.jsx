@@ -61,6 +61,7 @@ const Auth = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
+            dispatch({ type: 'SET_LOADING' });
             if (!validateForm()) {
                 return;
             }
@@ -80,7 +81,7 @@ const Auth = () => {
 
             // if (emailResult.success) {
             //     setActiveForm('login');
-            dispatch({ type: 'SET_ERROR', payload: "¡Registro Exitoso! Es necesario verificar tu correo electrónico para continuar.\nHemos enviado un enlace de verificación a tu dirección de correo.\nPor favor, revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta." }); dispatch({ type: 'SET_LOADING', payload: false });
+            dispatch({ type: 'SET_ERROR', payload: "¡Registro Exitoso! Es necesario verificar tu correo electrónico para continuar.\nHemos enviado un enlace de verificación a tu dirección de correo.\nPor favor, revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta." });
             // Limpiar formulario
             setFormData({
                 firstName: '',
@@ -100,8 +101,6 @@ const Auth = () => {
             // }
         } catch (error) {
             dispatch({ type: 'SET_ERROR', payload: error.message });
-        } finally {
-            dispatch({ type: 'SET_LOADING', payload: false });
         }
     };
 
