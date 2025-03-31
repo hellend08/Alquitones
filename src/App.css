@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 body {
-  margin-top: 6rem;
   background-color: var(--color-light);
 }
 

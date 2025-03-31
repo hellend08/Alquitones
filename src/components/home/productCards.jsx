@@ -192,10 +192,6 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                                 </tbody>
                                             </table>
                                         </div>
-                                    ) : product.availabilityDetails === undefined ? (
-                                        <div className="my-4 py-2 text-center text-sm text-gray-500 bg-gray-50 rounded-md">
-                                            Disponible en fechas seleccionadas
-                                        </div>
                                     ) : null}
 
                                     <div className="flex justify-between items-center">
