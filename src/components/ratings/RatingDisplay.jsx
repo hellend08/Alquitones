@@ -17,6 +17,8 @@ const RatingsDisplay = ({ instrumentId }) => {
                 const sortedRatings = Array.isArray(data) 
                     ? [...data].sort((a, b) => new Date(b.createdAt || Date.now()) - new Date(a.createdAt || Date.now()))
                     : [];
+                    console.log(data);
+                    
                 
                 setRatings(sortedRatings);
                 
@@ -92,6 +94,7 @@ const RatingsDisplay = ({ instrumentId }) => {
             {/* Lista de valoraciones */}
             {ratings.length > 0 ? (
                 <div className="space-y-6">
+                    {console.log(ratings)}
                     {ratings.map((rating) => (
                         <div key={rating.id || `rating-${rating.userId}-${Math.random().toString(36).substring(2)}`} className="border-b border-gray-200 pb-4">
                             <div className="flex justify-between items-start mb-2">
@@ -104,7 +107,7 @@ const RatingsDisplay = ({ instrumentId }) => {
                                 
                                 {/* Se podría agregar información de usuario aquí */}
                                 <div className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                                    Usuario #{rating.userId}
+                                    {rating.username}
                                 </div>
                             </div>
                             
