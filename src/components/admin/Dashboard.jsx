@@ -14,7 +14,8 @@ import {
     ArcElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Filler
 } from 'chart.js';
 import { Doughnut, Line, Bar } from 'react-chartjs-2';
 
@@ -28,7 +29,8 @@ ChartJS.register(
     ArcElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Filler
 );
 
 const Dashboard = () => {
