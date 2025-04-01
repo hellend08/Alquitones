@@ -470,6 +470,8 @@ export const apiService = {
         }
 
         const availability = await axios.get(`${API_BASE_URL}/availability/daily-stock?instrumentId=${id}&startDate=${startDate}&endDate=${endDate}`);
+        console.log("📅 Disponibilidad: ", availability.data);
+        
         return availability.data;
     },
     getCategories: async () => {

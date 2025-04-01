@@ -333,6 +333,8 @@ function CardDetails() {
                     <AvailabilityCalendar
                         availability={instrument.availability || []}
                         onSelect={handleDateSelect}
+                        getAvailabilityById={getAvailabilityById}
+                        instrumentId={instrument.id}
                     />
                 )}
             </div>

@@ -25,10 +25,10 @@ const Header = () => {
     }, []);
 
     return (
-        <header className={`w-full fixed top-0 z-50 transition-all duration-300 shadow-md border-b border-gray-300 ${
+        <header className={`w-full top-0 z-50 transition-all duration-300 shadow-md border-b border-gray-300 ${
             isScrolled 
-              ? 'bg-white' 
-              : 'bg-gradient-to-r from-gray-100 to-gray-200'
+              ? 'bg-white fixed ' 
+              : 'bg-gradient-to-r from-gray-100 to-gray-200 relative'
         }`}>
             {/* Desktop */}
             <div className='mx-auto px-4 py-3'>

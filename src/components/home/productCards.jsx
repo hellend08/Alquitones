@@ -165,7 +165,18 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                     {/* Tabla de disponibilidad */}
                                     {product.availabilityDetails && product.availabilityDetails.length > 0 ? (
                                         <div className="my-4 overflow-hidden border border-gray-200 rounded-md">
-                                            <table className="w-full divide-y divide-gray-200">
+
+                                            {Math.min(...product.availabilityDetails.map(i => i.availableStock)) < 1 ? (
+                                                <div className="bg-yellow-100 text-yellow-700 p-2 text-sm font-semibold text-center">
+                                                    Disponible parcialmente
+                                                </div>
+                                            ) : (
+                                                <div className="bg-green-100 text-green-700 p-2 text-sm font-semibold text-center">
+                                                    {`Disponible: ${Math.min(...product.availabilityDetails.map(i => i.availableStock))}`}
+                                                </div>
+                                            )}
+
+                                            {/* <table className="w-full divide-y divide-gray-200">
                                                 <thead className="bg-gray-50">
                                                     <tr>
                                                         <th className="px-3 py-2 text-xs font-medium text-gray-500 text-left">
@@ -190,11 +201,7 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
                                                         </tr>
                                                     ))}
                                                 </tbody>
-                                            </table>
-                                        </div>
-                                    ) : product.availabilityDetails === undefined ? (
-                                        <div className="my-4 py-2 text-center text-sm text-gray-500 bg-gray-50 rounded-md">
-                                            Disponible en fechas seleccionadas
+                                            </table> */}
                                         </div>
                                     ) : null}
 
