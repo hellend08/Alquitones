@@ -36,6 +36,11 @@ export const InstrumentProvider = ({ children }) => {
         try {
             const response = await apiService.addInstrument(instrumentData, imagesAdj);
             dispatch({ type: "ADD_INSTRUMENT", payload: response.data });
+    
+            // Vuelve a obtener la lista completa de instrumentos
+            const instrumentsData = await apiService.getInstruments();
+            dispatch({ type: "GET_INSTRUMENTS_RANDOMED", payload: instrumentsData });
+    
             return response.data;
         } catch (error) {
             dispatch({ type: "SET_ERROR", payload: "Error al agregar instrumento" });

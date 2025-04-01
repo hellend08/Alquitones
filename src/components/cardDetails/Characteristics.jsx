@@ -28,9 +28,10 @@ const Characteristics = ({ specifications }) => {
                                     />
                                 )}
                             </div>
+                            
                         )}
                         <h3 className="font-semibold text-gray-700">
-                            {spec.specification ? spec.specification.name : 'Característica'}
+                            {spec.specification ? spec.specification.label : 'Característica'}
                         </h3>
                     </div>
                     <p className="text-gray-600 text-sm mt-1 ml-10">

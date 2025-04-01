@@ -8,6 +8,18 @@ import EmailConfirmationService from "../../services/emailConfirmationService";
 import WhatsAppChat from '../crossSections/WhatsAppChat';
 
 function Reservation() {
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+
+        return () => {
+            document.head.removeChild(link);
+        };
+    }, []);
+
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [instrument, setInstrument] = useState(null);
@@ -504,9 +516,11 @@ function Reservation() {
                                                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                     {instrument.specifications.slice(0, 4).map((spec, idx) => (
                                                         <li key={idx} className="text-sm flex items-center gap-1">
-                                                            <span className="material-symbols-outlined text-xs text-(--color-secondary)">check_circle</span>
-                                                            <span>
-                                                                <strong>{spec.specification.name}:</strong> {spec.spValue}
+                                                            <div className="w-8 h-8 flex items-center justify-center bg-(--color-sunset) rounded-full">
+                                                                <i className={`fas ${spec.specification.icon} text-(--color-secondary)`}></i>
+                                                            </div>
+                                                            <span>{console.log(instrument.specifications.slice(0, 4))}
+                                                                <strong>{spec.specification.label}:</strong> {spec.spValue}
                                                             </span>
                                                         </li>
                                                     ))}
@@ -610,9 +624,7 @@ function Reservation() {
                                         Cancelar
                                     </button>
                                 </div>
-                                <div className="text-xs text-gray-600 mt-2 text-center">
-                                    Nota: Al confirmar, estas fechas exactas se enviarán al servidor.
-                                </div>
+                                
                             </div>
                         )}
 
