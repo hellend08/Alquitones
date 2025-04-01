@@ -2,36 +2,77 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const AvailabilityCalendar = ({ availability = [], onSelect }) => {
+const AvailabilityCalendar = ({ availability = [], onSelect, getAvailabilityById, instrumentId }) => {
+    const [availabilityData, setAvailabilityData] = useState(availability);
+    
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [nextMonth, setNextMonth] = useState(new Date(new Date().setMonth(currentMonth.getMonth() + 1)));
+    const [nextMonth, setNextMonth] = useState(
+        new Date(
+          currentMonth.getFullYear(),
+          currentMonth.getMonth() + 1, 
+          1
+        )
+    );
     const [selectedStartDate, setSelectedStartDate] = useState(null);
     const [selectedEndDate, setSelectedEndDate] = useState(null);
     const [calendarError, setCalendarError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     
-
     useEffect(() => {
         // Actualizar el mes siguiente cuando cambia el mes actual
-        const nextMonthDate = new Date(currentMonth);
-        nextMonthDate.setMonth(currentMonth.getMonth() + 1);
-        setNextMonth(nextMonthDate);
+        setNextMonth(new Date(
+            currentMonth.getFullYear(),
+            currentMonth.getMonth() + 1, 
+            1
+        ));
     }, [currentMonth]);
-
+    
     // Navegar al mes anterior
-    const goToPreviousMonth = () => {
+    const goToPreviousMonth = async () => {
         const prevMonth = new Date(currentMonth);
         prevMonth.setMonth(currentMonth.getMonth() - 1);
+        const today = new Date();
+        console.log("prevMonth", prevMonth);    
+        console.log("currentMonth", currentMonth);
+        console.log("nextMonth", nextMonth);
+        
+        console.log("today", today);
+
+        if (currentMonth.getDate < today.getDate) {
+            return;
+        }
+            
+        
         
         // No permitir navegar a meses pasados
-        const today = new Date();
         if (prevMonth.getMonth() >= today.getMonth() || prevMonth.getFullYear() > today.getFullYear()) {
+            const startDateOfPrevMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() -1 , 1).toISOString().split('T')[0];
+            const endDateOfCurrentMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), 0).toISOString().split('T')[0];
+            try {
+                const availability = await getAvailabilityById(instrumentId, startDateOfPrevMonth, endDateOfCurrentMonth);
+                setAvailabilityData(availability);
+            } catch (error) {
+                console.error("Error fetching availability:", error);
+            }
             setCurrentMonth(prevMonth);
         }
     };
 
     // Navegar al mes siguiente
-    const goToNextMonth = () => {
+    const goToNextMonth = async () => {
+        const startDateOfNextMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() +1 , 1).toISOString().split('T')[0];
+        const endDateOfNextNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth()+2, 0).toISOString().split('T')[0];
+        console.log("startDateOfNextMonth", startDateOfNextMonth);
+        console.log("endDateOfNextNextMonth", endDateOfNextNextMonth);
+        try {
+            const availability = await getAvailabilityById(instrumentId, startDateOfNextMonth, endDateOfNextNextMonth);
+            setAvailabilityData(availability);
+        } catch (error) {
+            console.error("Error fetching availability:", error);
+        }
+
+
+
         const nextMonthDate = new Date(currentMonth);
         nextMonthDate.setMonth(currentMonth.getMonth() + 1);
         setCurrentMonth(nextMonthDate);
@@ -44,9 +85,9 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
 
     // Verificar si una fecha está disponible
     const isDateAvailable = (date, quantity = 1) => {
-        if (!availability || availability.length === 0) return false;
+        if (!availabilityData || availabilityData.length === 0) return false;
         const formattedDate = formatDateForComparison(date);
-        const availabilityEntry = availability.find(a => a.date === formattedDate);
+        const availabilityEntry = availabilityData.find(a => a.date === formattedDate);
         
         // Verificar si la disponibilidad es suficiente para la cantidad solicitada
         return availabilityEntry ? availabilityEntry.availableStock >= quantity : false;
@@ -54,9 +95,9 @@ const AvailabilityCalendar = ({ availability = [], onSelect }) => {
 
     // Obtener la cantidad disponible para una fecha
     const getAvailableQuantity = (date) => {
-        if (!availability || availability.length === 0) return 0;
+        if (!availabilityData || availabilityData.length === 0) return 0;
         const formattedDate = formatDateForComparison(date);
-        const availabilityEntry = availability.find(a => a.date === formattedDate);
+        const availabilityEntry = availabilityData.find(a => a.date === formattedDate);
         return availabilityEntry ? availabilityEntry.availableStock : 0;
     };
 
@@ -251,9 +292,10 @@ const handleDateClick = (date, quantity = 1) => {
                     <div className="month-header flex justify-between items-center mb-4">
                         <button 
                             onClick={goToPreviousMonth} 
-                            className="text-gray-600 hover:text-gray-900 p-1"
+                            disabled={currentMonth.toISOString().split('T')[0] === new Date().toISOString().split('T')[0]}
+                            className={`${currentMonth.toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? 'text-gray-300  p-1 cursor-not-allowed' : 'text-gray-600 hover:text-gray-900 p-1'}`}
                         >
-                            <span className="material-symbols-outlined">arrow_back_ios</span>
+                            {true ? <span className="material-symbols-outlined">arrow_back_ios</span> : null}
                         </button>
                         <h3 className="text-lg font-medium capitalize">{getMonthName(currentMonth)}</h3>
                         <button 
@@ -337,15 +379,15 @@ const handleDateClick = (date, quantity = 1) => {
                 <div className="calendar bg-white rounded-lg shadow p-4">
                     <div className="month-header flex justify-between items-center mb-4">
                         <button 
-                            className="text-gray-600 hover:text-gray-900 p-1 invisible" // Invisible para mantener alineación
+                            onClick={goToPreviousMonth}
+                            disabled={currentMonth.toISOString().split('T')[0] === new Date().toISOString().split('T')[0]}
+                            className={`${currentMonth.toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? 'text-gray-300  p-1 cursor-not-allowed' : 'text-gray-600 hover:text-gray-900 p-1'}`}
                         >
                             <span className="material-symbols-outlined">arrow_back_ios</span>
                         </button>
                         <h3 className="text-lg font-medium capitalize">{getMonthName(nextMonth)}</h3>
                         <button 
-                            onClick={() => {
-                                setCurrentMonth(nextMonth);
-                            }} 
+                            onClick={goToNextMonth} 
                             className="text-gray-600 hover:text-gray-900 p-1"
                         >
                             <span className="material-symbols-outlined">arrow_forward_ios</span>

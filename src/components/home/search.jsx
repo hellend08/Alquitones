@@ -139,7 +139,6 @@ const SearchBar = ({ onSearch, products: products, getAvailabilityById }) => {
                             availableStock: availItem ? availItem.availableStock : 0
                         };
                     })
-                    .filter(detail => detail.availableStock > 0);
 
                 return {
                     ...product,

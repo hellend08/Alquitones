@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import Header  from '../crossSections/Header';
+import Footer  from '../crossSections/Footer';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useInstrumentState, useInstrumentDispatch } from "../../context/InstrumentContext";
@@ -503,6 +505,8 @@ const Categories = () => {
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+    const [errorModalOpen, setErrorModalOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const [deleteConfirmationValid, setDeleteConfirmationValid] = useState(false);
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification,
         deleteSpecification, updateSpecification } = useInstrumentState();
@@ -608,10 +612,11 @@ const Categories = () => {
             // Limpiar el estado
             setCategoryToDelete(null);
         } catch (error) {
-            console.error('Error al eliminar categoria:', error);
+            console.error('Error al eliminar categoria:', error.response.data.error);
+            setErrorMessage(error.response.data.error);
+            setErrorModalOpen(true);
+            setDeleteModalOpen(false)
 
-            // También podríamos usar un popup para errores
-            alert(`Error: ${error.message}`);
         }
     };
 
@@ -976,6 +981,31 @@ const Categories = () => {
 
                             <button
                                 onClick={() => setSuccessModalOpen(false)}
+                                className="bg-(--color-primary) hover:bg-(--color-secondary) w-[110px] text-white font-semibold py-1 px-4 rounded shadow-sm transition-colors duration-200 mt-2"
+                            >
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {errorModalOpen && (
+                <div className={styles.modal}>
+                    <div className={`${styles.modalContent} max-w-md`}>
+                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
+                            Error al eliminar categoría
+                        </h3>
+
+                        <div className="flex flex-col items-center gap-4 text-center">
+                                <i className="fas fa-times-circle text-red-500 text-5xl mb-2"></i>
+
+                            <p className="text-gray-700">
+                                {errorMessage}
+                            </p>
+
+                            <button
+                                onClick={() => setErrorModalOpen(false)}
                                 className="bg-(--color-primary) hover:bg-(--color-secondary) w-[110px] text-white font-semibold py-1 px-4 rounded shadow-sm transition-colors duration-200 mt-2"
                             >
                                 Aceptar
@@ -1740,6 +1770,21 @@ const Admin = () => {
           <div>
 
             {/* Agregar el div del mensaje responsive */}
+            <div className={styles.responsiveMessage}>
+                <Header />
+                <div className={styles.responsiveContent}>
+                    <div className="w-[90%]">
+                        {/* <img 
+                src="/src/assets/no-disponible.jpg" 
+                alt="Vista no disponible en móviles" 
+                className={styles.responsiveImage}
+            /> */}
+                        <h3 className="pt-3 text-3xl font-semibold">Esta modalidad no esta disponible en móviles.</h3>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+
             <div className={styles.adminContainer}>
                 <aside className={styles.sidebar}>
                     <nav className={styles.sidebarNav}>
