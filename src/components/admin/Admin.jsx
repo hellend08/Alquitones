@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import Header  from '../crossSections/Header';
-import Footer  from '../crossSections/Footer';
+import Header from '../crossSections/Header';
+import Footer from '../crossSections/Footer';
 import styles from './Admin.module.css';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useInstrumentState, useInstrumentDispatch } from "../../context/InstrumentContext";
@@ -22,14 +22,14 @@ const Instruments = () => {
     const { categories, loading: categoriesLoading } = useCategoryState();
     const dispatch = useInstrumentDispatch();
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument } = useInstrumentState();
-    
+
     // Estados para paginación
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredInstruments, setFilteredInstruments] = useState([]);
     const [paginatedInstruments, setPaginatedInstruments] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
-    
+
     // Estados para los modales de feedback
     const [feedbackModal, setFeedbackModal] = useState(false);
     const [feedbackType, setFeedbackType] = useState('');
@@ -38,23 +38,23 @@ const Instruments = () => {
     // Filtrar y ordenar instrumentos cuando cambia searchTerm o instruments
     useEffect(() => {
         let filtered = [...instruments];
-        
+
         // Filtrar por término de búsqueda
         if (searchTerm) {
             filtered = filtered.filter(instrument =>
                 instrument.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
-        
+
         // Ordenar por ID de menor a mayor
         filtered.sort((a, b) => a.id - b.id);
-        
+
         setFilteredInstruments(filtered);
-        
+
         // Calcular total de páginas
         const total = Math.ceil(filtered.length / itemsPerPage);
         setTotalPages(total > 0 ? total : 1);
-        
+
         // Asegurar que la página actual no exceda el total
         if (currentPage > total && total > 0) {
             setCurrentPage(1);
@@ -66,7 +66,7 @@ const Instruments = () => {
         // Calcular índices para la paginación
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        
+
         // Obtener instrumentos paginados
         const paginated = filteredInstruments.slice(startIndex, endIndex);
         setPaginatedInstruments(paginated);
@@ -77,7 +77,7 @@ const Instruments = () => {
         setFeedbackType(type);
         setFeedbackMessage(message);
         setFeedbackModal(true);
-        
+
         // Autoclose success feedbacks after 2 seconds
         if (type === 'success') {
             setTimeout(() => {
@@ -257,40 +257,40 @@ const Instruments = () => {
                     </thead>
                     <tbody>
                         {paginatedInstruments.map(instrument => {
-                            const status = (instrument.stock > 0 || instrument.status =='Disponible') ? 'Disponible' : 'No disponible';
+                            const status = (instrument.stock > 0 || instrument.status == 'Disponible') ? 'Disponible' : 'No disponible';
                             return (
-                            <tr key={instrument.id}>
-                                <td>{instrument.id}</td>
-                                <td>
-                                    <img
-                                        src={instrument.mainImage}
-                                        alt={instrument.name}
-                                        className={styles.productImage}
-                                    />
-                                </td>
-                                <td>{instrument.name}</td>
-                                <td>{getProductCategory(instrument.categoryId)}</td>
-                                <td>
-                                    <span className={`${styles.statusBadge} ${styles[status.toLowerCase()]}`}>
-                                        {status}
-                                    </span>
-                                </td>
-                                <td>${instrument.pricePerDay.toFixed(2)}</td>
-                                <td className="flex items-center gap-4 h-[83.33px]">
-                                    <button
-                                        onClick={() => handleEditInstrument(instrument)}
-                                        className={styles.editButton}
-                                    >
-                                        <i className="fas fa-edit"></i>
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteInstrument(instrument)}
-                                        className={styles.deleteButton}
-                                    >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                                <tr key={instrument.id}>
+                                    <td>{instrument.id}</td>
+                                    <td>
+                                        <img
+                                            src={instrument.mainImage}
+                                            alt={instrument.name}
+                                            className={styles.productImage}
+                                        />
+                                    </td>
+                                    <td>{instrument.name}</td>
+                                    <td>{getProductCategory(instrument.categoryId)}</td>
+                                    <td>
+                                        <span className={`${styles.statusBadge} ${styles[status.toLowerCase()]}`}>
+                                            {status}
+                                        </span>
+                                    </td>
+                                    <td>${instrument.pricePerDay.toFixed(2)}</td>
+                                    <td className="flex items-center gap-4 h-[83.33px]">
+                                        <button
+                                            onClick={() => handleEditInstrument(instrument)}
+                                            className={styles.editButton}
+                                        >
+                                            <i className="fas fa-edit"></i>
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteInstrument(instrument)}
+                                            className={styles.deleteButton}
+                                        >
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
                             )
                         })}
                     </tbody>
@@ -509,7 +509,7 @@ const Instruments = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* Modal de Feedback */}
             {feedbackModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -522,13 +522,13 @@ const Instruments = () => {
                                 <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-4">Confirmar eliminación</h3>
                                 <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
                                 <div className="flex justify-center gap-4">
-                                    <button 
+                                    <button
                                         onClick={() => setFeedbackModal(false)}
                                         className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
                                     >
                                         Cancelar
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={confirmDeleteInstrument}
                                         className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
                                     >
@@ -552,7 +552,7 @@ const Instruments = () => {
                                 <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
                                 <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
                                 <div className="flex justify-center">
-                                    <button 
+                                    <button
                                         onClick={() => setFeedbackModal(false)}
                                         className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                                     >
@@ -588,7 +588,7 @@ const Categories = () => {
     const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
     // Nuevo estado para controlar página actual
     const [currentPage, setCurrentPage] = useState(1);
-    
+
     useEffect(() => {
         if (searchTerm) {
             const filteredCategories = categories.filter(category =>
@@ -622,25 +622,20 @@ const Categories = () => {
     const handleModalSubmit = async (e) => {
         e.preventDefault();
         const form = e.target;
-
-        // Obtener SOLO el icono de Font Awesome, eliminar cualquier otra opción
-        const icon = form['icon-class'].value;
-
+    
         const categoryData = {
             name: form['category-name'].value,
             description: form['category-description'].value,
-            icon: icon // Siempre usar el valor del select, sin considerar imágenes personalizadas
+            icon: form['icon-class'].value
         };
-        
+    
         try {
             if (modalMode === 'create') {
                 await addCategory(categoryData);
-                // Reemplazando alert con modal de éxito
                 setSuccessMessage('Categoría creada con éxito');
                 setSuccessModalOpen(true);
             } else {
                 await updateCategory(currentCategory.id, categoryData);
-                // Reemplazando alert con modal de éxito
                 setSuccessMessage('Categoría actualizada con éxito');
                 setSuccessModalOpen(true);
             }
@@ -648,10 +643,22 @@ const Categories = () => {
             setModalOpen(false);
             setPreviews([]);
         } catch (error) {
-            console.error('Error:', error);
-            // Reemplazando alert con modal de error
-            setErrorMessage(error.message || 'Ha ocurrido un error al procesar la categoría');
-            setErrorModalOpen(true);
+            console.error('Error completo:', error);
+            setModalOpen(false); // Cierra el modal de creación primero
+            setPreviews([]);
+    
+            // Extraer mensaje del error de diferentes posibles propiedades
+            const serverError = error.response?.data;
+            const errorMessage = 
+                serverError?.error?.includes("duplicate") ? "Ya existe una categoría con este nombre. Por favor, utiliza un nombre único." :
+                serverError?.message?.includes("duplicate") ? "El nombre de categoría ya está registrado." :
+                serverError?.error ? serverError.error :
+                serverError?.message ? serverError.message :
+                error.message?.includes("400") ? "El nombre de categoría ya está registrado." :
+                'Error al procesar la solicitud';
+    
+            setErrorMessage(errorMessage);
+            setErrorModalOpen(true); // Muestra solo el modal de error
         }
     };
 
@@ -665,7 +672,7 @@ const Categories = () => {
 
         try {
             // Obtener productos asociados
-            const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);	
+            const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);
 
             // Eliminar la categoria
             await deleteCategory(categoryToDelete.id);
@@ -927,7 +934,7 @@ const Categories = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* Modal de eliminación - Este no se modifica como solicitado */}
             {deleteModalOpen && categoryToDelete && (
                 <div className={styles.modal}>
@@ -1032,7 +1039,7 @@ const Categories = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* Nuevo Modal de Éxito - Para reemplazar los alerts de creación/actualización */}
             {successModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -1043,7 +1050,7 @@ const Categories = () => {
                         <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">¡Operación exitosa!</h3>
                         <p className="text-gray-600 mb-6 text-center">{successMessage}</p>
                         <div className="flex justify-center">
-                            <button 
+                            <button
                                 onClick={() => setSuccessModalOpen(false)}
                                 className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                             >
@@ -1053,7 +1060,7 @@ const Categories = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* Nuevo Modal de Error - Para reemplazar los alerts de error */}
             {errorModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -1064,7 +1071,7 @@ const Categories = () => {
                         <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
                         <p className="text-gray-600 mb-6 text-center">{errorMessage}</p>
                         <div className="flex justify-center">
-                            <button 
+                            <button
                                 onClick={() => setErrorModalOpen(false)}
                                 className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                             >
@@ -1145,7 +1152,7 @@ const Specifications = ({ instruments, specifications, addSpecification, updateS
         setFeedbackType(type);
         setFeedbackMessage(message);
         setFeedbackModal(true);
-        
+
         // Autoclose success feedbacks after 2 seconds
         if (type === 'success') {
             setTimeout(() => {
@@ -1512,13 +1519,13 @@ const Specifications = ({ instruments, specifications, addSpecification, updateS
                                 <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-4">Confirmar eliminación</h3>
                                 <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
                                 <div className="flex justify-center gap-4">
-                                    <button 
+                                    <button
                                         onClick={() => setFeedbackModal(false)}
                                         className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
                                     >
                                         Cancelar
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={confirmDeleteSpecification}
                                         className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
                                     >
@@ -1542,7 +1549,7 @@ const Specifications = ({ instruments, specifications, addSpecification, updateS
                                 <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
                                 <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
                                 <div className="flex justify-center">
-                                    <button 
+                                    <button
                                         onClick={() => setFeedbackModal(false)}
                                         className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                                     >
@@ -1560,7 +1567,7 @@ const Specifications = ({ instruments, specifications, addSpecification, updateS
 
 
 const Users = () => {
-    const { users, loading, error, updateUserRole} = useUserState();
+    const { users, loading, error, updateUserRole } = useUserState();
     const dispatch = useUserDispatch();
     const { getCurrentUser } = useAuthState();
     const [searchTerm, setSearchTerm] = useState('');
@@ -1573,7 +1580,7 @@ const Users = () => {
     // Estados para el popup de confirmación
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [pendingRoleChange, setPendingRoleChange] = useState(null);
-    
+
     // Nuevos estados para los modales de éxito y error
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
@@ -1602,24 +1609,24 @@ const Users = () => {
                     user.email.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-            
+
             // Guardar usuarios filtrados completos
             setFilteredUsers(filtered);
-            
+
             // Calcular paginación
             const total = Math.ceil(filtered.length / itemsPerPage);
             setTotalPages(total > 0 ? total : 1);
-            
+
             // Asegurarse de que la página actual no exceda el total de páginas
             const validCurrentPage = Math.min(currentPage, total);
             if (validCurrentPage !== currentPage) {
                 setCurrentPage(validCurrentPage);
             }
-            
+
             // Calcular índices para la paginación
             const startIndex = (validCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            
+
             // Obtener usuarios paginados
             const paginated = filtered.slice(startIndex, endIndex);
             setPaginatedUsers(paginated);
@@ -1671,13 +1678,13 @@ const Users = () => {
 
             await updateUserRole(pendingRoleChange.userId, pendingRoleChange.newRole);
             filterAndPaginateUsers(); // Actualizar la lista después del cambio
-            
+
             // Reemplazar el alert con modal de éxito
             setSuccessMessage('Permisos actualizados correctamente');
             setSuccessModalOpen(true);
         } catch (error) {
             console.error('Error al cambiar permisos:', error);
-            
+
             // Reemplazar el alert con modal de error
             setErrorMessage(`Error al cambiar permisos: ${error.message}`);
             setErrorModalOpen(true);
@@ -1886,7 +1893,7 @@ const Users = () => {
                         <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">¡Operación exitosa!</h3>
                         <p className="text-gray-600 mb-6 text-center">{successMessage}</p>
                         <div className="flex justify-center">
-                            <button 
+                            <button
                                 onClick={() => setSuccessModalOpen(false)}
                                 className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                             >
@@ -1896,7 +1903,7 @@ const Users = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* Modal de Error - Reemplaza los alerts de error */}
             {errorModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -1907,7 +1914,7 @@ const Users = () => {
                         <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
                         <p className="text-gray-600 mb-6 text-center">{errorMessage}</p>
                         <div className="flex justify-center">
-                            <button 
+                            <button
                                 onClick={() => setErrorModalOpen(false)}
                                 className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                             >
@@ -1966,89 +1973,89 @@ const Admin = () => {
 
     return (
         <>
-          <div>
+            <div>
 
-            {/* Agregar el div del mensaje responsive */}
-            <div className={styles.responsiveMessage}>
-                <Header />
-                <div className={styles.responsiveContent}>
-                    <div className="w-[90%]">
-                        {/* <img 
+                {/* Agregar el div del mensaje responsive */}
+                <div className={styles.responsiveMessage}>
+                    <Header />
+                    <div className={styles.responsiveContent}>
+                        <div className="w-[90%]">
+                            {/* <img 
                 src="/src/assets/no-disponible.jpg" 
                 alt="Vista no disponible en móviles" 
                 className={styles.responsiveImage}
             /> */}
-                        <h3 className="pt-3 text-3xl font-semibold">Esta modalidad no esta disponible en móviles.</h3>
+                            <h3 className="pt-3 text-3xl font-semibold">Esta modalidad no esta disponible en móviles.</h3>
+                        </div>
                     </div>
+                    <Footer />
                 </div>
-                <Footer />
+
+                <div className={styles.adminContainer}>
+                    <aside className={styles.sidebar}>
+                        <nav className={styles.sidebarNav}>
+                            <ul>
+                                <li>
+                                    <Link to="/administracion/dashboard">
+                                        <i className="fas fa-home"></i> Dashboard
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/administracion/instruments">
+                                        <i className="fas fa-guitar"></i> Lista Productos
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/administracion/specifications">
+                                        <i className="fas fa-list-ul"></i> Características
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/administracion/rentals">
+                                        <i className="fas fa-calendar-alt"></i> Reservas
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/administracion/categories">
+                                        <i className="fas fa-tags"></i> Categorías
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/administracion/users">
+                                        <i className="fas fa-users"></i> Usuarios
+                                    </Link>
+                                </li>
+                            </ul>
+                        </nav>
+                    </aside>
+
+                    <main className={styles.mainContent}>
+                        <div className={styles.contentArea}>
+                            {instrumentsLoading ? (
+                                <div className="flex justify-center items-center p-10">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-(--color-primary)"></div>
+                                </div>
+                            ) :
+                                (<Routes>
+                                    <Route path="dashboard" element={<Dashboard />} />
+                                    <Route path="instruments" element={<Instruments />} />
+                                    <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
+                                    <Route path="rentals" element={<ReservationsModal instruments={instrumentsWithCategories} />} />
+                                    <Route path="categories" element={<Categories />} />
+                                    <Route path="users" element={<Users />} />
+                                    <Route path="" element={<Navigate to="dashboard" replace />} />
+                                </Routes>)
+                            }
+                        </div>
+                    </main>
+                </div>
             </div>
 
-            <div className={styles.adminContainer}>
-                <aside className={styles.sidebar}>
-                    <nav className={styles.sidebarNav}>
-                        <ul>
-                            <li>
-                                <Link to="/administracion/dashboard">
-                                    <i className="fas fa-home"></i> Dashboard
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/administracion/instruments">
-                                    <i className="fas fa-guitar"></i> Lista Productos
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/administracion/specifications">
-                                    <i className="fas fa-list-ul"></i> Características
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/administracion/rentals">
-                                    <i className="fas fa-calendar-alt"></i> Reservas
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/administracion/categories">
-                                    <i className="fas fa-tags"></i> Categorías
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/administracion/users">
-                                    <i className="fas fa-users"></i> Usuarios
-                                </Link>
-                            </li>
-                        </ul>
-                    </nav>
-                </aside>
+            {/* Agregar el div del mensaje responsive */}
 
-                <main className={styles.mainContent}>
-                    <div className={styles.contentArea}>
-                        {instrumentsLoading ? (
-                            <div className="flex justify-center items-center p-10">
-                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-(--color-primary)"></div>
-                            </div>
-                        ) : 
-                        (<Routes>
-                            <Route path="dashboard" element={<Dashboard />} />
-                            <Route path="instruments" element={<Instruments />} />
-                            <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
-                            <Route path="rentals" element={<ReservationsModal instruments={instrumentsWithCategories}/>} />
-                            <Route path="categories" element={<Categories />} />
-                            <Route path="users" element={<Users />} />
-                            <Route path="" element={<Navigate to="dashboard" replace />} />
-                        </Routes>)
-                        }
-                    </div>
-                </main>
-            </div>
-        </div> 
 
-        {/* Agregar el div del mensaje responsive */}
-
-        
         </>
-        
+
     );
 };
 
