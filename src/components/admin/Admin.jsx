@@ -1743,7 +1743,15 @@ const Admin = () => {
     }, []);
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification, updateSpecification, deleteSpecification } = useInstrumentState();
     const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
-    
+    const instrumentsWithCategories = instruments.map(instrument => {
+        const category = categories.find(category => category.id === instrument.categoryId);
+        //falta eliminar categoryId de instrument
+        const { categoryId, ...instrumentWithoutCategoryId } = instrument;
+        return {
+            ...instrumentWithoutCategoryId,
+            category
+        };
+    });
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);
 
@@ -1834,7 +1842,7 @@ const Admin = () => {
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
                             <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
-                            <Route path="rentals" element={<ReservationsModal instruments={instruments}/>} />
+                            <Route path="rentals" element={<ReservationsModal instruments={instrumentsWithCategories}/>} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />
                             <Route path="" element={<Navigate to="dashboard" replace />} />
