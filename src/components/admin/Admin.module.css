@@ -68,6 +68,10 @@
     line-height: 1.6;
     margin: 0 auto;
 }
+.adminContainer {
+    display: flex;
+    min-height: 100vh;
+}
 
 /* Media query para móviles */
 @media (max-width: 760px) {
@@ -123,10 +127,6 @@
 
 
 
-.adminContainer {
-    display: flex;
-    min-height: 100vh;
-}
 
 /* Sidebar */
 .sidebar {

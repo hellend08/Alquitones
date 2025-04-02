@@ -581,6 +581,7 @@ export const apiService = {
     },
     logout: () => {
         localStorage.removeItem('currentUser');
+        localStorage.removeItem('favorites');
     },
     register: async (userData) => {
         if (!(await checkBackendStatus())) {

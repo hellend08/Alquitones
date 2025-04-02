@@ -544,13 +544,11 @@ function Reservation() {
                                     <div className="flex flex-col md:flex-row md:justify-between bg-gray-50 p-4 rounded-lg border border-gray-100">
                                         <div className="mb-2 md:mb-0">
                                             <div className="font-medium">
-                                                {currentUser.firstName && currentUser.lastName
-                                                    ? `${currentUser.firstName} ${currentUser.lastName}`
-                                                    : currentUser.username
-                                                        ? currentUser.username
-                                                        : currentUser.name
-                                                            ? currentUser.name
-                                                            : "Usuario"}
+                                                {
+                                                 currentUser?.username && currentUser?.lastname
+                                                    ? `${currentUser.username} ${currentUser.lastname}`
+                                                    : "Usuario"
+                                                }
                                             </div>
                                             <div className="text-gray-500 text-sm mt-1">
                                                 <i className="fas fa-envelope mr-1"></i> {currentUser.email}

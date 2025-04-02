@@ -168,7 +168,7 @@ const ProductCards = ({ products: products, categories: categories, isLoading })
 
                                             {Math.min(...product.availabilityDetails.map(i => i.availableStock)) < 1 ? (
                                                 <div className="bg-yellow-100 text-yellow-700 p-2 text-sm font-semibold text-center">
-                                                    Disponible parcialmente
+                                                        Disponible en algunas fechas
                                                 </div>
                                             ) : (
                                                 <div className="bg-green-100 text-green-700 p-2 text-sm font-semibold text-center">
