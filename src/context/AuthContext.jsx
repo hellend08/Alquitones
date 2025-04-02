@@ -79,6 +79,9 @@ export const AuthProvider = ({ children }) => {
         try {
             const user = await apiService.login(email, password);
             dispatch({ type: "LOGIN_SUCCESS", payload: user });
+            const favorites = await apiService.getFavorites(user.id);
+            dispatch({ type: "SET_FAVORITES", payload: favorites });
+            localStorage.setItem('favorites', JSON.stringify(favorites));
             return user;
         } catch (error) {
             dispatch({ type: "SET_ERROR", payload: error.message });

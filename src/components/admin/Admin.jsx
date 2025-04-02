@@ -29,6 +29,11 @@ const Instruments = () => {
     const [paginatedInstruments, setPaginatedInstruments] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
+    
+    // Estados para los modales de feedback
+    const [feedbackModal, setFeedbackModal] = useState(false);
+    const [feedbackType, setFeedbackType] = useState('');
+    const [feedbackMessage, setFeedbackMessage] = useState('');
 
     // Filtrar y ordenar instrumentos cuando cambia searchTerm o instruments
     useEffect(() => {
@@ -67,6 +72,20 @@ const Instruments = () => {
         setPaginatedInstruments(paginated);
     }, [currentPage, filteredInstruments]);
 
+    // Función para mostrar modales de feedback
+    const showFeedback = (type, message) => {
+        setFeedbackType(type);
+        setFeedbackMessage(message);
+        setFeedbackModal(true);
+        
+        // Autoclose success feedbacks after 2 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                setFeedbackModal(false);
+            }, 2000);
+        }
+    };
+
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
         setCurrentPage(1); // Resetear a la primera página al buscar
@@ -98,7 +117,7 @@ const Instruments = () => {
 
         // Validación de imágenes SOLO para creación
         if (modalMode === 'create' && (newImages.length < 1 || newImages.length > 6)) {
-            alert('Debes seleccionar entre 1 y 6 imágenes');
+            showFeedback('error', 'Debes seleccionar entre 1 y 6 imágenes');
             return;
         }
 
@@ -139,34 +158,35 @@ const Instruments = () => {
 
             if (modalMode === 'create') {
                 await addInstrument(instrumentData, imagesAdj);
-                alert('Instrumento creado con éxito');
+                setModalOpen(false);
+                showFeedback('success', 'Instrumento creado con éxito');
             } else {
                 await updateInstrument(currentInstrument.id, instrumentData, imagesAdj);
-                alert('Instrumento actualizado con éxito');
+                setModalOpen(false);
+                showFeedback('success', 'Instrumento actualizado con éxito');
             }
 
-            setModalOpen(false);
             setPreviews([]);
             setExistingImages([]);
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message);
+            showFeedback('error', error.message || 'Error al procesar la solicitud');
         }
     };
 
-    const handleDeleteInstrument = async (instrument) => {
-        const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar el instrumento "${instrument.name}"?`);
+    const handleDeleteInstrument = (instrument) => {
+        setCurrentInstrument(instrument);
+        showFeedback('confirm', `¿Estás seguro que deseas eliminar el instrumento "${instrument.name}"?`);
+    };
 
-        if (!confirmDelete) {
-            return;
-        }
-
+    const confirmDeleteInstrument = async () => {
         try {
-            await deleteInstrument(instrument.id);
-            alert('Instrumento eliminado exitosamente');
+            await deleteInstrument(currentInstrument.id);
+            setFeedbackModal(false);
+            showFeedback('success', 'Instrumento eliminado exitosamente');
         } catch (error) {
             console.error('Error al eliminar instrumento:', error);
-            alert('Error al eliminar el instrumento');
+            showFeedback('error', 'Error al eliminar el instrumento');
         }
     };
 
@@ -489,11 +509,66 @@ const Instruments = () => {
                     </div>
                 </div>
             )}
+            
+            {/* Modal de Feedback */}
+            {feedbackModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                        {feedbackType === 'confirm' ? (
+                            <>
+                                <div className="flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined text-4xl text-yellow-500">help</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-4">Confirmar eliminación</h3>
+                                <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
+                                <div className="flex justify-center gap-4">
+                                    <button 
+                                        onClick={() => setFeedbackModal(false)}
+                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        onClick={confirmDeleteInstrument}
+                                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </>
+                        ) : feedbackType === 'success' ? (
+                            <>
+                                <div className="flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined text-4xl text-green-500">check_circle</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">¡Operación exitosa!</h3>
+                                <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined text-4xl text-red-500">error</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
+                                <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
+                                <div className="flex justify-center">
+                                    <button 
+                                        onClick={() => setFeedbackModal(false)}
+                                        className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-// Categories component - Solo con iconos predefinidos (sin imagen personalizada)
+// Categories component con modales estilizados para Create y Update
 const Categories = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
@@ -511,6 +586,8 @@ const Categories = () => {
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification,
         deleteSpecification, updateSpecification } = useInstrumentState();
     const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
+    // Nuevo estado para controlar página actual
+    const [currentPage, setCurrentPage] = useState(1);
     
     useEffect(() => {
         if (searchTerm) {
@@ -520,7 +597,6 @@ const Categories = () => {
             dispatch({ type: "SET_CATEGORIES", payload: filteredCategories });
         } else {
             dispatch({ type: "SET_CATEGORIES", payload: categories });
-
         }
     }, [searchTerm, categories]);
 
@@ -544,8 +620,6 @@ const Categories = () => {
     };
 
     const handleModalSubmit = async (e) => {
-        console.log('Modal submit');
-        
         e.preventDefault();
         const form = e.target;
 
@@ -557,24 +631,27 @@ const Categories = () => {
             description: form['category-description'].value,
             icon: icon // Siempre usar el valor del select, sin considerar imágenes personalizadas
         };
-        console.log('categoryData:', categoryData);
         
         try {
             if (modalMode === 'create') {
                 await addCategory(categoryData);
-                alert('Categoría creada con éxito');
+                // Reemplazando alert con modal de éxito
+                setSuccessMessage('Categoría creada con éxito');
+                setSuccessModalOpen(true);
             } else {
-                console.log('currentCategory:', currentCategory);
-                
                 await updateCategory(currentCategory.id, categoryData);
-                alert('Categoría actualizada con éxito');
+                // Reemplazando alert con modal de éxito
+                setSuccessMessage('Categoría actualizada con éxito');
+                setSuccessModalOpen(true);
             }
     
             setModalOpen(false);
             setPreviews([]);
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message);
+            // Reemplazando alert con modal de error
+            setErrorMessage(error.message || 'Ha ocurrido un error al procesar la categoría');
+            setErrorModalOpen(true);
         }
     };
 
@@ -583,7 +660,6 @@ const Categories = () => {
         setDeleteModalOpen(true);
     };
 
-    // Agregar esta nueva función para procesar la eliminación confirmada:
     const confirmDeleteCategory = async () => {
         if (!categoryToDelete) return;
 
@@ -591,32 +667,23 @@ const Categories = () => {
             // Obtener productos asociados
             const associatedProducts = instruments.filter(instrument => instrument.categoryId === categoryToDelete.id);	
 
-            // Eliminar productos asociados primero
-            // associatedProducts.forEach(async product => {
-            //     await deleteProduct(product.id);
-            // });
-
             // Eliminar la categoria
             await deleteCategory(categoryToDelete.id);
-
-            // Actualizar la lista de categorías
-            // loadCategories();
 
             // Cerrar el modal de eliminación
             setDeleteModalOpen(false);
 
             // Mostrar mensaje de éxito
-            setSuccessMessage('categoria y productos asociados eliminados exitosamente');
+            setSuccessMessage('Categoría y productos asociados eliminados exitosamente');
             setSuccessModalOpen(true);
 
             // Limpiar el estado
             setCategoryToDelete(null);
         } catch (error) {
-            console.error('Error al eliminar categoria:', error.response.data.error);
-            setErrorMessage(error.response.data.error);
+            console.error('Error al eliminar categoria:', error.response?.data?.error || error.message);
+            setErrorMessage(error.response?.data?.error || error.message);
             setErrorModalOpen(true);
-            setDeleteModalOpen(false)
-
+            setDeleteModalOpen(false);
         }
     };
 
@@ -860,6 +927,8 @@ const Categories = () => {
                     </div>
                 </div>
             )}
+            
+            {/* Modal de eliminación - Este no se modifica como solicitado */}
             {deleteModalOpen && categoryToDelete && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
@@ -963,25 +1032,20 @@ const Categories = () => {
                     </div>
                 </div>
             )}
+            
+            {/* Nuevo Modal de Éxito - Para reemplazar los alerts de creación/actualización */}
             {successModalOpen && (
-                <div className={styles.modal}>
-                    <div className={`${styles.modalContent} max-w-md`}>
-                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                            Operación Exitosa
-                        </h3>
-
-                        <div className="flex flex-col items-center gap-4 text-center">
-                            <div className="flex justify-center items-center h-16 w-16 rounded-full bg-green-100">
-                                <i className="fas fa-check text-green-500 text-3xl"></i>
-                            </div>
-
-                            <p className="text-gray-700">
-                                {successMessage}
-                            </p>
-
-                            <button
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                        <div className="flex items-center justify-center mb-4">
+                            <span className="material-symbols-outlined text-4xl text-green-500">check_circle</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">¡Operación exitosa!</h3>
+                        <p className="text-gray-600 mb-6 text-center">{successMessage}</p>
+                        <div className="flex justify-center">
+                            <button 
                                 onClick={() => setSuccessModalOpen(false)}
-                                className="bg-(--color-primary) hover:bg-(--color-secondary) w-[110px] text-white font-semibold py-1 px-4 rounded shadow-sm transition-colors duration-200 mt-2"
+                                className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                             >
                                 Aceptar
                             </button>
@@ -990,25 +1054,21 @@ const Categories = () => {
                 </div>
             )}
             
+            {/* Nuevo Modal de Error - Para reemplazar los alerts de error */}
             {errorModalOpen && (
-                <div className={styles.modal}>
-                    <div className={`${styles.modalContent} max-w-md`}>
-                        <h3 className="text-(--color-secondary) text-xl text-center font-bold mb-4">
-                            Error al eliminar categoría
-                        </h3>
-
-                        <div className="flex flex-col items-center gap-4 text-center">
-                                <i className="fas fa-times-circle text-red-500 text-5xl mb-2"></i>
-
-                            <p className="text-gray-700">
-                                {errorMessage}
-                            </p>
-
-                            <button
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                        <div className="flex items-center justify-center mb-4">
+                            <span className="material-symbols-outlined text-4xl text-red-500">error</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
+                        <p className="text-gray-600 mb-6 text-center">{errorMessage}</p>
+                        <div className="flex justify-center">
+                            <button 
                                 onClick={() => setErrorModalOpen(false)}
-                                className="bg-(--color-primary) hover:bg-(--color-secondary) w-[110px] text-white font-semibold py-1 px-4 rounded shadow-sm transition-colors duration-200 mt-2"
+                                className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
                             >
-                                Aceptar
+                                Cerrar
                             </button>
                         </div>
                     </div>
@@ -1018,14 +1078,16 @@ const Categories = () => {
     );
 };
 
-// Specifications component - Solo eliminando imagen personalizada pero manteniendo la funcionalidad original
-const Specifications = ( { instruments, specifications, addSpecification, updateSpecification, deleteSpecification } ) => {
+// Specifications component - Con modales profesionales en lugar de alerts
+const Specifications = ({ instruments, specifications, addSpecification, updateSpecification, deleteSpecification }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create');
     const [currentSpecification, setCurrentSpecification] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [previews, setPreviews] = useState([]);
-
+    const [feedbackModal, setFeedbackModal] = useState(false);
+    const [feedbackType, setFeedbackType] = useState('');
+    const [feedbackMessage, setFeedbackMessage] = useState('');
 
     // Estados para paginación
     const [currentPage, setCurrentPage] = useState(1);
@@ -1078,6 +1140,20 @@ const Specifications = ( { instruments, specifications, addSpecification, update
         }
     }, [modalOpen]);
 
+    // Función para mostrar los modales de feedback
+    const showFeedback = (type, message) => {
+        setFeedbackType(type);
+        setFeedbackMessage(message);
+        setFeedbackModal(true);
+        
+        // Autoclose success feedbacks after 2 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                setFeedbackModal(false);
+            }, 2000);
+        }
+    };
+
     const loadSpecifications = () => {
         try {
             const allSpecifications = specifications;
@@ -1103,7 +1179,7 @@ const Specifications = ( { instruments, specifications, addSpecification, update
             setTotalPages(Math.ceil(filteredSpecifications.length / itemsPerPage));
         } catch (error) {
             console.error('Error al cargar características:', error);
-            alert('Error al cargar las características');
+            showFeedback('error', 'Error al cargar las características');
         }
     };
 
@@ -1142,32 +1218,36 @@ const Specifications = ( { instruments, specifications, addSpecification, update
         try {
             if (modalMode === 'create') {
                 await addSpecification(specificationData);
-                alert('Característica creada con éxito');
-            } else {updateSpecification(currentSpecification.id, specificationData);
-                alert('Característica actualizada con éxito');
+                setModalOpen(false);
+                showFeedback('success', 'Característica creada con éxito');
+            } else {
+                await updateSpecification(currentSpecification.id, specificationData);
+                setModalOpen(false);
+                showFeedback('success', 'Característica actualizada con éxito');
             }
 
             loadSpecifications();
-            setModalOpen(false);
             setPreviews([]);
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message);
+            showFeedback('error', error.message || 'Error al procesar la solicitud');
         }
     };
 
-    const handleDeleteSpecification = async (specification) => {
-        const confirmDelete = window.confirm(`¿Estás seguro que deseas eliminar la característica "${specification.name}"?`);
+    const handleDeleteSpecification = (specification) => {
+        setCurrentSpecification(specification);
+        showFeedback('confirm', `¿Estás seguro que deseas eliminar la característica "${specification.label}"?`);
+    };
 
-        if (!confirmDelete) return;
-
+    const confirmDeleteSpecification = async () => {
         try {
-            await deleteSpecification(specification.id);
+            await deleteSpecification(currentSpecification.id);
+            setFeedbackModal(false);
+            showFeedback('success', 'Característica eliminada exitosamente');
             loadSpecifications();
-            alert('Característica eliminada exitosamente');
         } catch (error) {
             console.error('Error al eliminar característica:', error);
-            alert(error.message);
+            showFeedback('error', 'Error al eliminar la característica');
         }
     };
 
@@ -1419,6 +1499,61 @@ const Specifications = ( { instruments, specifications, addSpecification, update
                     </div>
                 </div>
             )}
+
+            {/* Modal de Feedback */}
+            {feedbackModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                        {feedbackType === 'confirm' ? (
+                            <>
+                                <div className="flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined text-4xl text-yellow-500">help</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-4">Confirmar eliminación</h3>
+                                <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
+                                <div className="flex justify-center gap-4">
+                                    <button 
+                                        onClick={() => setFeedbackModal(false)}
+                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        onClick={confirmDeleteSpecification}
+                                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </>
+                        ) : feedbackType === 'success' ? (
+                            <>
+                                <div className="flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined text-4xl text-green-500">check_circle</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">¡Operación exitosa!</h3>
+                                <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex items-center justify-center mb-4">
+                                    <span className="material-symbols-outlined text-4xl text-red-500">error</span>
+                                </div>
+                                <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
+                                <p className="text-gray-600 mb-6 text-center">{feedbackMessage}</p>
+                                <div className="flex justify-center">
+                                    <button 
+                                        onClick={() => setFeedbackModal(false)}
+                                        className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -1438,6 +1573,12 @@ const Users = () => {
     // Estados para el popup de confirmación
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [pendingRoleChange, setPendingRoleChange] = useState(null);
+    
+    // Nuevos estados para los modales de éxito y error
+    const [successModalOpen, setSuccessModalOpen] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorModalOpen, setErrorModalOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         // Al iniciar o cambiar users
@@ -1521,17 +1662,25 @@ const Users = () => {
             // Obtener el usuario actual para verificar que no se quite permisos a sí mismo
             const currentUser = getCurrentUser();
             if (currentUser && currentUser.id === pendingRoleChange.userId && pendingRoleChange.newRole !== 'ADMIN') {
-                alert('No puedes quitarte permisos de administrador a ti mismo');
+                // Reemplazar el alert con modal de error
+                setErrorMessage('No puedes quitarte permisos de administrador a ti mismo');
+                setErrorModalOpen(true);
                 setShowConfirmation(false);
                 return;
             }
 
             await updateUserRole(pendingRoleChange.userId, pendingRoleChange.newRole);
             filterAndPaginateUsers(); // Actualizar la lista después del cambio
-            alert(`Permisos actualizados correctamente`);
+            
+            // Reemplazar el alert con modal de éxito
+            setSuccessMessage('Permisos actualizados correctamente');
+            setSuccessModalOpen(true);
         } catch (error) {
             console.error('Error al cambiar permisos:', error);
-            alert(`Error al cambiar permisos: ${error.message}`);
+            
+            // Reemplazar el alert con modal de error
+            setErrorMessage(`Error al cambiar permisos: ${error.message}`);
+            setErrorModalOpen(true);
         } finally {
             // Cerrar el popup y limpiar el estado
             setShowConfirmation(false);
@@ -1726,6 +1875,48 @@ const Users = () => {
                     </div>
                 </div>
             )}
+
+            {/* Modal de Éxito - Reemplaza los alerts de éxito */}
+            {successModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                        <div className="flex items-center justify-center mb-4">
+                            <span className="material-symbols-outlined text-4xl text-green-500">check_circle</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">¡Operación exitosa!</h3>
+                        <p className="text-gray-600 mb-6 text-center">{successMessage}</p>
+                        <div className="flex justify-center">
+                            <button 
+                                onClick={() => setSuccessModalOpen(false)}
+                                className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
+                            >
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Modal de Error - Reemplaza los alerts de error */}
+            {errorModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+                        <div className="flex items-center justify-center mb-4">
+                            <span className="material-symbols-outlined text-4xl text-red-500">error</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-center text-(--color-secondary) mb-2">Error</h3>
+                        <p className="text-gray-600 mb-6 text-center">{errorMessage}</p>
+                        <div className="flex justify-center">
+                            <button 
+                                onClick={() => setErrorModalOpen(false)}
+                                className="px-4 py-2 bg-(--color-primary) text-white rounded-md hover:bg-(--color-secondary) transition"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -1743,7 +1934,15 @@ const Admin = () => {
     }, []);
     const { instruments, specifications, loading: instrumentsLoading, addInstrument, updateInstrument, deleteInstrument, addSpecification, updateSpecification, deleteSpecification } = useInstrumentState();
     const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useCategoryState();
-    
+    const instrumentsWithCategories = instruments.map(instrument => {
+        const category = categories.find(category => category.id === instrument.categoryId);
+        //falta eliminar categoryId de instrument
+        const { categoryId, ...instrumentWithoutCategoryId } = instrument;
+        return {
+            ...instrumentWithoutCategoryId,
+            category
+        };
+    });
     // const navigate = useNavigate();
     // // const [user, setUser] = useState(null);
 
@@ -1834,7 +2033,7 @@ const Admin = () => {
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="instruments" element={<Instruments />} />
                             <Route path="specifications" element={<Specifications instruments={instruments} specifications={specifications} addSpecification={addSpecification} updateSpecification={updateSpecification} deleteSpecification={deleteSpecification} />} />
-                            <Route path="rentals" element={<ReservationsModal instruments={instruments}/>} />
+                            <Route path="rentals" element={<ReservationsModal instruments={instrumentsWithCategories}/>} />
                             <Route path="categories" element={<Categories />} />
                             <Route path="users" element={<Users />} />
                             <Route path="" element={<Navigate to="dashboard" replace />} />
