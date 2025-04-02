@@ -185,7 +185,7 @@ function Reservation() {
 
             const minAvailableStockForSelectedDates = Math.min(...instrument.availability.map(i => i.availableStock))
 
-            if ( minAvailableStockForSelectedDates > 0) {
+            if (minAvailableStockForSelectedDates > 0) {
                 return minAvailableStockForSelectedDates;
             }
 
@@ -515,12 +515,12 @@ function Reservation() {
                                                 <h4 className="font-medium text-gray-700 mb-2">Información destacada:</h4>
                                                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                     {instrument.specifications.slice(0, 4).map((spec, idx) => (
-                                                        <li key={idx} className="text-sm flex items-center gap-1">
-                                                            <div className="w-8 h-8 flex items-center justify-center bg-(--color-sunset) rounded-full">
-                                                                <i className={`fas ${spec.specification.icon} text-(--color-secondary)`}></i>
+                                                        <li key={idx} className="text-sm flex items-center gap-2">
+                                                            <div className="w-8 h-8 flex items-center justify-center bg-(--color-sunset) rounded-full shrink-0">
+                                                                <i className={`fas ${spec.specification.icon || 'fa-tag'} text-(--color-secondary) text-base`}></i>
                                                             </div>
-                                                            <span>{console.log(instrument.specifications.slice(0, 4))}
-                                                                <strong>{spec.specification.label}:</strong> {spec.spValue}
+                                                            <span>
+                                                                <strong>{spec.specification.name || spec.specification.label}:</strong> {spec.spValue}
                                                             </span>
                                                         </li>
                                                     ))}
@@ -545,9 +545,9 @@ function Reservation() {
                                         <div className="mb-2 md:mb-0">
                                             <div className="font-medium">
                                                 {
-                                                 currentUser?.username && currentUser?.lastname
-                                                    ? `${currentUser.username} ${currentUser.lastname}`
-                                                    : "Usuario"
+                                                    currentUser?.username && currentUser?.lastname
+                                                        ? `${currentUser.username} ${currentUser.lastname}`
+                                                        : "Usuario"
                                                 }
                                             </div>
                                             <div className="text-gray-500 text-sm mt-1">
@@ -622,7 +622,7 @@ function Reservation() {
                                         Cancelar
                                     </button>
                                 </div>
-                                
+
                             </div>
                         )}
 
