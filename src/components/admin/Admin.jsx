@@ -109,18 +109,18 @@ const Instruments = () => {
 
     const handleModalSubmit = async (e) => {
         e.preventDefault();
-
+    
         const form = e.target;
         const fileInput = document.getElementById('instrument-images');
         const newImages = Array.from(fileInput.files);
         const imagesAdj = fileInput.files;
-
+    
         // Validación de imágenes SOLO para creación
         if (modalMode === 'create' && (newImages.length < 1 || newImages.length > 6)) {
             showFeedback('error', 'Debes seleccionar entre 1 y 6 imágenes');
             return;
         }
-
+    
         try {
             // Convertir nuevas imágenes solo si hay
             const newImageUrls = newImages.length > 0
@@ -132,7 +132,7 @@ const Instruments = () => {
                     });
                 }))
                 : [];
-
+    
             // Recopilar especificaciones
             const productSpecifications = specifications
                 .map(spec => {
@@ -143,7 +143,7 @@ const Instruments = () => {
                     } : null;
                 })
                 .filter(spec => spec !== null);
-
+    
             // Usar valores existentes si los campos están vacíos
             const instrumentData = {
                 name: form['instrument-name'].value.trim() || currentInstrument?.name,
@@ -155,7 +155,7 @@ const Instruments = () => {
                 mainImage: existingImages[0]?.url || currentInstrument?.mainImage,
                 specifications: productSpecifications.length > 0 ? productSpecifications : currentInstrument?.specifications
             };
-
+    
             if (modalMode === 'create') {
                 await addInstrument(instrumentData, imagesAdj);
                 setModalOpen(false);
@@ -165,12 +165,29 @@ const Instruments = () => {
                 setModalOpen(false);
                 showFeedback('success', 'Instrumento actualizado con éxito');
             }
-
+    
             setPreviews([]);
             setExistingImages([]);
         } catch (error) {
             console.error('Error:', error);
-            showFeedback('error', error.message || 'Error al procesar la solicitud');
+            // Cerrar modal primero
+            setModalOpen(false);
+            setPreviews([]);
+            setExistingImages([]);
+    
+            // Extraer mensaje del error
+            const serverError = error.response?.data;
+            const errorMessage = 
+                serverError?.error?.toLowerCase().includes("duplicate") ? 
+                    "Ya existe un instrumento con este nombre. Por favor usa un nombre único." :
+                serverError?.message?.toLowerCase().includes("duplicate") ? 
+                    "El nombre del instrumento ya está registrado." :
+                serverError?.error ? serverError.error :
+                serverError?.message ? serverError.message :
+                error.message?.includes("400") ? "Ya existe un instrumento con este nombre. Por favor usa un nombre único." :
+                'Error al procesar la solicitud';
+    
+            showFeedback('error', errorMessage);
         }
     };
 
