@@ -41,7 +41,20 @@ function CardDetails() {
     const [loadingAvailability, setLoadingAvailability] = useState(true);
     const [availabilityError, setAvailabilityError] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null); // Para compartir producto
+    const [notification, setNotification] = useState({
+        show: false,
+        type: '',
+        message: ''
+    });
 
+    // Replace existing alerts with this function
+    const showNotification = (message, type = 'info') => {
+        setNotification({
+            show: true,
+            type,
+            message
+        });
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -124,14 +137,14 @@ function CardDetails() {
     const handleDateSelect = (dates) => {
         setSelectedDates(dates);
     };
-
     const handleToggleFavorite = async () => {
         try {
             await toggleFavorite(instrument);
         } catch (error) {
-            alert("Inicia Sesión para interactuar.");
+            showNotification("Inicia Sesión para interactuar.", 'error');
         }
     };
+
 
     // Calcular el precio total basado en las fechas seleccionadas
     // Utilizando un enfoque más preciso para el cálculo de días
@@ -238,7 +251,10 @@ function CardDetails() {
                             <i className={`fa${isLiked ? 's' : 'r'} fa-heart`}></i>
                         </button>
                     ) : (
-                        <button className="cursor-pointer" onClick={() => alert("Inicia Sesión para interactuar.")}>
+                        <button
+                            className="cursor-pointer"
+                            onClick={() => showNotification("Inicia Sesión para interactuar.", 'error')}
+                        >
                             <i className="far fa-heart disabled:text-gray-100"></i>
                         </button>
                     )}
@@ -477,6 +493,37 @@ function CardDetails() {
             {/* Modal de Compartir Producto */}
             {selectedProduct && (
                 <ShareProduct product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+            )}
+            {notification.show && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className={`
+            bg-white rounded-lg shadow-xl p-6 max-w-md w-full
+            ${notification.type === 'error' ? 'border-2 border-red-500' :
+                            notification.type === 'success' ? 'border-2 border-green-500' : 'border-2 border-blue-500'}
+        `}>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold text-(--color-secondary)">
+                                {notification.type === 'error' ? 'Error' :
+                                    notification.type === 'success' ? 'Éxito' : 'Información'}
+                            </h3>
+                            <button
+                                onClick={() => setNotification({ show: false, type: '', message: '' })}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <p className="text-gray-700">{notification.message}</p>
+                        <div className="mt-4 flex justify-end">
+                            <button
+                                onClick={() => setNotification({ show: false, type: '', message: '' })}
+                                className="bg-(--color-secondary) text-white px-4 py-2 rounded-lg hover:bg-(--color-primary)"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
             <WhatsAppChat />
         </div>
