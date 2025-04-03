@@ -8,6 +8,11 @@ import EmailConfirmationService from "../../services/emailConfirmationService";
 import WhatsAppChat from '../crossSections/WhatsAppChat';
 
 function Reservation() {
+
+    useEffect(() => {
+        // Hacer scroll al inicio de la página cuando el componente se monta
+        window.scrollTo(0,0);
+      }, []);
     useEffect(() => {
         const link = document.createElement("link");
         link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
@@ -261,6 +266,15 @@ function Reservation() {
             }
         }
     }, [instrument, selectedDates.startDate]);
+    // Añadir este useEffect después de los otros useEffects en el componente
+useEffect(() => {
+    if (reservationSuccess) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'  // Para un desplazamiento suave
+      });
+    }
+  }, [reservationSuccess]);
 
     const handleReservationSubmit = async (e) => {
         e.preventDefault();
