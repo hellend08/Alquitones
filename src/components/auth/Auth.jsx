@@ -1,13 +1,16 @@
 // Auth.jsx - Simplified email sending
 import { useState, useEffect } from 'react';
-import { localDB } from '../../database/LocalDB';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthState, useAuthDispatch } from '../../context/AuthContext';
+
 import styles from './Auth.module.css';
-import EmailConfirmationService from '../../services/emailConfirmationService';
+// import EmailConfirmationService from '../../services/emailConfirmationService';
 
 const Auth = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { login, error, loading, register } = useAuthState();
+    const dispatch = useAuthDispatch();
     const [activeForm, setActiveForm] = useState('login');
     const [formData, setFormData] = useState({
         firstName: '',
@@ -16,8 +19,6 @@ const Auth = () => {
         password: '',
         confirmPassword: ''
     });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
 
     // Check URL and set active form accordingly
     useEffect(() => {
@@ -34,23 +35,23 @@ const Auth = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
-        setError('');
+        dispatch({ type: 'SET_ERROR', payload: '' });
     };
 
     const validateForm = () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|co|io|info|biz)$/;
         if (!emailRegex.test(formData.email)) {
-            setError('Por favor ingrese un correo electrónico válido con un dominio reconocido');
+            dispatch({ type: 'SET_ERROR', payload: 'Por favor ingrese un correo electrónico válido con un dominio reconocido' });
             return false;
         }
 
         if (formData.password.length < 6) {
-            setError('La contraseña debe tener al menos 6 caracteres');
+            dispatch({ type: 'SET_ERROR', payload: 'La contraseña debe tener al menos 6 caracteres' });
             return false;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            setError('Las contraseñas no coinciden');
+            dispatch({ type: 'SET_ERROR', payload: 'Las contraseñas no coinciden' });
             return false;
         }
 
@@ -60,52 +61,46 @@ const Auth = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
+            dispatch({ type: 'SET_LOADING' });
             if (!validateForm()) {
                 return;
             }
-            
-            setLoading(true);
-            
+
             const userData = {
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                username: `${formData.firstName} ${formData.lastName}`,
+                lastname: formData.lastName,
+                username: formData.firstName,
                 email: formData.email,
                 password: formData.password,
-                role: 'client'
             };
-            
+
             // Crear el usuario en la base de datos local
-            await localDB.createUser(userData);
-            
+            await register(userData);
+
             // Mantener el envío del correo de bienvenida
-            const emailResult = await EmailConfirmationService.sendWelcomeEmail(userData);
-            
-            if (emailResult.success) {
-                setActiveForm('login');
-                setError('Registro exitoso. Se ha enviado un correo de bienvenida.');
-                
-                // Limpiar formulario
-                setFormData({
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    password: '',
-                    confirmPassword: ''
-                });
-                
-                // Opcional: redirigir después de un breve retraso
-                setTimeout(() => {
-                    navigate('/login');
-                }, 2000);
-            } else {
-                // Si el email falló
-                setError('Tu cuenta fue creada pero hubo un problema al enviar el correo.');
-            }
+            // const emailResult = await EmailConfirmationService.sendWelcomeEmail(userData);
+
+            // if (emailResult.success) {
+            //     setActiveForm('login');
+            dispatch({ type: 'SET_ERROR', payload: "¡Registro Exitoso! Es necesario verificar tu correo electrónico para continuar.\nHemos enviado un enlace de verificación a tu dirección de correo.\nPor favor, revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta." });
+            // Limpiar formulario
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            });
+
+            // Opcional: redirigir después de un breve retraso
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
+            // } else {
+            //     // Si el email falló
+            //     dispatch({ type: 'SET_ERROR', payload: 'Tu cuenta fue creada pero hubo un problema al enviar el correo.' });
+            // }
         } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
+            dispatch({ type: 'SET_ERROR', payload: error.message });
         }
     };
 
@@ -119,16 +114,16 @@ const Auth = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            setLoading(true);
-            
-            const user = await localDB.login(formData.email, formData.password);
+            dispatch({ type: 'SET_LOADING' });
+
+            const user = await login(formData.email, formData.password);
+            console.log("Usuario autenticado: ", user);
             if (user) {
-                navigate(user.role === 'admin' ? '/administracion' : '/');
+                navigate(user.role === 'ADMIN' ? '/administracion' : '/');
             }
         } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
+            console.error("Error en el inicio de sesión: ", error.message);
+            dispatch({ type: 'SET_ERROR', payload: error.message });
         }
     };
 
@@ -140,8 +135,7 @@ const Auth = () => {
                 </div>
 
                 {error && (
-                    <div className={`${styles.errorMessage} ${error.includes('exitoso') ? styles.success : ''}`}>
-                        {error}
+                    <div className={`${styles.errorMessage} ${error.toLowerCase().includes('exitoso') ? styles.success : ''}`}>                        {error}
                     </div>
                 )}
 
@@ -206,8 +200,8 @@ const Auth = () => {
                             />
                             {formData.password && (
                                 <div className={`${styles.passwordStrength} ${styles[getPasswordStrength(formData.password)]}`}>
-                                    Fuerza: {getPasswordStrength(formData.password) === 'debil' ? 'Débil' : 
-                                            getPasswordStrength(formData.password) === 'media' ? 'Media' : 'Fuerte'}
+                                    Fuerza: {getPasswordStrength(formData.password) === 'debil' ? 'Débil' :
+                                        getPasswordStrength(formData.password) === 'media' ? 'Media' : 'Fuerte'}
                                 </div>
                             )}
                         </div>
@@ -225,8 +219,8 @@ const Auth = () => {
                                 placeholder="Ingresa nuevamente tu contraseña"
                             />
                         </div>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="p-2 mt-8 bg-(--color-primary) text-white font-semibold rounded hover:bg-(--color-secondary) transition-colors duration-200 cursor-pointer"
                             disabled={loading}
                         >
@@ -264,8 +258,8 @@ const Auth = () => {
                                 placeholder="Ingresa tu contraseña"
                             />
                         </div>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="p-2 mt-8 bg-(--color-primary) text-white font-semibold rounded hover:bg-(--color-secondary) transition-colors duration-200 cursor-pointer"
                             disabled={loading}
                         >

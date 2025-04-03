@@ -4,175 +4,194 @@ class LocalDB {
         this.data = {
             // En LocalDB.jsx, actualiza categories:
             categories: [
-                { id: 1, name: 'Cuerdas', icon: '/src/assets/icons/guitar.png', description: 'Instrumentos de cuerda' },
-                { id: 2, name: 'Viento', icon: '/src/assets/icons/flute.png', description: 'Instrumentos de viento' },
-                { id: 3, name: 'Percusión', icon: '/src/assets/icons/drums.png', description: 'Instrumentos de percusión' },
-                { id: 4, name: 'Teclados', icon: '/src/assets/icons/piano.png', description: 'Instrumentos de teclado' }
+                { id: 1, name: 'Cuerdas', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/banjo.png', description: 'Instrumentos de cuerda' },
+                { id: 2, name: 'Viento', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/french-horn.png', description: 'Instrumentos de viento' },
+                { id: 3, name: 'Percusión', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/drum.png', description: 'Instrumentos de percusión' },
+                { id: 4, name: 'Teclados', icon: 'https://alquitones.s3.us-east-2.amazonaws.com/piano-keys.png', description: 'Instrumentos de teclado' }
             ],
             users: [
                 {
                     id: 1,
                     username: 'admin',
+                    lastname: 'todopoderoso',
                     email: 'admin@alquitones.com',
-                    password: 'admin123',
-                    role: 'admin',
+                    password: 'admin123456',
+                    role: 'ADMIN',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 2,
                     username: 'cliente1',
+                    lastname: 'apellido1',
                     email: 'cliente@alquitones.com',
                     password: 'cliente123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 3,
-                    username: 'mariaperez',
+                    username: 'maria',
+                    lastname: 'perez',
                     email: 'maria@ejemplo.com',
                     password: 'maria123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 4,
-                    username: 'juangarcia',
+                    username: 'juan',
+                    lastname: 'garcia',
                     email: 'juan@ejemplo.com',
                     password: 'juan123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 5,
-                    username: 'carlosmendez',
+                    username: 'carlos',
+                    lastname: 'mendez',
                     email: 'carlos@ejemplo.com',
                     password: 'carlos123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 6,
-                    username: 'luisafernandez',
+                    username: 'luisa',
+                    lastname: 'fernandez',
                     email: 'luisa@ejemplo.com',
                     password: 'luisa123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 7,
-                    username: 'pedroramirez',
+                    username: 'pedro',
+                    lastname: 'ramirez',
                     email: 'pedro@ejemplo.com',
                     password: 'pedro123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 8,
-                    username: 'sofiavega',
+                    username: 'sofia',
+                    lastname: 'vega',
                     email: 'sofia@ejemplo.com', 
                     password: 'sofia123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 9,
-                    username: 'davidmartinez',
+                    username: 'david',
+                    lastname: 'martinez',
                     email: 'david@ejemplo.com',
                     password: 'david123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 10,
-                    username: 'anaromero',
+                    username: 'ana',
+                    lastname: 'romero',
                     email: 'ana@ejemplo.com',
                     password: 'ana123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 11,
-                    username: 'josegonzalez',
+                    username: 'jose',
+                    lastname: 'gonzalez',
                     email: 'jose@ejemplo.com',
                     password: 'jose123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: false
                 },
                 {
                     id: 12,
-                    username: 'laurarodriguez',
+                    username: 'laura',
+                    lastname: 'rodriguez',
                     email: 'laura@ejemplo.com',
                     password: 'laura123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 13,
-                    username: 'albertorivas',
+                    username: 'alberto',
+                    lastname: 'rivas',
                     email: 'alberto@ejemplo.com',
                     password: 'alberto123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 14,
-                    username: 'martacortes',
+                    username: 'marta',
+                    lastname: 'cortes',
                     email: 'marta@ejemplo.com',
                     password: 'marta123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 15,
-                    username: 'felipeduran',
+                    username: 'felipe',
+                    lastname: 'duran',
                     email: 'felipe@ejemplo.com',
                     password: 'felipe123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 16,
-                    username: 'paolaherrera',
+                    username: 'paola',
+                    lastname: 'herrera',
                     email: 'paola@ejemplo.com',
                     password: 'paola123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: true
                 },
                 {
                     id: 17,
-                    username: 'robertocastro',
+                    username: 'roberto',
+                    lastname: 'castro',
                     email: 'roberto@ejemplo.com',
                     password: 'roberto123',
-                    role: 'client',
+                    role: 'USER',
                     createdAt: new Date().toISOString(),
                     isActive: false
                 }
             ],
 
+            ratings: [],
+
             // En el constructor de LocalDB, actualiza el array specifications:
             specifications: [
-                { id: 1, name: 'Marca', description: 'Marca del instrumento', icon: 'fa-trademark' },
-                { id: 2, name: 'Modelo', description: 'Modelo específico del instrumento', icon: 'fa-cube' },
-                { id: 3, name: 'Material', description: 'Material principal del instrumento', icon: 'fa-tree' },
-                { id: 4, name: 'Tipo', description: 'Tipo o clasificación del instrumento', icon: 'fa-shapes' },
-                { id: 5, name: 'Características técnicas', description: 'Detalles técnicos específicos', icon: 'fa-cogs' },
-                { id: 6, name: 'Accesorios', description: 'Elementos incluidos con el instrumento', icon: 'fa-plug' }
+                { id: 1, label: 'Marca', description: 'Marca del instrumento', icon: 'fa-trademark' },
+                { id: 2, label: 'Modelo', description: 'Modelo específico del instrumento', icon: 'fa-cube' },
+                { id: 3, label: 'Material', description: 'Material principal del instrumento', icon: 'fa-tree' },
+                { id: 4, label: 'Tipo', description: 'Tipo o clasificación del instrumento', icon: 'fa-shapes' },
+                { id: 5, label: 'Características técnicas', description: 'Detalles técnicos específicos', icon: 'fa-cogs' },
+                { id: 6, label: 'Accesorios', description: 'Elementos incluidos con el instrumento', icon: 'fa-plug' }
             ],
             products: [
                 // CUERDAS (ID: 1)
@@ -194,11 +213,28 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/02.PNG',
                         'https://alquitones.s3.us-east-2.amazonaws.com/03.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/04.jpg',
-                        'https://alquitones.s3.us-east-2.amazonaws.com/05.webp',
+                        'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
                         'https://alquitones.s3.us-east-2.amazonaws.com/06.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/05.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-15", availableStock: 3 },
+  { date: "2025-03-16", availableStock: 2 },
+  { date: "2025-03-17", availableStock: 5 },
+  { date: "2025-03-18", availableStock: 4 },
+  { date: "2025-03-19", availableStock: 3 },
+  { date: "2025-03-20", availableStock: 2 },
+  { date: "2025-03-21", availableStock: 1 },
+  { date: "2025-03-27", availableStock: 2 },
+  { date: "2025-03-28", availableStock: 3 },
+  { date: "2025-03-29", availableStock: 4 },
+  { date: "2025-03-30", availableStock: 2 },
+  { date: "2025-04-05", availableStock: 1 },
+  { date: "2025-04-06", availableStock: 1 },
+  { date: "2025-04-12", availableStock: 2 },
+  { date: "2025-04-13", availableStock: 3 }
+                      ]
                 },
                 {
                     id: 2,
@@ -228,7 +264,25 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/3.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-18", availableStock: 2 },
+                        { date: "2025-03-19", availableStock: 2 },
+                        { date: "2025-03-20", availableStock: 2 },
+                        { date: "2025-03-21", availableStock: 2 },
+                        { date: "2025-03-22", availableStock: 2 },
+                        { date: "2025-04-01", availableStock: 3 },
+                        { date: "2025-04-02", availableStock: 3 },
+                        { date: "2025-04-03", availableStock: 3 },
+                        { date: "2025-04-04", availableStock: 3 },
+                        { date: "2025-04-05", availableStock: 3 },
+                        { date: "2025-04-15", availableStock: 1 },
+                        { date: "2025-04-16", availableStock: 1 },
+                        { date: "2025-04-17", availableStock: 1 },
+                        { date: "2025-05-01", availableStock: 4 },
+                        { date: "2025-05-02", availableStock: 4 },
+                        { date: "2025-05-03", availableStock: 4 }
+                      ]
                 },
                 {
                     id: 3,
@@ -258,7 +312,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/11.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-15", availableStock: 1 },
+                        { date: "2025-03-17", availableStock: 1 },
+                        { date: "2025-03-19", availableStock: 1 },
+                        { date: "2025-03-21", availableStock: 1 },
+                        { date: "2025-03-23", availableStock: 1 },
+                        { date: "2025-04-02", availableStock: 2 },
+                        { date: "2025-04-04", availableStock: 2 },
+                        { date: "2025-04-06", availableStock: 2 },
+                        { date: "2025-04-08", availableStock: 2 },
+                        { date: "2025-04-10", availableStock: 2 },
+                        { date: "2025-05-03", availableStock: 3 },
+                        { date: "2025-05-05", availableStock: 3 },
+                        { date: "2025-05-07", availableStock: 3 },
+                        { date: "2025-05-09", availableStock: 3 },
+                        { date: "2025-05-11", availableStock: 3 }
+                      ]
                 },
 
                 // VIENTO (ID: 2)
@@ -290,7 +361,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/24.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-25", availableStock: 1 },
+  { date: "2025-03-26", availableStock: 1 },
+  { date: "2025-03-27", availableStock: 1 },
+  { date: "2025-04-05", availableStock: 5 },
+  { date: "2025-04-06", availableStock: 5 },
+  { date: "2025-04-07", availableStock: 5 },
+  { date: "2025-04-08", availableStock: 5 },
+  { date: "2025-04-09", availableStock: 5 },
+  { date: "2025-04-15", availableStock: 4 },
+  { date: "2025-04-16", availableStock: 4 },
+  { date: "2025-04-17", availableStock: 4 },
+  { date: "2025-04-18", availableStock: 4 },
+  { date: "2025-05-10", availableStock: 2 },
+  { date: "2025-05-11", availableStock: 2 },
+  { date: "2025-05-12", availableStock: 2 }
+                      ]
                 },
                 {
                     id: 5,
@@ -320,7 +408,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/32.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-20", availableStock: 2 },
+  { date: "2025-03-21", availableStock: 2 },
+  { date: "2025-03-22", availableStock: 2 },
+  { date: "2025-04-01", availableStock: 3 },
+  { date: "2025-04-02", availableStock: 3 },
+  { date: "2025-04-03", availableStock: 3 },
+  { date: "2025-04-10", availableStock: 4 },
+  { date: "2025-04-11", availableStock: 4 },
+  { date: "2025-04-12", availableStock: 4 },
+  { date: "2025-04-20", availableStock: 2 },
+  { date: "2025-04-21", availableStock: 2 },
+  { date: "2025-04-22", availableStock: 2 },
+  { date: "2025-05-05", availableStock: 1 },
+  { date: "2025-05-06", availableStock: 1 },
+  { date: "2025-05-07", availableStock: 1 }
+                      ]
                 },
                 {
                     id: 6,
@@ -350,7 +455,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/41.webp',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-15", availableStock: 1 },
+  { date: "2025-03-16", availableStock: 1 },
+  { date: "2025-03-17", availableStock: 1 },
+  { date: "2025-03-18", availableStock: 1 },
+  { date: "2025-03-19", availableStock: 1 },
+  { date: "2025-04-10", availableStock: 1 },
+  { date: "2025-04-11", availableStock: 1 },
+  { date: "2025-04-12", availableStock: 1 },
+  { date: "2025-04-13", availableStock: 1 },
+  { date: "2025-04-14", availableStock: 1 },
+  { date: "2025-05-01", availableStock: 1 },
+  { date: "2025-05-02", availableStock: 1 },
+  { date: "2025-05-03", availableStock: 1 },
+  { date: "2025-05-04", availableStock: 1 },
+  { date: "2025-05-05", availableStock: 1 }
+                      ]
                 },
 
                 // PERCUSIÓN (ID: 3)
@@ -383,7 +505,25 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/50.PNG',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-22", availableStock: 6 },
+  { date: "2025-03-23", availableStock: 6 },
+  { date: "2025-03-29", availableStock: 6 },
+  { date: "2025-03-30", availableStock: 6 },
+  { date: "2025-04-05", availableStock: 5 },
+  { date: "2025-04-06", availableStock: 5 },
+  { date: "2025-04-12", availableStock: 5 },
+  { date: "2025-04-13", availableStock: 5 },
+  { date: "2025-04-19", availableStock: 5 },
+  { date: "2025-04-20", availableStock: 5 },
+  { date: "2025-05-03", availableStock: 4 },
+  { date: "2025-05-04", availableStock: 4 },
+  { date: "2025-05-10", availableStock: 4 },
+  { date: "2025-05-11", availableStock: 4 },
+  { date: "2025-05-17", availableStock: 4 },
+  { date: "2025-05-18", availableStock: 4 }
+                      ]
                 },
                 {
                     id: 8,
@@ -414,7 +554,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/61.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-18", availableStock: 2 },
+  { date: "2025-03-19", availableStock: 3 },
+  { date: "2025-03-20", availableStock: 4 },
+  { date: "2025-03-21", availableStock: 3 },
+  { date: "2025-03-22", availableStock: 2 },
+  { date: "2025-04-08", availableStock: 1 },
+  { date: "2025-04-09", availableStock: 2 },
+  { date: "2025-04-10", availableStock: 3 },
+  { date: "2025-04-11", availableStock: 2 },
+  { date: "2025-04-12", availableStock: 1 },
+  { date: "2025-05-05", availableStock: 5 },
+  { date: "2025-05-06", availableStock: 4 },
+  { date: "2025-05-07", availableStock: 3 },
+  { date: "2025-05-08", availableStock: 2 },
+  { date: "2025-05-09", availableStock: 1 }
+                      ]
                 },
                 {
                     id: 9,
@@ -444,7 +601,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/73.webp',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-12", availableStock: 3 },
+                        { date: "2025-03-13", availableStock: 3 },
+                        { date: "2025-03-14", availableStock: 3 },
+                        { date: "2025-03-15", availableStock: 3 },
+                        { date: "2025-03-16", availableStock: 3 },
+                        { date: "2025-04-10", availableStock: 2 },
+                        { date: "2025-04-11", availableStock: 2 },
+                        { date: "2025-04-12", availableStock: 2 },
+                        { date: "2025-04-13", availableStock: 2 },
+                        { date: "2025-04-14", availableStock: 2 },
+                        { date: "2025-05-15", availableStock: 4 },
+                        { date: "2025-05-16", availableStock: 4 },
+                        { date: "2025-05-17", availableStock: 4 },
+                        { date: "2025-05-18", availableStock: 4 },
+                        { date: "2025-05-19", availableStock: 4 }
+                      ]
                 },
 
                 // TECLADOS (ID: 4)
@@ -477,7 +651,25 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/81.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-10", availableStock: 2 },
+                        { date: "2025-03-11", availableStock: 2 },
+                        { date: "2025-03-12", availableStock: 2 },
+                        { date: "2025-03-13", availableStock: 2 },
+                        { date: "2025-04-07", availableStock: 3 },
+                        { date: "2025-04-08", availableStock: 3 },
+                        { date: "2025-04-09", availableStock: 3 },
+                        { date: "2025-04-10", availableStock: 3 },
+                        { date: "2025-05-05", availableStock: 1 },
+                        { date: "2025-05-06", availableStock: 1 },
+                        { date: "2025-05-07", availableStock: 1 },
+                        { date: "2025-05-08", availableStock: 1 },
+                        { date: "2025-05-25", availableStock: 4 },
+                        { date: "2025-05-26", availableStock: 4 },
+                        { date: "2025-05-27", availableStock: 4 },
+                        { date: "2025-05-28", availableStock: 4 }
+                      ]
                 },
                 {
                     id: 11,
@@ -508,7 +700,24 @@ class LocalDB {
 
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/93.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-05", availableStock: 1 },
+                        { date: "2025-03-06", availableStock: 1 },
+                        { date: "2025-03-07", availableStock: 1 },
+                        { date: "2025-03-08", availableStock: 1 },
+                        { date: "2025-03-09", availableStock: 1 },
+                        { date: "2025-04-15", availableStock: 2 },
+                        { date: "2025-04-16", availableStock: 2 },
+                        { date: "2025-04-17", availableStock: 2 },
+                        { date: "2025-04-18", availableStock: 2 },
+                        { date: "2025-04-19", availableStock: 2 },
+                        { date: "2025-05-10", availableStock: 3 },
+                        { date: "2025-05-11", availableStock: 3 },
+                        { date: "2025-05-12", availableStock: 3 },
+                        { date: "2025-05-13", availableStock: 3 },
+                        { date: "2025-05-14", availableStock: 3 }
+                      ]
                 },
                 {
                     id: 12,
@@ -533,7 +742,22 @@ class LocalDB {
                         'https://alquitones.s3.us-east-2.amazonaws.com/115.jpg'
                     ],
                     mainImage: 'https://alquitones.s3.us-east-2.amazonaws.com/114.jpg',
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    availability: [
+                        { date: "2025-03-08", availableStock: 7 },
+                        { date: "2025-03-15", availableStock: 7 },
+                        { date: "2025-03-22", availableStock: 7 },
+                        { date: "2025-03-29", availableStock: 7 },
+                        { date: "2025-04-05", availableStock: 6 },
+                        { date: "2025-04-12", availableStock: 6 },
+                        { date: "2025-04-19", availableStock: 6 },
+                        { date: "2025-04-26", availableStock: 6 },
+                        { date: "2025-05-03", availableStock: 5 },
+                        { date: "2025-05-10", availableStock: 5 },
+                        { date: "2025-05-17", availableStock: 5 },
+                        { date: "2025-05-24", availableStock: 5 },
+                        { date: "2025-05-31", availableStock: 5 }
+                      ]
                 }
             ]
         };
@@ -572,6 +796,9 @@ class LocalDB {
     saveToStorage() {
         localStorage.setItem('alquitonesDB', JSON.stringify(this.data));
     }
+
+
+    
 
 
     // Añadir estos métodos en LocalDB.jsx, dentro de la clase LocalDB
@@ -666,18 +893,18 @@ class LocalDB {
         }
     
         // Verificar que los campos requeridos estén presentes
-        if (!userData.firstName || !userData.lastName || !userData.email || !userData.password) {
+        if (!userData.username || !userData.lastname || !userData.email || !userData.password) {
             throw new Error('Todos los campos son obligatorios');
         }
     
         const newUser = {
             id: this.data.users.length + 1,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            username: userData.username || `${userData.firstName} ${userData.lastName}`,
+            firstName: userData.username,
+            lastName: userData.lastname,
+            username: userData.username || `${userData.usernameame} ${userData.lastname}`,
             email: userData.email,
             password: userData.password,
-            role: userData.role || 'client',
+            role: 'USER',
             createdAt: new Date().toISOString(),
             isActive: true,
             // Eliminar el campo emailVerified
@@ -766,13 +993,15 @@ class LocalDB {
     }
 
     getProductById(id) {
+        console.log(this.data.products);
+        
         return this.data.products.find(product => product.id === id);
     }
 
     createProduct(productData) {
         // Modificar validación para permitir 1-5 imágenes
-        if (!productData.images || productData.images.length < 1 || productData.images.length > 5) {
-          throw new Error('El producto debe tener al menos 1 imagen');
+        if (!productData.images || productData.images.length < 1 || productData.images.length > 6) {
+          throw new Error('El producto debe tener entre 1 y 6 imágenes');
         }
       
         const newProduct = {
@@ -850,8 +1079,8 @@ class LocalDB {
     getUserStats() {
         return {
             total: this.data.users.length,
-            admins: this.data.users.filter(user => user.role === 'admin').length,
-            clients: this.data.users.filter(user => user.role === 'client').length
+            admins: this.data.users.filter(user => user.role === 'ADMIN').length,
+            clients: this.data.users.filter(user => user.role === 'USER').length
         };
     }
 
@@ -865,7 +1094,7 @@ class LocalDB {
         }
         
         // Eliminar solo la verificación de correo electrónico
-        // if (user.role !== 'admin' && !user.emailVerified) {
+        // if (user.role !== 'ADMIN' && !user.emailVerified) {
         //     const confirmedInStorage = localStorage.getItem(`email_confirmed_${email}`) === 'true';
         //     if (confirmedInStorage) {
         //         user.emailVerified = true;
@@ -922,7 +1151,7 @@ class LocalDB {
 
     isAdmin() {
         const user = this.getCurrentUser();
-        return user?.role === 'admin';
+        return user?.role === 'ADMIN';
     }
 
     // Métodos para gestionar especificaciones
@@ -951,7 +1180,7 @@ class LocalDB {
 
         const newSpecification = {
             id: this.data.specifications.length + 1,
-            name: specificationData.name,
+            label: specificationData.label,
             description: specificationData.description || '',
             icon: specificationData.icon || 'fa-tag' // Nuevo campo
           };
@@ -967,7 +1196,7 @@ class LocalDB {
 
         // Validar nombre único
         const existingSpecification = this.data.specifications.find(
-            spec => spec.name.toLowerCase() === specificationData.name.toLowerCase() && spec.id !== id
+            spec => spec.label.toLowerCase() === specificationData.name.toLowerCase() && spec.id !== id
         );
         if (existingSpecification) {
             throw new Error('Ya existe una característica con este nombre');
@@ -976,7 +1205,8 @@ class LocalDB {
         this.data.specifications[index] = {
             ...this.data.specifications[index],
             ...specificationData,
-            icon: specificationData.icon // Asegurar que se actualice el icono
+            icon: specificationData.icon, // Asegurar que se actualice el icono
+            label: specificationData.name // Actualizar el nombre de la característica
           };
 
         this.saveToStorage();
