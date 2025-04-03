@@ -588,8 +588,23 @@ export const apiService = {
             const newUser = await localDB.createUser(userData);
             return newUser;
         }
-
-        return axios.post(`${API_BASE_URL}/users/register`, userData);
+        try {
+            const response = await axios.post(`${API_BASE_URL}/users/register`, userData, {
+            headers: { 'Content-Type': 'application/json' }
+            });
+            return response.data;
+        }
+        catch (error) {
+            console.error("Error en registro:", error.response?.data || error.message);
+            if (error.response?.data) {
+            const errorDetails = Object.values(error.response.data);
+            const errorMessages = errorDetails.join('\n');
+            if (errorMessages) {
+                throw new Error(errorMessages); // Mostrar todos los mensajes de error
+            }
+        }
+            throw new Error('Error al registrar usuario');
+        }
     },
     // Métodos para favoritos
     addFavorite: async (userId, instrumentId) => {
