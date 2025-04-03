@@ -17,6 +17,8 @@ export default defineConfig({
     host: '0.0.0.0',  // Expone el preview públicamente
     port:  4173,
     strictPort: true,
-    allowedHosts: ["alquitonesfront-production.up.railway.app", "http://localhost:5173","alquitonesfront-dev.up.railway.app"]
+    allowedHosts: process.env.VITE_ALLOWED_ORIGINS 
+      ? process.env.VITE_ALLOWED_ORIGINS.split(',') 
+      : ["alquitonesfront-production.up.railway.app", "http://localhost:5173","alquitonesfront-dev.up.railway.app"]
   }
 });
