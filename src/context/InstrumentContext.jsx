@@ -59,15 +59,28 @@ export const InstrumentProvider = ({ children }) => {
 
     const updateInstrument = async (instrumentId, instrumentData, imagesAdj) => {
         try {
+            const response = await apiService.updateInstrument(instrumentId, instrumentData, imagesAdj);
             
-            const response = await apiService.updateInstrument(instrumentId , instrumentData, imagesAdj);
-            dispatch({ type: "UPDATE_INSTRUMENT", payload: response.data });
+            // Modificación clave: Actualizar directamente el estado local
+            dispatch({ 
+                type: "UPDATE_INSTRUMENT", 
+                payload: {
+                    ...response.data,
+                    // Asegurar que categoryId esté disponible
+                    categoryId: response.data.category?.id || instrumentData.categoryId,
+                    // Mantener las imágenes existentes si no se actualizan
+                    images: response.data.images || instrumentData.images,
+                    mainImage: response.data.mainImage || instrumentData.mainImage
+                }
+            });
+            
             return response.data;
         } catch (error) {
             dispatch({ type: "SET_ERROR", payload: "Error al actualizar instrumento" });
             throw error;
         }
-    }
+    };
+    
     const deleteInstrument = async (instrumentId) => {
         try {
             const response = await apiService.deleteInstrument(instrumentId);
